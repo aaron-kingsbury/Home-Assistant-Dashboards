@@ -1,0 +1,25 @@
+# HouseVoice Panel Development card
+# Add this to a hidden or test view. Do NOT place on the production Floorplan.
+type: entities
+title: "HouseVoice Panel Development"
+entities:
+  - entity: input_boolean.housevoice_panel_mock_presence
+    name: "Mock Presence"
+  - entity: input_boolean.housevoice_panel_awake
+    name: "Panel Awake State"
+  - entity: input_boolean.housevoice_panel_manual_hold
+    name: "Manual Hold"
+  - entity: timer.housevoice_panel_standby
+    name: "Standby Countdown"
+  - type: button
+    name: "Wake Panel"
+    icon: mdi:monitor-eye
+    tap_action:
+      action: call-service
+      service: script.housevoice_panel_wake
+  - type: button
+    name: "Send to Standby"
+    icon: mdi:monitor-off
+    tap_action:
+      action: call-service
+      service: script.housevoice_panel_sleep

@@ -1,0 +1,487 @@
+- id: hallway_light_sync
+  alias: Hallway Light Sync
+  description: Sync hallway floorplan toggle with TP-Link smart switch
+  triggers:
+    - trigger: state
+      entity_id: input_boolean.hall_light_mock
+  actions:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.to_state.state == 'on' }}"
+          sequence:
+            - action: switch.turn_on
+              target:
+                entity_id: switch.tp_link_smart_switch
+      default:
+        - action: switch.turn_off
+          target:
+            entity_id: switch.tp_link_smart_switch
+- id: hallway_light_sync_from_switch
+  alias: Hallway Light Sync - Real Switch to Floorplan
+  description: Update floorplan icon when the physical TP-Link switch changes
+  triggers:
+    - trigger: state
+      entity_id: switch.tp_link_smart_switch
+  actions:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.to_state.state == 'on' }}"
+          sequence:
+            - action: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.hall_light_mock
+      default:
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.hall_light_mock
+- id: right_bedroom_lock_sync_to_real
+  alias: Right Bedroom Lock - Sync Floorplan to Real Lock
+  description: Sync right bedroom floorplan lock toggle with Graham's door lock
+  triggers:
+    - trigger: state
+      entity_id: input_boolean.right_bedroom_door_lock_mock
+  actions:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.to_state.state == 'on' }}"
+          sequence:
+            - action: lock.lock
+              target:
+                entity_id: lock.grahams_door
+      default:
+        - action: lock.unlock
+          target:
+            entity_id: lock.grahams_door
+- id: right_bedroom_lock_sync_from_real
+  alias: Right Bedroom Lock - Sync Real Lock to Floorplan
+  description: Update floorplan mock when Graham's door lock state changes
+  triggers:
+    - trigger: state
+      entity_id: lock.grahams_door
+  actions:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.to_state.state == 'locked' }}"
+          sequence:
+            - action: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.right_bedroom_door_lock_mock
+      default:
+        - action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.right_bedroom_door_lock_mock
+- id: thermostat_hvac_dashboard_to_real
+  alias: Thermostat HVAC Mode - Dashboard to Real
+  description: Sync HVAC mode from dashboard controls to the real Honeywell thermostat
+  triggers:
+    - trigger: state
+      entity_id: input_select.hvac_mode
+  actions:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.to_state.state == 'Cooling' and state_attr('climate.thermostat',
+                'hvac_mode') != 'cool' }}"
+          sequence:
+            - action: climate.set_hvac_mode
+              target:
+                entity_id: climate.thermostat
+              data:
+                hvac_mode: cool
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.to_state.state == 'Heating' and state_attr('climate.thermostat',
+                'hvac_mode') != 'heat' }}"
+          sequence:
+            - action: climate.set_hvac_mode
+              target:
+                entity_id: climate.thermostat
+              data:
+                hvac_mode: heat
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.to_state.state == 'Idle' and state_attr('climate.thermostat',
+                'hvac_mode') != 'off' }}"
+          sequence:
+            - action: climate.set_hvac_mode
+              target:
+                entity_id: climate.thermostat
+              data:
+                hvac_mode: false
+- id: thermostat_hvac_real_to_dashboard
+  alias: Thermostat HVAC Mode - Real to Dashboard
+  description: Sync real Honeywell thermostat HVAC mode changes back to the dashboard
+    controls
+  triggers:
+    - trigger: state
+      entity_id: climate.thermostat
+      attribute: hvac_mode
+  actions:
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.to_state.state == 'cool' and states('input_select.hvac_mode')
+                != 'Cooling' }}"
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.hvac_mode
+              data:
+                option: Cooling
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.to_state.state == 'heat' and states('input_select.hvac_mode')
+                != 'Heating' }}"
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.hvac_mode
+              data:
+                option: Heating
+        - conditions:
+            - condition: template
+              value_template: "{{ trigger.to_state.state == 'off' and states('input_select.hvac_mode')
+                != 'Idle' }}"
+          sequence:
+            - action: input_select.select_option
+              target:
+                entity_id: input_select.hvac_mode
+              data:
+                option: Idle
+- id: thermostat_temp_dashboard_to_real
+  alias: Thermostat Temperature - Dashboard to Real
+  description: Sync target temperature from dashboard controls to the real Honeywell
+    thermostat
+  triggers:
+    - trigger: state
+      entity_id: input_number.indoor_temperature
+  actions:
+    - condition: template
+      value_template: "{{ trigger.to_state.state | float(0) != state_attr('climate.thermostat',
+        'temperature') | float(0) }}"
+    - action: climate.set_temperature
+      target:
+        entity_id: climate.thermostat
+      data:
+        temperature: "{{ trigger.to_state.state | int }}"
+- id: thermostat_temp_real_to_dashboard
+  alias: Thermostat Temperature - Real to Dashboard
+  description: Sync real Honeywell thermostat target temperature changes back to dashboard
+    controls
+  triggers:
+    - trigger: state
+      entity_id: climate.thermostat
+      attribute: temperature
+  actions:
+    - condition: template
+      value_template: "{{ state_attr('climate.thermostat', 'temperature') | float(0)
+        != states('input_number.indoor_temperature') | float(0) }}"
+    - action: input_number.set_value
+      target:
+        entity_id: input_number.indoor_temperature
+      data:
+        value: "{{ state_attr('climate.thermostat', 'temperature') | int }}"
+- id: housevoice_panel_presence_manager
+  alias: HouseVoice Panel Presence Manager
+  description: Wake the panel on presence, start the standby countdown when presence
+    clears
+  mode: restart
+  triggers:
+    - trigger: state
+      entity_id: input_boolean.housevoice_panel_mock_presence
+      to: "on"
+      id: presence_on
+    - trigger: state
+      entity_id: input_boolean.housevoice_panel_mock_presence
+      to: "off"
+      id: presence_off
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: presence_on
+          sequence:
+            - action: script.housevoice_panel_cancel_standby_countdown
+            - action: script.housevoice_panel_wake
+        - conditions:
+            - condition: trigger
+              id: presence_off
+          sequence:
+            - action: script.housevoice_panel_start_standby_countdown
+- id: housevoice_panel_standby_timer_finished
+  alias: HouseVoice Panel Standby Timer Finished
+  description: Send the panel to Standby when the inactivity countdown completes
+  mode: restart
+  triggers:
+    - trigger: event
+      event_type: timer.finished
+      event_data:
+        entity_id: timer.housevoice_panel_standby
+  actions:
+    - action: script.housevoice_panel_sleep
+- id: housevoice_panel_manual_hold_manager
+  alias: HouseVoice Panel Manual Hold Manager
+  description: Cancel the standby countdown while Manual Hold is on, restart it when
+    released
+  mode: restart
+  triggers:
+    - trigger: state
+      entity_id: input_boolean.housevoice_panel_manual_hold
+      to: "on"
+      id: hold_on
+    - trigger: state
+      entity_id: input_boolean.housevoice_panel_manual_hold
+      to: "off"
+      id: hold_off
+  actions:
+    - choose:
+        - conditions:
+            - condition: trigger
+              id: hold_on
+          sequence:
+            - action: script.housevoice_panel_cancel_standby_countdown
+        - conditions:
+            - condition: trigger
+              id: hold_off
+          sequence:
+            - action: script.housevoice_panel_start_standby_countdown
+- id: housevoice_calendar_refresh
+  alias: HouseVoice Calendar Refresh
+  description: Fetch the current family calendar week for the HouseVoice calendar
+    view.
+  triggers:
+    - event: start
+      trigger: homeassistant
+    - minutes: /15
+      trigger: time_pattern
+  actions:
+    - action: calendar.get_events
+      data:
+        end_date_time: "{{ week_end }}"
+        start_date_time: "{{ week_start }}"
+      response_variable: family_calendar
+      target:
+        entity_id: calendar.kingsbury_mindy_gmail_com
+    - action: input_text.set_value
+      data:
+        value:
+          "{% set ns = namespace(lines=[]) %}{% for event in family_calendar['calendar.kingsbury_mindy_gmail_com']['events']
+          | default([]) %}{% set start = event.start %}{% if start[:10] == sun_date
+          %}{% set when = 'All day' if start | length == 10 else (as_datetime(start)
+          | as_local).strftime('%-I:%M %p') %}{% set title = event.summary | default('Untitled')
+          | replace('|', '/') | replace('
+
+          ', ' ') | truncate(34, True, '...') %}{% set ns.lines = ns.lines + [title
+          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:4] | join('
+
+          ') }}"
+      target:
+        entity_id: input_text.calendar_sun_events
+    - action: input_text.set_value
+      data:
+        value:
+          "{% set ns = namespace(lines=[]) %}{% for event in family_calendar['calendar.kingsbury_mindy_gmail_com']['events']
+          | default([]) %}{% set start = event.start %}{% if start[:10] == mon_date
+          %}{% set when = 'All day' if start | length == 10 else (as_datetime(start)
+          | as_local).strftime('%-I:%M %p') %}{% set title = event.summary | default('Untitled')
+          | replace('|', '/') | replace('
+
+          ', ' ') | truncate(34, True, '...') %}{% set ns.lines = ns.lines + [title
+          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:4] | join('
+
+          ') }}"
+      target:
+        entity_id: input_text.calendar_mon_events
+    - action: input_text.set_value
+      data:
+        value:
+          "{% set ns = namespace(lines=[]) %}{% for event in family_calendar['calendar.kingsbury_mindy_gmail_com']['events']
+          | default([]) %}{% set start = event.start %}{% if start[:10] == tue_date
+          %}{% set when = 'All day' if start | length == 10 else (as_datetime(start)
+          | as_local).strftime('%-I:%M %p') %}{% set title = event.summary | default('Untitled')
+          | replace('|', '/') | replace('
+
+          ', ' ') | truncate(34, True, '...') %}{% set ns.lines = ns.lines + [title
+          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:4] | join('
+
+          ') }}"
+      target:
+        entity_id: input_text.calendar_tue_events
+    - action: input_text.set_value
+      data:
+        value:
+          "{% set ns = namespace(lines=[]) %}{% for event in family_calendar['calendar.kingsbury_mindy_gmail_com']['events']
+          | default([]) %}{% set start = event.start %}{% if start[:10] == wed_date
+          %}{% set when = 'All day' if start | length == 10 else (as_datetime(start)
+          | as_local).strftime('%-I:%M %p') %}{% set title = event.summary | default('Untitled')
+          | replace('|', '/') | replace('
+
+          ', ' ') | truncate(34, True, '...') %}{% set ns.lines = ns.lines + [title
+          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:4] | join('
+
+          ') }}"
+      target:
+        entity_id: input_text.calendar_wed_events
+    - action: input_text.set_value
+      data:
+        value:
+          "{% set ns = namespace(lines=[]) %}{% for event in family_calendar['calendar.kingsbury_mindy_gmail_com']['events']
+          | default([]) %}{% set start = event.start %}{% if start[:10] == thu_date
+          %}{% set when = 'All day' if start | length == 10 else (as_datetime(start)
+          | as_local).strftime('%-I:%M %p') %}{% set title = event.summary | default('Untitled')
+          | replace('|', '/') | replace('
+
+          ', ' ') | truncate(34, True, '...') %}{% set ns.lines = ns.lines + [title
+          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:4] | join('
+
+          ') }}"
+      target:
+        entity_id: input_text.calendar_thu_events
+    - action: input_text.set_value
+      data:
+        value:
+          "{% set ns = namespace(lines=[]) %}{% for event in family_calendar['calendar.kingsbury_mindy_gmail_com']['events']
+          | default([]) %}{% set start = event.start %}{% if start[:10] == fri_date
+          %}{% set when = 'All day' if start | length == 10 else (as_datetime(start)
+          | as_local).strftime('%-I:%M %p') %}{% set title = event.summary | default('Untitled')
+          | replace('|', '/') | replace('
+
+          ', ' ') | truncate(34, True, '...') %}{% set ns.lines = ns.lines + [title
+          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:4] | join('
+
+          ') }}"
+      target:
+        entity_id: input_text.calendar_fri_events
+    - action: input_text.set_value
+      data:
+        value:
+          "{% set ns = namespace(lines=[]) %}{% for event in family_calendar['calendar.kingsbury_mindy_gmail_com']['events']
+          | default([]) %}{% set start = event.start %}{% if start[:10] == sat_date
+          %}{% set when = 'All day' if start | length == 10 else (as_datetime(start)
+          | as_local).strftime('%-I:%M %p') %}{% set title = event.summary | default('Untitled')
+          | replace('|', '/') | replace('
+
+          ', ' ') | truncate(34, True, '...') %}{% set ns.lines = ns.lines + [title
+          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:4] | join('
+
+          ') }}"
+      target:
+        entity_id: input_text.calendar_sat_events
+    - action: input_text.set_value
+      data:
+        value: >-
+          {% set ns = namespace(lines=[]) %}
+          {% for event in family_calendar['calendar.kingsbury_mindy_gmail_com']['events'] | default([]) %}
+            {% set start = event.start %}
+            {% if start[:10] == today_date %}
+              {% set when = 'All day' if start | length == 10 else (as_datetime(start) | as_local).strftime('%-I:%M %p') %}
+              {% set title = event.summary | default('Untitled') | replace('|', '/') | replace('\n', ' ') | truncate(34, True, '...') %}
+              {% set ns.lines = ns.lines + [title ~ '||' ~ when] %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.lines | join('\n') }}
+      target:
+        entity_id: input_text.calendar_today_events
+    - action: input_text.set_value
+      data:
+        value: >-
+          {% set ns = namespace(lines=[]) %}
+          {% for event in family_calendar['calendar.kingsbury_mindy_gmail_com']['events'] | default([]) %}
+            {% set start = event.start %}
+            {% if next_week_start <= start[:10] <= next_week_end %}
+              {% set when = 'All day' if start | length == 10 else (as_datetime(start) | as_local).strftime('%-I:%M %p') %}
+              {% set date_label = as_datetime(start[:10]).strftime('%a %-m/%-d') %}
+              {% set title = event.summary | default('Untitled') | replace('|', '/') | replace('\n', ' ') | truncate(34, True, '...') %}
+              {% set ns.lines = ns.lines + [date_label ~ '||' ~ title ~ '||' ~ when] %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.lines[:4] | join('\n') }}
+      target:
+        entity_id: input_text.calendar_next_week_events
+    - action: input_text.set_value
+      data:
+        value:
+          "{% set ns = namespace(lines=[], count=0) %}{% for event in family_calendar['calendar.kingsbury_mindy_gmail_com']['events']
+          | default([]) %}{% set start = event.start %}{% if start[:10] == today_date
+          %}{% set ns.count = ns.count + 1 %}{% if ns.count > 4 %}{% set when = 'All
+          day' if start | length == 10 else (as_datetime(start) | as_local).strftime('%-I:%M
+          %p') %}{% set title = event.summary | default('Untitled') | replace('|',
+          '/') | replace('
+
+          ', ' ') | truncate(34, True, '...') %}{% set ns.lines = ns.lines + [title
+          ~ '||' ~ when] %}{% endif %}{% endif %}{% endfor %}{{ ns.lines | join('
+
+          ') }}"
+      target:
+        entity_id: input_text.calendar_today_overflow
+  mode: restart
+  variables:
+    fri_date:
+      "{{ (today_at() - timedelta(days=(now().weekday() + 1) % 7) + timedelta(days=5) + timedelta(days=states('input_number.calendar_week_offset') | int(0) * 7)).strftime('%Y-%m-%d')
+      }}"
+    mon_date:
+      "{{ (today_at() - timedelta(days=(now().weekday() + 1) % 7) + timedelta(days=1) + timedelta(days=states('input_number.calendar_week_offset') | int(0) * 7)).strftime('%Y-%m-%d')
+      }}"
+    sat_date:
+      "{{ (today_at() - timedelta(days=(now().weekday() + 1) % 7) + timedelta(days=6) + timedelta(days=states('input_number.calendar_week_offset') | int(0) * 7)).strftime('%Y-%m-%d')
+      }}"
+    sun_date:
+      "{{ (today_at() - timedelta(days=(now().weekday() + 1) % 7) + timedelta(days=states('input_number.calendar_week_offset') | int(0) * 7)).strftime('%Y-%m-%d')
+      }}"
+    thu_date:
+      "{{ (today_at() - timedelta(days=(now().weekday() + 1) % 7) + timedelta(days=4) + timedelta(days=states('input_number.calendar_week_offset') | int(0) * 7)).strftime('%Y-%m-%d')
+      }}"
+    today_date: "{{ now().strftime('%Y-%m-%d') }}"
+    tue_date:
+      "{{ (today_at() - timedelta(days=(now().weekday() + 1) % 7) + timedelta(days=2) + timedelta(days=states('input_number.calendar_week_offset') | int(0) * 7)).strftime('%Y-%m-%d')
+      }}"
+    wed_date:
+      "{{ (today_at() - timedelta(days=(now().weekday() + 1) % 7) + timedelta(days=3) + timedelta(days=states('input_number.calendar_week_offset') | int(0) * 7)).strftime('%Y-%m-%d')
+      }}"
+    next_week_end: "{{ (today_at() - timedelta(days=(now().weekday() + 1) % 7) + timedelta(days=13) + timedelta(days=states('input_number.calendar_week_offset') | int(0) * 7)).strftime('%Y-%m-%d') }}"
+    next_week_start: "{{ (today_at() - timedelta(days=(now().weekday() + 1) % 7) + timedelta(days=7) + timedelta(days=states('input_number.calendar_week_offset') | int(0) * 7)).strftime('%Y-%m-%d') }}"
+    week_end:
+      "{{ today_at() - timedelta(days=(now().weekday() + 1) % 7) + timedelta(days=14) + timedelta(days=states('input_number.calendar_week_offset') | int(0) * 7)
+      }}"
+    week_start: "{{ today_at() - timedelta(days=(now().weekday() + 1) % 7) + timedelta(days=states('input_number.calendar_week_offset') | int(0) * 7) }}"
+- id: cora_music_volume_device_to_ma
+  alias: Cora Music Volume - Device to Music Assistant
+  description: Sync Cora's physical device volume to Music Assistant
+  triggers:
+    - trigger: state
+      entity_id: number.vaca_c958413a0_music_volume
+  conditions:
+    - condition: template
+      value_template: >-
+        {{ trigger.to_state.state not in ['unknown', 'unavailable'] and
+        (trigger.to_state.state | int(0)) !=
+        ((state_attr('media_player.cora_s_room_display_media_player', 'volume_level') | float(0) * 15) | round(0) | int) }}
+  actions:
+    - action: media_player.volume_set
+      target:
+        entity_id: media_player.cora_s_room_display_media_player
+      data:
+        volume_level: "{{ (trigger.to_state.state | float(0) / 15) | round(2) }}"
+- id: cora_music_volume_ma_to_device
+  alias: Cora Music Volume - Music Assistant to Device
+  description: Sync Music Assistant volume changes to Cora's physical device
+  triggers:
+    - trigger: state
+      entity_id: media_player.cora_s_room_display_media_player
+      attribute: volume_level
+  conditions:
+    - condition: template
+      value_template: >-
+        {{ trigger.to_state.attributes.volume_level is not none and
+        ((trigger.to_state.attributes.volume_level | float(0) * 15) | round(0) | int) !=
+        (states('number.vaca_c958413a0_music_volume') | int(0)) }}
+  actions:
+    - action: number.set_value
+      target:
+        entity_id: number.vaca_c958413a0_music_volume
+      data:
+        value: "{{ (trigger.to_state.attributes.volume_level | float(0) * 15) | round(0) }}"

@@ -1,0 +1,19 @@
+# Secrets and private Home Assistant state
+secrets.yaml
+.storage/
+.cloud/
+deps/
+tts/
+backups/
+*.db
+*.db-*
+home-assistant.log*
+*.bak
+
+# Runtime and local tooling data
+.git/
+opencode/
+
+# Generated caches
+__pycache__/
+*.pyc

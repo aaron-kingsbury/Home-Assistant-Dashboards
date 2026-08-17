@@ -1,0 +1,251 @@
+# ─────────────────────────────────────────────────────────────
+# HouseVoice Brand Lockup — Stacked Vertical Component
+# ─────────────────────────────────────────────────────────────
+#
+# Reusable custom:button-card template for the HouseVoice
+# brand mark. Mountain SVG on top, HOUSEVOICE + COMMAND
+# text centered below. Fully transparent — no card surface.
+#
+# Layout:
+#        [MOUNTAIN SVG]
+#
+#      H O U S E V O I C E
+#      C O M M A N D
+#
+# SVG source: /config/www/housevoice/logo.svg
+#             served as /local/housevoice/logo.svg
+#
+# Usage:
+#   type: custom:button-card
+#   template: hv_brand_logo
+#
+# Light-mode override:
+#   type: custom:button-card
+#   template: hv_brand_logo
+#   variables:
+#     title_color: "#172631"
+#     command_color: "#327CA6"
+#
+# Small dashboard version:
+#   type: custom:button-card
+#   template: hv_brand_logo
+#   variables:
+#     brand_width: 145px
+#     brand_height: 100px
+#     logo_width: 105px
+#     logo_height: 52px
+#     title_size: 12px
+#     title_spacing: 4px
+#     command_size: 9px
+#     command_spacing: 4.5px
+# ─────────────────────────────────────────────────────────────
+
+button_card_templates:
+  hv_brand_logo:
+    show_icon: false
+    show_name: false
+    show_state: false
+    show_label: false
+
+    tap_action:
+      action: none
+
+    hold_action:
+      action: none
+
+    variables:
+      brand_width: 220px
+      brand_height: 122px
+
+      logo_width: 172px
+      logo_height: 68px
+      logo_scale: 1.06
+
+      title_color: "#F4F7FA"
+      title_size: 17px
+      title_spacing: 6.2px
+
+      command_color: "#53B9FF"
+      command_size: 12px
+      command_spacing: 7.2px
+
+    custom_fields:
+      brand: |
+        [[[
+          return `
+            <div
+              class="hv-brand-stack"
+              style="
+                width:${variables.brand_width};
+                height:${variables.brand_height};
+              "
+            >
+              <div
+                class="hv-brand-logo-frame"
+                style="
+                  width:${variables.logo_width};
+                  height:${variables.logo_height};
+                "
+              >
+                <img
+                  class="hv-brand-logo"
+                  src="/local/housevoice/logo.svg?v=12"
+                  alt="HouseVoice"
+                  style="
+                    transform:scale(${variables.logo_scale});
+                  "
+                />
+              </div>
+
+              <div
+                class="hv-brand-title"
+                style="
+                  color:${variables.title_color};
+                  font-size:${variables.title_size};
+                  letter-spacing:${variables.title_spacing};
+                "
+              >
+                HOUSEVOICE
+              </div>
+
+              <div
+                class="hv-brand-command"
+                style="
+                  color:${variables.command_color};
+                  font-size:${variables.command_size};
+                  letter-spacing:${variables.command_spacing};
+                "
+              >
+                COMMAND
+              </div>
+            </div>
+          `;
+        ]]]
+
+    styles:
+      card:
+        - width: |
+            [[[
+              return variables.brand_width;
+            ]]]
+        - height: |
+            [[[
+              return variables.brand_height;
+            ]]]
+        - min-width: 0
+        - min-height: 0
+        - padding: 0
+        - margin: 0
+        - background: "rgba(0, 0, 0, 0) !important"
+        - background-color: "rgba(0, 0, 0, 0) !important"
+        - background-image: "none !important"
+        - border: "0 !important"
+        - border-radius: "0 !important"
+        - box-shadow: "none !important"
+        - backdrop-filter: "none !important"
+        - "-webkit-backdrop-filter": "none !important"
+        - overflow: visible
+        - "--ha-card-background": "rgba(0, 0, 0, 0)"
+        - "--card-background-color": "rgba(0, 0, 0, 0)"
+        - "--ha-card-border-color": transparent
+        - "--ha-card-border-width": 0
+        - "--ha-card-box-shadow": none
+
+      grid:
+        - grid-template-areas: '"brand"'
+        - grid-template-columns: 1fr
+        - grid-template-rows: 1fr
+        - align-items: center
+        - justify-items: center
+
+      custom_fields:
+        brand:
+          - grid-area: brand
+          - width: 100%
+          - height: 100%
+          - align-self: center
+          - justify-self: center
+
+    card_mod:
+      style: |
+        :host {
+          background: transparent !important;
+          background-color: transparent !important;
+          --ha-card-background: transparent !important;
+          --card-background-color: transparent !important;
+          --ha-card-border-color: transparent !important;
+          --ha-card-border-width: 0 !important;
+          --ha-card-box-shadow: none !important;
+        }
+
+        ha-card,
+        ha-card:hover,
+        ha-card:focus,
+        ha-card:active {
+          background: transparent !important;
+          background-color: transparent !important;
+          background-image: none !important;
+          border: 0 !important;
+          border-radius: 0 !important;
+          box-shadow: none !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          overflow: visible !important;
+        }
+
+        #container,
+        #card {
+          background: transparent !important;
+          background-color: transparent !important;
+          box-shadow: none !important;
+        }
+
+        .hv-brand-stack {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+
+          font-family:
+            Inter,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
+
+          line-height: 1;
+          white-space: nowrap;
+        }
+
+        .hv-brand-logo-frame {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: visible;
+          margin: 0 0 -5px 0;
+        }
+
+        .hv-brand-logo {
+          display: block;
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+          object-position: center;
+          transform-origin: center center;
+        }
+
+        .hv-brand-title {
+          margin: 0 0 0 6px;
+          font-weight: 400;
+          line-height: 1;
+          white-space: nowrap;
+        }
+
+        .hv-brand-command {
+          margin: 7px 0 0 8px;
+          font-weight: 500;
+          line-height: 1;
+          white-space: nowrap;
+        }

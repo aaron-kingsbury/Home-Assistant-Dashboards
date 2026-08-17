@@ -1,0 +1,399 @@
+alarm_pin_0:
+  alias: "Alarm: PIN 0"
+  sequence:
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.alarm_pin_entry
+      data:
+        value: "{{ states('input_text.alarm_pin_entry') | default('', true) }}0"
+alarm_pin_1:
+  alias: "Alarm: PIN 1"
+  sequence:
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.alarm_pin_entry
+      data:
+        value: "{{ states('input_text.alarm_pin_entry') | default('', true) }}1"
+alarm_pin_2:
+  alias: "Alarm: PIN 2"
+  sequence:
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.alarm_pin_entry
+      data:
+        value: "{{ states('input_text.alarm_pin_entry') | default('', true) }}2"
+alarm_pin_3:
+  alias: "Alarm: PIN 3"
+  sequence:
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.alarm_pin_entry
+      data:
+        value: "{{ states('input_text.alarm_pin_entry') | default('', true) }}3"
+alarm_pin_4:
+  alias: "Alarm: PIN 4"
+  sequence:
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.alarm_pin_entry
+      data:
+        value: "{{ states('input_text.alarm_pin_entry') | default('', true) }}4"
+alarm_pin_5:
+  alias: "Alarm: PIN 5"
+  sequence:
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.alarm_pin_entry
+      data:
+        value: "{{ states('input_text.alarm_pin_entry') | default('', true) }}5"
+alarm_pin_6:
+  alias: "Alarm: PIN 6"
+  sequence:
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.alarm_pin_entry
+      data:
+        value: "{{ states('input_text.alarm_pin_entry') | default('', true) }}6"
+alarm_pin_7:
+  alias: "Alarm: PIN 7"
+  sequence:
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.alarm_pin_entry
+      data:
+        value: "{{ states('input_text.alarm_pin_entry') | default('', true) }}7"
+alarm_pin_8:
+  alias: "Alarm: PIN 8"
+  sequence:
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.alarm_pin_entry
+      data:
+        value: "{{ states('input_text.alarm_pin_entry') | default('', true) }}8"
+alarm_pin_9:
+  alias: "Alarm: PIN 9"
+  sequence:
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.alarm_pin_entry
+      data:
+        value: "{{ states('input_text.alarm_pin_entry') | default('', true) }}9"
+alarm_pin_backspace:
+  alias: "Alarm: PIN Backspace"
+  sequence:
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.alarm_pin_entry
+      data:
+        value: "{{ (states('input_text.alarm_pin_entry') | default('', true))[:-1] }}"
+alarm_disarm_with_pin:
+  alias: "Alarm: Disarm with PIN"
+  sequence:
+    - action: alarm_control_panel.alarm_disarm
+      target:
+        entity_id: alarm_control_panel.alarmo
+      data:
+        code: "{{ states('input_text.alarm_pin_entry') | default('', true) }}"
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.alarm_pin_entry
+      data:
+        value: ""
+alarm_arm_home_with_pin:
+  alias: "Alarm: Arm Home with PIN"
+  sequence:
+    - action: alarm_control_panel.alarm_arm_home
+      target:
+        entity_id: alarm_control_panel.alarmo
+      data:
+        code: "{{ states('input_text.alarm_pin_entry') | default('', true) }}"
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.alarm_pin_entry
+      data:
+        value: ""
+alarm_arm_away_with_pin:
+  alias: "Alarm: Arm Away with PIN"
+  sequence:
+    - action: alarm_control_panel.alarm_arm_away
+      target:
+        entity_id: alarm_control_panel.alarmo
+      data:
+        code: "{{ states('input_text.alarm_pin_entry') | default('', true) }}"
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.alarm_pin_entry
+      data:
+        value: ""
+housevoice_lights_day_mode:
+  alias: "HouseVoice Lights: Day Mode"
+  description: Set house lights to bright day mode
+  sequence:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.tp_link_smart_switch
+    - action: input_boolean.turn_on
+      target:
+        entity_id:
+          - input_boolean.primary_bedroom_light
+          - input_boolean.small_bedroom_light
+          - input_boolean.right_bedroom_light
+          - input_boolean.hall_light_mock
+          - input_boolean.kitchen_light_mock
+          - input_boolean.living_room_light_mock
+housevoice_lights_evening_mode:
+  alias: "HouseVoice Lights: Evening Mode"
+  description: Set warm evening mode
+  sequence:
+    - action: switch.turn_on
+      target:
+        entity_id: switch.tp_link_smart_switch
+    - action: input_boolean.turn_on
+      target:
+        entity_id:
+          - input_boolean.primary_bedroom_light
+          - input_boolean.small_bedroom_light
+          - input_boolean.right_bedroom_light
+          - input_boolean.hall_light_mock
+          - input_boolean.kitchen_light_mock
+          - input_boolean.living_room_light_mock
+housevoice_lights_night_mode:
+  alias: "HouseVoice Lights: Night Mode"
+  description: Set low comfort night lighting
+  sequence:
+    - action: switch.turn_off
+      target:
+        entity_id: switch.tp_link_smart_switch
+    - action: input_boolean.turn_off
+      target:
+        entity_id:
+          - input_boolean.primary_bedroom_light
+          - input_boolean.small_bedroom_light
+          - input_boolean.right_bedroom_light
+          - input_boolean.hall_light_mock
+          - input_boolean.kitchen_light_mock
+          - input_boolean.living_room_light_mock
+housevoice_lights_all_off:
+  alias: "HouseVoice Lights: All Off"
+  description: Turn off all house and exterior lights
+  sequence:
+    - action: switch.turn_off
+      target:
+        entity_id: switch.tp_link_smart_switch
+    - action: input_boolean.turn_off
+      target:
+        entity_id:
+          - input_boolean.primary_bedroom_light
+          - input_boolean.small_bedroom_light
+          - input_boolean.right_bedroom_light
+          - input_boolean.hall_light_mock
+          - input_boolean.kitchen_light_mock
+          - input_boolean.living_room_light_mock
+    - action: light.turn_off
+      target:
+        entity_id:
+          - light.driveway_floodlight
+          - light.outside_back_yard_floodlight
+housevoice_panel_wake:
+  alias: HouseVoice Panel Wake
+  mode: restart
+  sequence:
+    - action: timer.cancel
+      target:
+        entity_id: timer.housevoice_panel_standby
+    - action: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.housevoice_panel_awake
+    - action: browser_mod.navigate
+      data:
+        path: /my-floorplan
+        browser_id:
+          - housevoice-hall-panel
+housevoice_panel_sleep:
+  alias: HouseVoice Panel Sleep
+  mode: restart
+  sequence:
+    - condition: state
+      entity_id: input_boolean.housevoice_panel_manual_hold
+      state: "off"
+    - condition: state
+      entity_id: input_boolean.housevoice_panel_mock_presence
+      state: "off"
+    - action: browser_mod.navigate
+      data:
+        path: /housevoice-standby/Standby
+        browser_id:
+          - housevoice-hall-panel
+    - action: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.housevoice_panel_awake
+housevoice_panel_start_standby_countdown:
+  alias: HouseVoice Panel Start Standby Countdown
+  mode: restart
+  sequence:
+    - condition: state
+      entity_id: input_boolean.housevoice_panel_mock_presence
+      state: "off"
+    - condition: state
+      entity_id: input_boolean.housevoice_panel_manual_hold
+      state: "off"
+    - action: timer.start
+      target:
+        entity_id: timer.housevoice_panel_standby
+housevoice_panel_cancel_standby_countdown:
+  alias: HouseVoice Panel Cancel Standby Countdown
+  mode: restart
+  sequence:
+    - action: timer.cancel
+      target:
+        entity_id: timer.housevoice_panel_standby
+housevoice_panel_screen_on:
+  alias: HouseVoice Panel Screen On
+  description: "Future use: - Fully Kiosk screen_on - panel backlight switch - Android display command - MQTT display brightness Placeholder only. Do not call until the real panel hardware is known.
+
+    "
+  mode: restart
+  sequence: []
+housevoice_panel_screen_dim:
+  alias: HouseVoice Panel Screen Dim
+  description: "Future use: - Fully Kiosk screen_dim / brightness - panel backlight dim - Android display command - MQTT display brightness Placeholder only. Do not call until the real panel hardware is known.
+
+    "
+  mode: restart
+  sequence: []
+housevoice_panel_screen_off:
+  alias: HouseVoice Panel Screen Off
+  description: "Future use: - Fully Kiosk screen_off - panel backlight power control - Android display command - MQTT display brightness Placeholder only. Do not call until the real panel hardware is known.
+
+    "
+  mode: restart
+  sequence: []
+calendar_week_today:
+  alias: "Calendar: This Week"
+  mode: restart
+  sequence:
+    - action: input_number.set_value
+      target:
+        entity_id: input_number.calendar_week_offset
+      data:
+        value: 0
+    - action: automation.trigger
+      target:
+        entity_id: automation.housevoice_calendar_refresh
+calendar_week_previous:
+  alias: "Calendar: Previous Week"
+  mode: restart
+  sequence:
+    - action: input_number.set_value
+      target:
+        entity_id: input_number.calendar_week_offset
+      data:
+        value: "{{ [states('input_number.calendar_week_offset') | int(0) - 1, -4] | max }}"
+    - action: automation.trigger
+      target:
+        entity_id: automation.housevoice_calendar_refresh
+calendar_week_next:
+  alias: "Calendar: Next Week"
+  mode: restart
+  sequence:
+    - action: input_number.set_value
+      target:
+        entity_id: input_number.calendar_week_offset
+      data:
+        value: "{{ [states('input_number.calendar_week_offset') | int(0) + 1, 4] | min }}"
+    - action: automation.trigger
+      target:
+        entity_id: automation.housevoice_calendar_refresh
+housevoice_music_dance:
+  alias: "HouseVoice Music: Dance Party"
+  description: Room-aware placeholder for the Dance Party quick play preset
+  variables:
+    room_media_player: media_player.housevoice_kids_room
+  sequence: []
+housevoice_music_chill:
+  alias: "HouseVoice Music: Chill"
+  description: Room-aware placeholder for the Chill quick play preset
+  variables:
+    room_media_player: media_player.housevoice_kids_room
+  sequence: []
+housevoice_music_reading:
+  alias: "HouseVoice Music: Reading"
+  description: Room-aware placeholder for the Reading quick play preset
+  variables:
+    room_media_player: media_player.housevoice_kids_room
+  sequence: []
+housevoice_music_sleep_sounds:
+  alias: "HouseVoice Music: Sleep Sounds"
+  description: Room-aware placeholder for the Sleep Sounds quick play preset
+  variables:
+    room_media_player: media_player.housevoice_kids_room
+  sequence: []
+housevoice_timer_start_selected:
+  alias: "HouseVoice Timer: Start Selected Duration"
+  description: Start the Kids Timer using the selected picker duration
+  sequence:
+    - action: timer.start
+      target:
+        entity_id: timer.housevoice_kids_timer
+      data:
+        duration: 00:{{ "%02d" | format(states("input_number.housevoice_timer_minutes") | int(0)) }}:{{ "%02d" | format(states("input_number.housevoice_timer_seconds") | int(0)) }}
+housevoice_kids_morning:
+  alias: "HouseVoice Kids: Morning"
+  description: Turn on the small bedroom light at full brightness and stop room music
+  sequence:
+    - action: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.small_bedroom_light
+    - action: input_number.set_value
+      data:
+        value: 100
+      target:
+        entity_id: input_number.housevoice_small_bedroom_brightness
+    - action: media_player.turn_off
+      target:
+        entity_id: media_player.housevoice_kids_room
+housevoice_kids_bedtime:
+  alias: "HouseVoice Kids: Bedtime"
+  description: Set the small bedroom light to 10%, start sleep sounds, and show a dim clock on Cora's display
+  sequence:
+    - action: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.small_bedroom_light
+    - action: input_number.set_value
+      data:
+        value: 10
+      target:
+        entity_id: input_number.housevoice_small_bedroom_brightness
+    - action: switch.turn_on
+      target:
+        entity_id:
+          - switch.vaca_c958413a0_screen
+          - switch.vaca_c958413a0_screen_always_on
+    - action: switch.turn_off
+      target:
+        entity_id: switch.vaca_c958413a0_screen_saver
+    - action: number.set_value
+      target:
+        entity_id: number.vaca_c958413a0_screen_brightness
+      data:
+        value: 10
+    - action: view_assist.navigate
+      data:
+        device: sensor.vaca_c958413a0_current_path
+        path: /kids-rooms/clock
+        revert_timeout: 0
+    - action: script.turn_on
+      target:
+        entity_id: script.housevoice_music_sleep_sounds
+housevoice_walkie_graham:
+  alias: "HouseVoice Walkie: Graham"
+  description: Placeholder for future Drop-In routing to Graham's room
+  sequence: []
+housevoice_walkie_parents:
+  alias: "HouseVoice Walkie: Mom and Dad"
+  description: Placeholder for future Drop-In routing to the master bedroom
+  sequence: []
+housevoice_walkie_kitchen:
+  alias: "HouseVoice Walkie: Kitchen"
+  description: Placeholder for future Drop-In routing to the kitchen
+  sequence: []

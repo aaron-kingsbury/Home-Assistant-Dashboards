@@ -1,0 +1,358 @@
+{
+  "card":
+    {
+      "cards":
+        [
+          {
+            "custom_fields":
+              {
+                "date": "[[[\n  const now = new Date();\n  return now.toLocaleDateString([], {\n    weekday: 'short',\n    month: 'short',\n    day: 'numeric'\n  });\n]]]",
+                "time": "[[[\n  const now = new Date();\n  return now.toLocaleTimeString([], {\n    hour: 'numeric',\n    minute: '2-digit'\n  });\n]]]",
+              },
+            "show_icon": false,
+            "show_name": false,
+            "show_state": false,
+            "styles":
+              {
+                "card":
+                  [
+                    { "width": "100%" },
+                    { "height": "82px" },
+                    { "margin": "0" },
+                    { "padding": "10px 8px" },
+                    { "box-sizing": "border-box" },
+                    { "background": "transparent" },
+                    { "border": "none" },
+                    { "border-radius": "0" },
+                    { "box-shadow": "none" },
+                    {},
+                    { "border-bottom": "1px solid rgba(125,165,195,0.13)" },
+                  ],
+                "custom_fields":
+                  {
+                    "date":
+                      [
+                        { "margin-top": "4px" },
+                        { "font-size": "10px" },
+                        { "color": "rgba(220,232,242,0.58)" },
+                        { "white-space": "nowrap" },
+                      ],
+                    "time":
+                      [
+                        { "font-size": "24px" },
+                        { "font-weight": "400" },
+                        { "letter-spacing": "-0.4px" },
+                        { "color": "rgba(255,255,255,0.96)" },
+                        { "white-space": "nowrap" },
+                        { "line-height": "1.1" },
+                      ],
+                  },
+                "grid":
+                  [
+                    { "grid-template-areas": '"time" "date"' },
+                    { "grid-template-columns": "1fr" },
+                    { "grid-template-rows": "min-content min-content" },
+                    { "align-content": "center" },
+                    { "justify-items": "center" },
+                  ],
+              },
+            "triggers_update": "all",
+            "type": "custom:button-card",
+          },
+          {
+            "custom_fields":
+              {
+                "icon": "[[[\n  const icons = {\n    sunny: '☀️',\n    clear_night: '🌙',\n    partlycloudy: '⛅',\n    cloudy: '☁️',\n    rainy: '🌧️',\n    pouring: '🌧️',\n    lightning: '⛈️',\n    lightning_rainy: '⛈️',\n    snowy: '❄️',\n    fog: '🌫️',\n    windy: '💨'\n  };\n  return icons[entity?.state] || '🌤️';\n]]]",
+                "status": "[[[\n  const labels = {\n    sunny: 'Clear',\n    clear_night: 'Clear Night',\n    partlycloudy: 'Partly Cloudy',\n    cloudy: 'Cloudy',\n    rainy: 'Rain',\n    pouring: 'Heavy Rain',\n    lightning: 'Storms',\n    lightning_rainy: 'Storms',\n    snowy: 'Snow',\n    fog: 'Fog',\n    windy: 'Windy'\n  };\n  return labels[entity?.state] || entity?.state || 'Unavailable';\n]]]",
+                "value": "[[[\n  const temp = entity?.attributes?.temperature;\n  return temp !== undefined ? `${Math.round(temp)}°` : '--°';\n]]]",
+              },
+            "entity": "weather.forecast_housevoice_weather",
+            "show_icon": false,
+            "show_name": false,
+            "show_state": false,
+            "styles":
+              {
+                "card":
+                  [
+                    { "width": "100%" },
+                    { "height": "82px" },
+                    { "margin": "0" },
+                    { "padding": "10px 8px" },
+                    { "box-sizing": "border-box" },
+                    { "background": "transparent" },
+                    { "border": "none" },
+                    { "border-radius": "0" },
+                    { "box-shadow": "none" },
+                    {},
+                    { "border-bottom": "1px solid rgba(125,165,195,0.13)" },
+                  ],
+                "custom_fields":
+                  {
+                    "icon": [{ "justify-self": "center" }, { "align-self": "center" }, { "font-size": "22px" }],
+                    "status":
+                      [
+                        { "justify-self": "start" },
+                        { "margin-top": "3px" },
+                        { "font-size": "10px" },
+                        { "color": "rgba(220,232,242,0.58)" },
+                        { "white-space": "nowrap" },
+                        { "overflow": "hidden" },
+                        { "text-overflow": "ellipsis" },
+                      ],
+                    "value":
+                      [
+                        { "justify-self": "start" },
+                        { "font-size": "21px" },
+                        { "color": "rgba(255,255,255,0.94)" },
+                        { "white-space": "nowrap" },
+                      ],
+                  },
+                "grid":
+                  [
+                    { "grid-template-areas": '"icon value" "icon status"' },
+                    { "grid-template-columns": "34px minmax(0, 1fr)" },
+                    { "grid-template-rows": "min-content min-content" },
+                    { "column-gap": "7px" },
+                    { "align-content": "center" },
+                  ],
+              },
+            "tap_action": { "action": "more-info" },
+            "type": "custom:button-card",
+          },
+          {
+            "icon": "mdi:lightbulb-outline",
+            "label": "[[[\n  const lights = [\n    'input_boolean.primary_bedroom_light',\n    'input_boolean.small_bedroom_light',\n    'input_boolean.right_bedroom_light',\n    'input_boolean.hall_light_mock',\n    'input_boolean.kitchen_light_mock',\n    'input_boolean.living_room_light_mock'\n  ];\n  const on = lights.filter(id => states[id]?.state === 'on').length;\n  return on > 0 ? `${on} On` : 'All Off';\n]]]",
+            "name": "Lights",
+            "show_icon": true,
+            "show_label": true,
+            "show_name": true,
+            "styles":
+              {
+                "card":
+                  [
+                    { "width": "100%" },
+                    { "height": "82px" },
+                    { "margin": "0" },
+                    { "padding": "10px 8px" },
+                    { "box-sizing": "border-box" },
+                    { "background": "transparent" },
+                    { "border": "none" },
+                    { "border-radius": "0" },
+                    { "box-shadow": "none" },
+                    {},
+                    { "border-bottom": "1px solid rgba(125,165,195,0.13)" },
+                  ],
+                "grid":
+                  [
+                    { "grid-template-areas": '"i n" "i l"' },
+                    { "grid-template-columns": "34px minmax(0, 1fr)" },
+                    { "grid-template-rows": "min-content min-content" },
+                    { "column-gap": "7px" },
+                    { "align-content": "center" },
+                  ],
+                "icon":
+                  [
+                    { "width": "24px" },
+                    {
+                      "color": "[[[\n  const ids = [\n    'input_boolean.primary_bedroom_light',\n    'input_boolean.small_bedroom_light',\n    'input_boolean.right_bedroom_light',\n    'input_boolean.hall_light_mock',\n    'input_boolean.kitchen_light_mock',\n    'input_boolean.living_room_light_mock'\n  ];\n  return ids.some(id => states[id]?.state === 'on') ? '#FFD089' : 'rgba(255,255,255,0.55)';\n]]]",
+                    },
+                  ],
+                "label":
+                  [
+                    { "justify-self": "start" },
+                    { "margin-top": "3px" },
+                    { "font-size": "10px" },
+                    { "color": "#58B9FF" },
+                  ],
+                "name":
+                  [
+                    { "justify-self": "start" },
+                    { "font-size": "12px" },
+                    { "font-weight": "500" },
+                    { "color": "rgba(255,255,255,0.92)" },
+                  ],
+              },
+            "tap_action": { "action": "none" },
+            "triggers_update": "all",
+            "type": "custom:button-card",
+          },
+          {
+            "icon": "mdi:lock-outline",
+            "label": "[[[\n  const frontLocked = states['input_boolean.front_door_locked_mock']?.state === 'on';\n  const backLocked = states['input_boolean.back_door_locked_mock']?.state === 'on';\n  const open = Number(!frontLocked) + Number(!backLocked);\n  if (open === 0) return 'All Secure';\n  return `${open} Open`;\n]]]",
+            "name": "Locks",
+            "show_icon": true,
+            "show_label": true,
+            "show_name": true,
+            "styles":
+              {
+                "card":
+                  [
+                    { "width": "100%" },
+                    { "height": "82px" },
+                    { "margin": "0" },
+                    { "padding": "10px 8px" },
+                    { "box-sizing": "border-box" },
+                    { "background": "transparent" },
+                    { "border": "none" },
+                    { "border-radius": "0" },
+                    { "box-shadow": "none" },
+                    {},
+                    { "border-bottom": "1px solid rgba(125,165,195,0.13)" },
+                  ],
+                "grid":
+                  [
+                    { "grid-template-areas": '"i n" "i l"' },
+                    { "grid-template-columns": "34px minmax(0, 1fr)" },
+                    { "grid-template-rows": "min-content min-content" },
+                    { "column-gap": "7px" },
+                    { "align-content": "center" },
+                  ],
+                "icon":
+                  [
+                    { "width": "24px" },
+                    {
+                      "color": "[[[\n  const frontLocked = states['input_boolean.front_door_locked_mock']?.state === 'on';\n  const backLocked = states['input_boolean.back_door_locked_mock']?.state === 'on';\n  return frontLocked && backLocked ? '#75E58B' : '#FF6B6B';\n]]]",
+                    },
+                  ],
+                "label":
+                  [
+                    { "justify-self": "start" },
+                    { "margin-top": "3px" },
+                    { "font-size": "10px" },
+                    {
+                      "color": "[[[\n  const frontLocked = states['input_boolean.front_door_locked_mock']?.state === 'on';\n  const backLocked = states['input_boolean.back_door_locked_mock']?.state === 'on';\n  return frontLocked && backLocked ? '#75E58B' : '#FF6B6B';\n]]]",
+                    },
+                  ],
+                "name":
+                  [
+                    { "justify-self": "start" },
+                    { "font-size": "12px" },
+                    { "font-weight": "500" },
+                    { "color": "rgba(255,255,255,0.92)" },
+                  ],
+              },
+            "tap_action": { "action": "none" },
+            "triggers_update": "all",
+            "type": "custom:button-card",
+          },
+          {
+            "entity": "alarm_control_panel.alarmo",
+            "icon": "[[[\n  const icons = {\n    disarmed: 'mdi:shield-off-outline',\n    armed_home: 'mdi:shield-home',\n    armed_away: 'mdi:shield-lock',\n    armed_night: 'mdi:shield-moon',\n    triggered: 'mdi:shield-alert'\n  };\n  return icons[entity?.state] || 'mdi:shield-home-outline';\n]]]",
+            "label": "[[[\n  const labels = {\n    disarmed: 'Disarmed',\n    armed_home: 'Armed Home',\n    armed_away: 'Armed Away',\n    armed_night: 'Armed Night',\n    pending: 'Pending',\n    triggered: 'Triggered'\n  };\n  return labels[entity?.state] || 'Unavailable';\n]]]",
+            "name": "Security",
+            "show_icon": true,
+            "show_label": true,
+            "show_name": true,
+            "styles":
+              {
+                "card":
+                  [
+                    { "width": "100%" },
+                    { "height": "82px" },
+                    { "margin": "0" },
+                    { "padding": "10px 8px" },
+                    { "box-sizing": "border-box" },
+                    { "background": "transparent" },
+                    { "border": "none" },
+                    { "border-radius": "0" },
+                    { "box-shadow": "none" },
+                    { "border-bottom": "1px solid rgba(125,165,195,0.13)" },
+                  ],
+                "grid":
+                  [
+                    { "grid-template-areas": '"i n" "i l"' },
+                    { "grid-template-columns": "34px minmax(0, 1fr)" },
+                    { "grid-template-rows": "min-content min-content" },
+                    { "column-gap": "7px" },
+                    { "align-content": "center" },
+                  ],
+                "icon":
+                  [
+                    { "width": "24px" },
+                    {
+                      "color": "[[[\n  if (entity?.state === 'disarmed') return '#75E58B';\n  if (entity?.state === 'triggered') return '#FF6B6B';\n  if (entity?.state === 'armed_home' || entity?.state === 'armed_away' || entity?.state === 'armed_night') return '#58B9FF';\n  return 'rgba(255,255,255,0.38)';\n]]]",
+                    },
+                  ],
+                "label":
+                  [
+                    { "justify-self": "start" },
+                    { "margin-top": "3px" },
+                    { "font-size": "10px" },
+                    {
+                      "color": "[[[\n  if (entity?.state === 'disarmed') return '#75E58B';\n  if (entity?.state === 'triggered') return '#FF6B6B';\n  if (entity?.state === 'armed_home' || entity?.state === 'armed_away' || entity?.state === 'armed_night') return '#58B9FF';\n  return 'rgba(255,255,255,0.38)';\n]]]",
+                    },
+                  ],
+                "name":
+                  [
+                    { "justify-self": "start" },
+                    { "font-size": "12px" },
+                    { "font-weight": "500" },
+                    { "color": "rgba(255,255,255,0.92)" },
+                  ],
+              },
+            "tap_action": { "action": "more-info" },
+            "type": "custom:button-card",
+          },
+          {
+            "card_mod":
+              {
+                "style": ".hv-thermostat { width: 76px; height: 76px; display: flex; align-items: center; justify-content: center; }\n.hv-dial { width: 76px; height: 76px; overflow: visible; }",
+              },
+            "custom_fields":
+              {
+                "dial": "[[[\n  const temp = entity?.state;\n  const mode = states['input_select.hvac_mode']?.state || 'Idle';\n\n  const numericTemp = Number(temp);\n  const displayTemp = Number.isFinite(numericTemp) ? `${Math.round(numericTemp)}°` : '--°';\n\n  const normalizedAction = mode === 'Cooling' ? 'Cooling' : mode === 'Heating' ? 'Heating' : 'Idle';\n\n  const accent = mode === 'Heating' ? '#FFD089' : mode === 'Cooling' ? '#58B9FF' : 'rgba(235,242,248,0.68)';\n  const glow = mode === 'Heating' ? 'rgba(255,208,137,0.35)' : mode === 'Cooling' ? 'rgba(88,185,255,0.35)' : 'rgba(220,232,242,0.12)';\n\n  const minTemp = 55;\n  const maxTemp = 85;\n  const clampedTemp = Number.isFinite(numericTemp) ? Math.min(maxTemp, Math.max(minTemp, numericTemp)) : minTemp;\n  const percentage = ((clampedTemp - minTemp) / (maxTemp - minTemp)) * 100;\n  const circumference = 188.5;\n  const progress = Math.max(12, Math.min(100, percentage));\n  const dash = (progress / 100) * circumference;\n\n  return `\n    <div class=\"hv-thermostat\">\n      <svg class=\"hv-dial\" viewBox=\"0 0 80 80\" aria-label=\"${displayTemp}, ${normalizedAction}\">\n        <circle cx=\"40\" cy=\"40\" r=\"30\" fill=\"rgba(5,18,31,0.38)\" stroke=\"rgba(190,215,235,0.14)\" stroke-width=\"5\" />\n        <circle cx=\"40\" cy=\"40\" r=\"30\" fill=\"none\" stroke=\"${accent}\" stroke-width=\"5\" stroke-linecap=\"round\" stroke-dasharray=\"${dash} ${circumference - dash}\" transform=\"rotate(135 40 40)\" style=\"filter: drop-shadow(0 0 4px ${glow}) drop-shadow(0 0 8px ${glow});\" />\n        <text x=\"40\" y=\"40\" text-anchor=\"middle\" dominant-baseline=\"middle\" fill=\"rgba(255,255,255,0.96)\" font-size=\"18\" font-weight=\"500\">${displayTemp}</text>\n        <text x=\"40\" y=\"55\" text-anchor=\"middle\" fill=\"${accent}\" font-size=\"7.5\" font-weight=\"500\">${normalizedAction}</text>\n      </svg>\n    </div>\n  `;\n]]]",
+              },
+            "entity": "input_number.indoor_temperature",
+            "show_icon": false,
+            "show_name": false,
+            "show_state": false,
+            "styles":
+              {
+                "card":
+                  [
+                    { "width": "100%" },
+                    { "height": "104px" },
+                    { "margin": "0" },
+                    { "height": "92px" },
+                    { "box-sizing": "border-box" },
+                    { "background": "transparent" },
+                    { "border": "none" },
+                    { "border-radius": "0" },
+                    { "box-shadow": "none" },
+                    {},
+                  ],
+                "custom_fields":
+                  {
+                    "dial":
+                      [
+                        { "width": "76px" },
+                        { "height": "76px" },
+                        { "display": "flex" },
+                        { "align-items": "center" },
+                        { "justify-content": "center" },
+                        { "overflow": "visible" },
+                      ],
+                  },
+                "grid":
+                  [
+                    { "grid-template-areas": '"dial"' },
+                    { "grid-template-columns": "1fr" },
+                    { "grid-template-rows": "1fr" },
+                    { "justify-items": "center" },
+                    { "align-items": "center" },
+                  ],
+              },
+            "tap_action": { "action": "more-info" },
+            "triggers_update": ["input_number.indoor_temperature", "input_select.hvac_mode"],
+            "type": "custom:button-card",
+          },
+        ],
+      "type": "vertical-stack",
+    },
+  "card_mod":
+    {
+      "style": "ha-card {\n  width: 100%;\n  max-width: 170px;\n  margin: 0;\n  padding: 8px;\n  box-sizing: border-box;\n  background: linear-gradient(180deg, rgba(5,18,31,0.94), rgba(4,14,25,0.86));\n  border: 1px solid rgba(95,145,185,0.22);\n  border-radius: 18px;\n  box-shadow: 0 12px 32px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.025);\n  overflow: hidden;\n}",
+    },
+  "type": "custom:mod-card",
+  "view_layout": { "grid-area": "status" },
+}

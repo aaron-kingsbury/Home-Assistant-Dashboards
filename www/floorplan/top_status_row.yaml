@@ -1,0 +1,288 @@
+{
+  "card_mod":
+    {
+      "style": "ha-card {\n  width: 100%;\n  max-width: 100%;\n  margin: 0 0 3px 0;\n  padding: 6px;\n  background: linear-gradient(180deg, rgba(5,18,31,0.72), rgba(4,14,25,0.58));\n  border: 1px solid rgba(95,145,185,0.18);\n  border-radius: 16px 16px 6px 6px;\n  box-shadow: 0 8px 24px rgba(0,0,0,0.24);\n  box-sizing: border-box;\n  overflow: hidden;\n}\n#root {\n  width: 100%;\n  display: grid !important;\n  grid-template-columns: minmax(0, 1.30fr) minmax(0, 1.00fr) minmax(0, 0.90fr) minmax(0, 1.00fr) minmax(0, 1.10fr) !important;\n  gap: 5px !important;\n  width: 100%;\n  padding: 0;\n  align-items: stretch;\n}",
+    },
+  "cards":
+    [
+      {
+        "custom_fields":
+          {
+            "date": "[[[ const parts = (entity?.state || '').split(', '); const datePart = parts[0] || ''; const d = new Date(datePart + 'T12:00:00'); if (isNaN(d.getTime())) return ''; const days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat']; const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return days[d.getDay()] + ', ' + months[d.getMonth()] + ' ' + d.getDate(); ]]]",
+            "time": "[[[ const parts = (entity?.state || '').split(', '); const timePart = parts[1] || '--:--'; const [h, m] = timePart.split(':').map(Number); const ampm = h >= 12 ? 'PM' : 'AM'; const h12 = h % 12 || 12; return h12 + ':' + String(m).padStart(2, '0') + ' ' + ampm; ]]]",
+          },
+        "entity": "sensor.date_time",
+        "show_icon": false,
+        "show_name": false,
+        "show_state": false,
+        "styles":
+          {
+            "card":
+              [
+                { "width": "100%" },
+                { "height": "76px" },
+                { "padding": "10px 12px" },
+                { "border-radius": "11px" },
+                { "background": "rgba(5,18,31,0.72)" },
+                { "border": "1px solid rgba(95,145,185,0.10)" },
+                { "box-shadow": "none" },
+                { "min-width": "0" },
+                { "border-right": "1px solid rgba(150,185,210,0.08)" },
+              ],
+            "custom_fields":
+              {
+                "date":
+                  [
+                    { "justify-self": "start" },
+                    { "align-self": "start" },
+                    { "font-size": "11px" },
+                    { "color": "rgba(205,217,229,0.58)" },
+                    { "margin-top": "2px" },
+                  ],
+                "time":
+                  [
+                    { "justify-self": "start" },
+                    { "align-self": "end" },
+                    { "font-size": "27px" },
+                    { "font-weight": "400" },
+                    { "color": "rgba(255,255,255,0.95)" },
+                    { "line-height": "1" },
+                    { "letter-spacing": "0.5px" },
+                  ],
+              },
+            "grid":
+              [
+                { "grid-template-areas": '"time" "date"' },
+                { "grid-template-columns": "1fr" },
+                { "grid-template-rows": "1fr 1fr" },
+                { "place-items": "start" },
+              ],
+          },
+        "tap_action": { "action": "none" },
+        "triggers_update": "sensor.date_time",
+        "type": "custom:button-card",
+      },
+      {
+        "custom_fields":
+          {
+            "weather_row": '[[[ const temp = entity?.attributes?.temperature ?? ''--''; const state = entity?.state || ''unknown''; const icons = {sunny: ''☀️'', partlycloudy: ''⛅'', cloudy: ''☁️'', rainy: ''🌧️'', snow: ''❄️'', thunderstorm: ''⛈️'', fog: ''🌫️'', windy: ''💨''}; const icon = icons[state] || ''🌤️''; const conditions = {sunny: ''Clear'', partlycloudy: ''Partly Cloudy'', cloudy: ''Cloudy'', rainy: ''Rain'', snow: ''Snow'', thunderstorm: ''Storms'', fog: ''Fog'', windy: ''Windy''}; const cond = conditions[state] || state; return ''<div style="display:flex;align-items:center;gap:8px;"><span style="font-size:18px;">'' + icon + ''</span><span style="font-size:22px;font-weight:400;color:rgba(255,255,255,0.95);">'' + temp + ''°</span></div><div style="font-size:11px;color:rgba(220,232,242,0.68);margin-top:2px;">'' + cond + ''</div>''; ]]]',
+          },
+        "entity": "weather.forecast_housevoice_weather",
+        "show_icon": false,
+        "show_name": false,
+        "show_state": false,
+        "styles":
+          {
+            "card":
+              [
+                { "width": "100%" },
+                { "height": "76px" },
+                { "padding": "10px 12px" },
+                { "border-radius": "11px" },
+                { "background": "rgba(5,18,31,0.72)" },
+                { "border": "1px solid rgba(95,145,185,0.10)" },
+                { "box-shadow": "none" },
+                { "min-width": "0" },
+                { "border-right": "1px solid rgba(150,185,210,0.08)" },
+              ],
+            "custom_fields": { "weather_row": [{ "justify-self": "start" }, { "align-self": "center" }] },
+            "grid":
+              [
+                { "grid-template-areas": '"weather_row"' },
+                { "grid-template-columns": "1fr" },
+                { "grid-template-rows": "1fr" },
+                { "place-items": "start" },
+              ],
+          },
+        "tap_action": { "action": "more-info" },
+        "type": "custom:button-card",
+      },
+      {
+        "icon": "mdi:lightbulb-outline",
+        "label": "[[[ const lights = ['input_boolean.primary_bedroom_light','input_boolean.small_bedroom_light','input_boolean.right_bedroom_light','input_boolean.hall_light_mock','input_boolean.kitchen_light_mock','input_boolean.living_room_light_mock']; const on = lights.filter(function(e) { return states[e] && states[e].state === 'on'; }).length; return on > 0 ? on + ' On' : 'All Off'; ]]]",
+        "name": "Lights",
+        "show_icon": true,
+        "show_label": true,
+        "show_name": true,
+        "styles":
+          {
+            "card":
+              [
+                { "width": "100%" },
+                { "height": "76px" },
+                { "padding": "10px 12px" },
+                { "border-radius": "11px" },
+                { "background": "rgba(5,18,31,0.72)" },
+                { "border": "1px solid rgba(95,145,185,0.10)" },
+                { "box-shadow": "none" },
+                { "min-width": "0" },
+                { "border-right": "1px solid rgba(150,185,210,0.08)" },
+              ],
+            "grid":
+              [
+                { "grid-template-areas": '"i n" "i l"' },
+                { "grid-template-columns": "32px 1fr" },
+                { "grid-template-rows": "1fr 1fr" },
+                { "place-items": "start" },
+              ],
+            "icon":
+              [
+                { "width": "22px" },
+                { "height": "22px" },
+                {
+                  "color": "[[[ var lights = ['input_boolean.primary_bedroom_light','input_boolean.small_bedroom_light','input_boolean.right_bedroom_light','input_boolean.hall_light_mock','input_boolean.kitchen_light_mock','input_boolean.living_room_light_mock']; var on = lights.filter(function(e) { return states[e] && states[e].state === 'on'; }).length; return on > 0 ? '#FFD089' : 'rgba(220,232,242,0.72)'; ]]]",
+                },
+              ],
+            "label":
+              [
+                { "justify-self": "start" },
+                { "color": "#58B9FF" },
+                { "font-size": "12px" },
+                { "white-space": "nowrap" },
+                { "overflow": "hidden" },
+                { "text-overflow": "ellipsis" },
+              ],
+            "name":
+              [
+                { "justify-self": "start" },
+                { "color": "rgba(255,255,255,0.95)" },
+                { "font-size": "13px" },
+                { "font-weight": "600" },
+                { "margin-top": "4px" },
+                { "white-space": "nowrap" },
+                { "overflow": "hidden" },
+                { "text-overflow": "ellipsis" },
+              ],
+          },
+        "tap_action": { "action": "none" },
+        "type": "custom:button-card",
+      },
+      {
+        "icon": "mdi:lock-outline",
+        "label": "[[[ var fd = states['input_boolean.front_door_locked_mock']; var bd = states['input_boolean.back_door_locked_mock']; var fdOn = fd && fd.state === 'on'; var bdOn = bd && bd.state === 'on'; if (fdOn && bdOn) return 'All Secure'; var unlocked = (!fdOn ? 1 : 0) + (!bdOn ? 1 : 0); return unlocked + ' Unlocked'; ]]]",
+        "name": "Locks",
+        "show_icon": true,
+        "show_label": true,
+        "show_name": true,
+        "styles":
+          {
+            "card":
+              [
+                { "width": "100%" },
+                { "height": "76px" },
+                { "padding": "10px 12px" },
+                { "border-radius": "11px" },
+                { "background": "rgba(5,18,31,0.72)" },
+                { "border": "1px solid rgba(95,145,185,0.10)" },
+                { "box-shadow": "none" },
+                { "min-width": "0" },
+                { "border-right": "1px solid rgba(150,185,210,0.08)" },
+              ],
+            "grid":
+              [
+                { "grid-template-areas": '"i n" "i l"' },
+                { "grid-template-columns": "32px 1fr" },
+                { "grid-template-rows": "1fr 1fr" },
+                { "place-items": "start" },
+              ],
+            "icon":
+              [
+                { "width": "22px" },
+                { "height": "22px" },
+                {
+                  "color": "[[[ var fd = states['input_boolean.front_door_locked_mock']; var bd = states['input_boolean.back_door_locked_mock']; var fdOn = fd && fd.state === 'on'; var bdOn = bd && bd.state === 'on'; return (fdOn && bdOn) ? '#75E58B' : '#FF6B6B'; ]]]",
+                },
+              ],
+            "label":
+              [
+                { "justify-self": "start" },
+                {
+                  "color": "[[[ var fd = states['input_boolean.front_door_locked_mock']; var bd = states['input_boolean.back_door_locked_mock']; var fdOn = fd && fd.state === 'on'; var bdOn = bd && bd.state === 'on'; return (fdOn && bdOn) ? '#75E58B' : '#FF6B6B'; ]]]",
+                },
+                { "font-size": "10px" },
+                { "white-space": "nowrap" },
+                { "overflow": "hidden" },
+                { "text-overflow": "ellipsis" },
+              ],
+            "name":
+              [
+                { "justify-self": "start" },
+                { "color": "rgba(255,255,255,0.95)" },
+                { "font-size": "12px" },
+                { "font-weight": "600" },
+                { "margin-top": "4px" },
+                { "white-space": "nowrap" },
+                { "overflow": "hidden" },
+                { "text-overflow": "ellipsis" },
+              ],
+          },
+        "tap_action": { "action": "none" },
+        "type": "custom:button-card",
+      },
+      {
+        "entity": "alarm_control_panel.alarmo",
+        "icon": "[[[ var s = entity ? entity.state : 'unknown'; if (s === 'disarmed') return 'mdi:shield-off-outline'; if (s === 'armed_home') return 'mdi:shield-home'; if (s === 'armed_away') return 'mdi:shield-lock'; if (s === 'triggered') return 'mdi:shield-alert'; return 'mdi:shield-home-outline'; ]]]",
+        "label": "[[[ var s = entity ? entity.state : 'unknown'; if (s === 'disarmed') return 'Disarmed'; if (s === 'armed_home') return 'Armed Home'; if (s === 'armed_away') return 'Armed Away'; if (s === 'triggered') return 'Triggered'; return s; ]]]",
+        "name": "Security",
+        "show_icon": true,
+        "show_label": true,
+        "show_name": true,
+        "styles":
+          {
+            "card":
+              [
+                { "width": "100%" },
+                { "height": "76px" },
+                { "padding": "10px 12px" },
+                { "border-radius": "11px" },
+                { "background": "rgba(5,18,31,0.72)" },
+                { "border": "1px solid rgba(95,145,185,0.10)" },
+                { "box-shadow": "none" },
+                { "border-right": "none" },
+              ],
+            "grid":
+              [
+                { "grid-template-areas": '"i n" "i l"' },
+                { "grid-template-columns": "32px 1fr" },
+                { "grid-template-rows": "1fr 1fr" },
+                { "place-items": "start" },
+              ],
+            "icon":
+              [
+                { "width": "22px" },
+                { "height": "22px" },
+                {
+                  "color": "[[[ var s = entity ? entity.state : 'unknown'; if (s === 'disarmed') return '#75E58B'; if (s === 'armed_home' || s === 'armed_away') return '#58B9FF'; if (s === 'triggered') return '#FF6B6B'; return 'rgba(220,232,242,0.72)'; ]]]",
+                },
+              ],
+            "label":
+              [
+                { "justify-self": "start" },
+                {
+                  "color": "[[[ var s = entity ? entity.state : 'unknown'; if (s === 'disarmed') return '#75E58B'; if (s === 'armed_home' || s === 'armed_away') return '#58B9FF'; if (s === 'triggered') return '#FF6B6B'; return 'rgba(220,232,242,0.72)'; ]]]",
+                },
+                { "font-size": "12px" },
+                { "white-space": "nowrap" },
+                { "overflow": "hidden" },
+                { "text-overflow": "ellipsis" },
+              ],
+            "name":
+              [
+                { "justify-self": "start" },
+                { "color": "rgba(255,255,255,0.95)" },
+                { "font-size": "13px" },
+                { "font-weight": "600" },
+                { "margin-top": "4px" },
+                { "white-space": "nowrap" },
+                { "overflow": "hidden" },
+                { "text-overflow": "ellipsis" },
+              ],
+          },
+        "tap_action": { "action": "more-info" },
+        "type": "custom:button-card",
+      },
+    ],
+  "columns": 5,
+  "square": false,
+  "type": "grid",
+}

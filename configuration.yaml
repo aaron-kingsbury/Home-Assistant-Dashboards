@@ -1,0 +1,91 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 127.0.0.1
+
+template:
+  - binary_sensor:
+      - name: "HouseVoice Any Camera Motion"
+        unique_id: "housevoice_any_camera_motion"
+        state: >
+          {{ is_state('binary_sensor.front_door_motion', 'on')
+             or is_state('binary_sensor.driveway_motion', 'on')
+             or is_state('binary_sensor.back_yard_motion', 'on')
+             or is_state('binary_sensor.culdesac_view_motion', 'on')
+           or is_state('binary_sensor.side_yard_motion', 'on') }}
+        device_class: motion
+  - triggers:
+      - trigger: time_pattern
+        seconds: "/1"
+    sensor:
+      - name: "HouseVoice Timer Tick"
+        unique_id: "housevoice_timer_tick"
+        state: "{{ now().timestamp() | int }}"
+
+# HouseVoice Panel Presence System
+# FUTURE HARDWARE REPLACEMENT:
+# input_boolean.housevoice_panel_mock_presence
+# becomes binary_sensor.real_panel_presence
+input_boolean:
+  housevoice_panel_mock_presence:
+    name: "HouseVoice Panel Mock Presence"
+    icon: mdi:motion-sensor
+  housevoice_panel_awake:
+    name: "HouseVoice Panel Awake"
+    icon: mdi:monitor-eye
+  housevoice_panel_manual_hold:
+    name: "HouseVoice Panel Manual Hold"
+    icon: mdi:hand-back-right-outline
+
+input_select:
+  housevoice_clock_brightness:
+    name: "HouseVoice Clock Brightness"
+    options:
+      - "Low"
+      - "Medium"
+      - "High"
+    initial: "Medium"
+    icon: mdi:brightness-6
+
+input_number:
+  housevoice_timer_minutes:
+    name: "HouseVoice Timer Minutes"
+    initial: 1
+    min: 0
+    max: 59
+    step: 1
+    mode: box
+  housevoice_timer_seconds:
+    name: "HouseVoice Timer Seconds"
+    initial: 0
+    min: 0
+    max: 59
+    step: 1
+    mode: box
+  housevoice_small_bedroom_brightness:
+    name: "Small Bedroom Light Brightness"
+    initial: 20
+    min: 0
+    max: 100
+    step: 1
+    mode: slider
+
+timer:
+  housevoice_panel_standby:
+    name: "HouseVoice Panel Standby Timer"
+    duration: "00:04:00"
+    restore: true
+  housevoice_kids_timer:
+    name: "HouseVoice Kids Timer"
+    duration: "00:01:00"
+    restore: true

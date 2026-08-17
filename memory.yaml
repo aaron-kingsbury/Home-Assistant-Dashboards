@@ -1,0 +1,332 @@
+# Memory tracking file for OpenCode sessions.
+# Each session should append a summary entry here before signing off.
+# Read this file at the start of every session for continuity.
+
+memories:
+  - date: "2026-07-18"
+    session: "initial"
+    summary: >
+      First session. User asked to set up a memory tracking system:
+      check for an existing memory.yaml, create one if absent, and add
+      an instruction to AGENTS.md to read/append to memory.yaml each session.
+      Created /homeassistant/memory.yaml with this memories list. Edited
+      /homeassistant/AGENTS.md to add a Memory Continuity section. No HA
+      config changes were made.
+
+  - date: "2026-07-18"
+    session: "floorplan-dashboard"
+    summary: >
+      Built a floorplan dashboard for the user's house. Used ChatGPT to
+      analyze the floorplan image (1448x1086px) and get bedroom positions.
+      Created 3 input_boolean helpers for virtual bedroom lights:
+      primary_bedroom_light, small_bedroom_light, right_bedroom_light.
+      Created a "Floorplan" dashboard (url_path: my-floorplan) with a
+      picture-elements card showing /local/floorplan/floorplan.png as the
+      background. Placed mdi:ceiling-light state-icons at the center of
+      each bedroom with tap-to-toggle and state-labels below. The user
+      has no real light entities yet — these are placeholders to swap in
+      later.       Screenshot tool was disabled so we could not visually verify.
+      Iterated on icon styling: off-state icons use mdi:circle-outline
+      + mdi:ceiling-light (white on white). On-state uses bright yellow
+      state-icon with drop-shadow glow. Added a "All Lights" button-card
+      to the left via horizontal-stack. Learned that button-card styles
+      must be objects not quoted strings, and state-icon ignores CSS
+      color overrides (use plain icon type for custom colors). Dashboard
+      url: /lovelace/my-floorplan.
+      Replaced stacked mdi:circle-outline + mdi:ceiling-light approach
+      with custom:button-card elements inside picture-elements. Each light
+      is now a single 42x42px circular button-card with template expressions
+      for dynamic border/icon/glow based on entity state. Much cleaner result.
+      Key lesson: button-card styles must use arrays of objects (not plain
+      objects) to produce YAML list format, and template expressions like
+      [[[return ...]]] work for dynamic CSS values.       Floorplan dashboard restructured to a single full-width picture-elements
+      card (no horizontal-stack/vertical-stack wrappers). The floorplan image
+      is used once as the card's main image. All buttons (All Lights + 3
+      bedrooms) are positioned directly on it using percentage coordinates.
+      All Lights button at 8.5%/22% with z-index:10 (on lawn, inside image), Primary at 24.1%/21.6%, Small at 58.5%/69.5%,
+      Right at 72.1%/69.5%. Buttons 38px (bedrooms) and 110x122px (All Lights).
+
+      Full sidebar built inside the single picture-elements card. Sidebar
+      occupies left ~19% of the image with dark gradient background. Contains:
+      - HouseVoice logo (image element at 10%/10%)
+      - Nav items: Home (active), Lights, Locks, Cameras, Climate, Automations, Settings
+      - Quick Controls section: All Lights, Front Door, Garage, Back Door tiles
+      - Family section: 4 person placeholders
+      - Night Mode pill at bottom
+      All sidebar elements use action:none (placeholders). Original standalone
+      All Lights button removed (replaced by sidebar Quick Controls tiles).
+      YAML anchors were expanded to full JSON since card.json is not YAML.
+      Logo expected at /config/www/housevoice/logo.svg.
+
+      SIDEBAR v2: Rebuilt sidebar with wider dimensions to fix collapse issues.
+      Sidebar 22% wide, nav items 18% wide, quick-control tiles 8%.
+      Logo path corrected to /local/housevoice/logo.svg.
+      Family and Night Mode sections removed temporarily (to be re-added after
+      core layout confirmed).       Quick Controls use 2x2 grid at 6.6%/15.4% columns.
+
+      SIDEBAR v3 (layout-card): Completely restructured dashboard to use
+      custom:layout-card with CSS Grid layout. Sidebar is now a separate
+      fixed 260px column (vertical-stack), floorplan fills remaining space.
+      Installed custom:layout-card from thomasloven/lovelace-layout-card
+      and card-mod from thomasloven/lovelace-card-mod.
+      Files: /homeassistant/www/community/layout-card/layout-card.js
+             /homeassistant/www/community/card-mod/card-mod.js
+      Dashboard card is now type: custom:layout-card with grid-template-columns:
+      260px minmax(0, 1fr). Sidebar contains: logo, Home nav (active), 6 nav
+      items, QUICK CONTROLS section with 2x2 grid (All Lights, Front Door,
+      Garage, Back Door). Floorplan card only contains the 3 bedroom light
+      buttons. card_mod used for sidebar background gradient and styling.
+      Resources may need manual registration in HA UI if not auto-discovered.
+
+      CORRECTION: Resource URLs must use /local/ prefix, not bare /community/.
+      Correct: /local/community/layout-card/layout-card.js
+      Correct: /local/community/card-mod/card-mod.js
+      Wrong: /community/layout-card/layout-card.js
+      Wrong: /community/card-mod/card-mod.js
+      Files under /config/www are served by HA under /local/. Register as
+      "JavaScript Module" resource type in Settings → Dashboards → Resources.
+      Also: manually downloaded JS from master branch rather than HACS. HACS
+      is safer as it auto-registers and updates resources.
+
+  - date: "2026-07-19"
+    session: "floorplan-visual-review-setup"
+    summary: >
+      Set up visual review workflow for floorplan dashboard. Fixed resource
+      URLs in dashboard config (were using /community/ instead of /local/community/).
+      Created VISUAL_NOTES.md at /homeassistant/www/floorplan/VISUAL_NOTES.md with
+      project goals, current state, and review workflow structure. Updated
+      MODEL_HANDOFF.md to document the visual review workflow. Resources confirmed
+      registered correctly in lovelace_resources. Screenshot captured but could
+      not be reviewed by current model (no image input support). Dashboard is
+      live at /lovelace/my-floorplan with layout-card sidebar (260px) and
+      floorplan with 3 bedroom light buttons.
+
+  - date: "2026-07-19"
+    session: "floorplan-design-spec"
+    summary: >
+      Received comprehensive dashboard specification from ChatGPT. Created
+      DASHBOARD_SPEC.md with full design tokens, layout rules, sidebar structure,
+      floorplan controls, component architecture, placeholder strategy, and
+      implementation phases. Created ENTITY_MAP.md for tracking placeholder-to-real
+      entity mappings. Ran analysis of current dashboard against spec. Current
+      state matches spec for: panel view, two-column layout, sidebar width, logo,
+      navigation, quick controls grid, floorplan image, 3 bedroom lights. Still
+      missing: Family section, Night Mode pill, quick control status text. Ready
+      for Phase 1 completion (visual shell).
+
+  - date: "2026-07-19"
+    session: "floorplan-phase1-complete"
+    summary: >
+      Completed Phase 1 visual shell. Added status text to quick control tiles:
+      All Lights (Ready, amber), Front Door (Locked, blue), Garage (Closed, green),
+      Back Door (Locked, blue). Added Family section with 4 circular placeholders
+      (Aaron, Mindy, Child 1, Child 2) in 2x2 grid. Added Night Mode pill at
+      bottom with moon icon and "Inactive" label. Dashboard now has complete
+      sidebar: logo, 7 nav items, quick controls, family, night mode. All working
+      correctly. Ready for visual review and fine-tuning.
+
+  - date: "2026-07-20"
+    session: "floorplan-mock-controls"
+    summary: >
+      Added 8 mock controls to floorplan picture-elements card. Created 8
+      placeholder input_boolean helpers: front_door_locked_mock, back_door_locked_mock,
+      garage_door_closed_mock, hall_light_mock, kitchen_light_mock,
+      living_room_light_mock, primary_bathroom_fan_mock, hall_bathroom_fan_mock.
+      Added controls at specified positions: front door lock (42%/52%), back door
+      lock (82%/29%), garage door (39%/65%), hall light (49%/45%), kitchen light
+      (69%/29%), living room light (75%/46%), primary bathroom fan (35.5%/25%),
+      hall bathroom fan (65%/59%). Lights use amber when on, locks use blue when
+      locked, garage uses green when closed, fans use pale blue when on. Fans have
+      spin animation when active. Updated ENTITY_MAP.md with all 11 placeholders.
+
+  - date: "2026-07-20"
+    session: "floorplan-color-system"
+    summary: >
+      Implemented HouseVoice status color palette for all floorplan controls
+      and sidebar quick-control tiles. Lights: amber #FFD089 when on, gray when
+      off. Fans: blue #58B9FF when on, gray when off. Locks: green #75E58B when
+      locked, red #FF6B6B when unlocked. Garage: green when closed, red when open.
+      Cameras: light gray #D7E0E8 when available, muted gray when unavailable.
+      Sidebar tiles now show dynamic status text (Locked/Unlocked, Closed/Open).
+      Deployed via hab dashboard view update API. Updated card.json backup.
+      Learned that direct .storage edits require restart; must use dashboard API
+      for live updates.
+
+  - date: "2026-07-20"
+    session: "floorplan-top-status-module"
+    summary: >
+      Built separate reusable top-status module above floorplan. Changed main
+      grid layout from single row to two rows: 92px topbar + fluid floorplan.
+      Grid areas: "sidebar topbar" / "sidebar floorplan". Sidebar spans both rows.
+      Module contains 5 cards: Time/Date/Weather, Lights, Locks, Climate, Security.
+      Discovered real entities: weather.forecast_housevoice_weather (82°F, partlycloudy),
+      alarm_control_panel.alarmo (disarmed). No climate entity found.
+      Time card uses live JS templates for clock/date. Lights card counts 6 mock
+      lights with dynamic amber/gray. Locks card shows All Secure/unlocked count.
+      Climate shows "Not configured". Security uses Alarmo entity with dynamic colors.
+      All cards use HouseVoice styling (dark navy, rounded corners, subtle borders).
+      Deployed via hab dashboard view update API. Saved card.json and top_status_row.yaml.
+
+  - date: "2026-07-20"
+    session: "floorplan-top-status-v2"
+    summary: >
+      Redesigned top indicator row from 5 cards to 6 compact modules:
+      Time, Outdoor Temperature, Lights, Locks, Indoor Air, Security.
+      Fixed time card raw JavaScript display issue - templates now properly
+      wrapped in [[[ ... ]]] brackets. Split time and temperature into
+      separate cards. Updated grid to 170px 190px 175px 175px minmax(250px,1fr) 190px.
+      Time uses sensor.date_time entity (parsing "2026-07-20, 14:18" format).
+      Weather uses weather.forecast_housevoice_weather (84°F, partlycloudy).
+      Indoor Air shows humidity, CO2, air quality - all showing "Not configured"
+      as no real sensors found. Security uses alarm_control_panel.alarmo (disarmed).
+      All templates validated - no raw JavaScript displayed. Deployed via API.
+      Saved card.json and top_status_row.yaml.
+
+  - date: "2026-07-20"
+    session: "floorplan-overflow-fix"
+    summary: >
+      Fixed floorplan overflow issue caused by adding top bar. Changed outer
+      grid height from 100vh to 100dvh with max-height and min-height: 0.
+      Added overflow: hidden to outer layout. Added card_mod to picture-elements
+      card forcing height: 100%, object-fit: contain. Updated sidebar card_mod
+      to remove min-height: 720px, added height: 100%, overflow-y: auto.
+      Result: top bar stays fixed, floorplan shrinks to fit remaining viewport,
+      sidebar scrolls internally. No page-level vertical scrollbar.
+
+  - date: "2026-07-21"
+    session: "climate-control-buttons-fix"
+    summary: >
+      Diagnosed and fixed button tap_actions on Climate Control view. Root cause:
+      all 9 interactive buttons used action:javascript with hass.callService() syntax,
+      which requires button-card v5.0+ official support. While bundled button-card
+      appears to be v5.0+ (has perform-action keyword), the javascript action was
+      unreliable. Converted all 9 buttons from action:javascript to action:call-service
+      with proper service/data fields. Buttons: COOL/IDLE/HEAT → input_select.select_option
+      on hvac_mode; AUTO/ON/CIRCULATE → input_select.select_option on fan_mode;
+      sp-minus → input_number.decrement; sp-plus → input_number.increment;
+      ECO → input_boolean.toggle. Deployed successfully via hab dashboard view update.
+      All 0 javascript actions remain, 9 call-service actions active.
+
+  - date: "2026-07-21"
+    session: "climate-control-dynamic"
+    summary: >
+      Major dynamic update to Climate Control view. Merged 3 separate setpoint
+      cards (sp-minus, sp-value, sp-plus) into single unified card with
+      grid-template-areas "minus value plus" for horizontal [−] [SET TO 66°] [+]
+      layout. Grid areas updated: "setpoint setpoint" replaces 3 sp-* areas.
+      Made dial dynamic: reads input_number.indoor_temperature and
+      input_select.hvac_mode via JS templates, updates arc color (blue=cooling,
+      amber=heating, gray=idle), temperature text, and mode label. Made top badge
+      dynamic with template icon/name/color. Added entity + state-based styling
+      to COOL/IDLE/HEAT (highlight selected mode), AUTO/ON/CIRCULATE fan buttons,
+      and ECO MODE (dynamic label OFF/ACTIVE, green glow when on). Made status
+      message template-driven.       All tap_actions use call-service. Deployed via
+      hab dashboard view update. View now has 17 cards (was 20), all interactive.
+
+  - date: "2026-07-22"
+    session: "alarm-control-panel-v2"
+    summary: >
+      Replaced the alarm control panel (index 2 of control-panels dashboard)
+      with a completely new design from the user. The new panel is a subview
+      with nested mod-cards, grid-based layout: Back button, ALARM CONTROL
+      title, status badge, vertical divider, large shield status display
+      (DISARMED / Doors Secure / Windows Secure), PIN entry area (4 dots),
+      3 arming modes (DISARM / ARM HOME / ARM AWAY), 3 quick modes
+      (NIGHT / PERIMETER / PANIC), message bar, and RETURN HOME button.
+      Back navigates to /control-panels, Return Home to /my-floorplan.
+      All other buttons set to tap_action: none pending future wiring.
+      Deployed via hab dashboard view update with -f flag.
+
+  - date: "2026-07-22"
+    session: "alarm-control-panel-v3-keypad"
+    summary: >
+      Replaced alarm control panel (index 2, control-panels dashboard) with
+      a new 3-column design from ChatGPT: large shield status display (left),
+      3 arming mode buttons (center), numeric keypad (right). Uses nested
+      layout-card for the keypad with 5-column grid (4 code dots + backspace
+      row, 12-key numpad, note). Applied 5-column correction as suggested.
+      All buttons have control_id variables. Back → /control-panels,
+      Return Home → /my-floorplan. All other actions disabled (action: none).
+      Card sizing: min(1180px, 100vw-44px) × min(680px, 100vh-82px).
+      Badge shows ARMED NIGHT (purple #B36BFF theme).
+      Deployed via hab dashboard view update.
+      Fixed Return Home button not spanning full panel — root cause was
+      duplicate `card:` key at same YAML indent level causing inner mod-card
+      to be silently dropped. Nested structure: outer mod-card (background) →
+      inner mod-card (centered panel with card_mod) → layout-card (grid).
+      Saved corrected YAML at /tmp/alarm_new_fixed.yaml.
+  - date: "2026-07-23"
+    session: "alarm-control-panel-overflow-fix"
+    summary: >
+      Applied all 7 sizing/alignment fixes from user spec: panel sizing
+      min(1180px/650px), Return Home button grid-area (122px rows), keypad
+      9-column grid, code bubbles, vertical centering, SECURITY STATUS label
+      removed, shield enlarged 140→205px, removed margin-left on titles,
+      raised Return Home rows. Fixed shield glow clipping: changed overflow:
+      hidden → overflow: visible on outer mod-card (line 19), inner mod-card
+      (line 49), and layout-card (line 83). Status section already had correct
+      centering (align-items: center, justify-content: center, justify-self:
+      stretch, align-self: stretch). Deployed via hab dashboard view update
+      control-panels 2 -f /tmp/alarm_final3.json.
+
+  - date: "2026-07-24"
+    session: "alarm-control-panel-wiring"
+    summary: >
+      Wired up alarm control panel functionality. Created input_text.alarm_pin_entry
+      helper (max 8 chars) for PIN entry state. Created 14 scripts in scripts.yaml:
+      alarm_pin_0 through alarm_pin_9 (append digit), alarm_pin_backspace (remove
+      last char), alarm_disarm_with_pin, alarm_arm_home_with_pin, alarm_arm_away_with_pin.
+      Each digit script uses {{ states('input_text.alarm_pin_entry') | default('', true) }}
+      + digit to append. Arm scripts call alarm_control_panel.alarmo then clear PIN.
+      Dashboard card updated: shield/status display uses [[[return ...]]] JS template
+      reading alarmo state (disarmed=green, armed_home=blue, armed_away=red,
+      armed_night=purple). Status badge dynamic. Arming buttons wired to scripts with
+      active-mode highlighting (purple when current state). Code dots dynamic
+      (filled purple when digit entered). Backspace and keypad 0-9 wired to scripts.
+      Star/hash buttons remain action:none. Fixed initial "unknown" bug by adding
+      | default('', true) filter to all templates. Verified: append "1"→"12"→backspace→"1"
+      all work correctly. Scripts reloaded via script.reload service.
+
+  - date: "2026-07-31"
+    session: "cameras-control-panel-aspect"
+    summary: >
+      Continued the control panels dashboard. The dashboard has 4 views: Alarm
+      Control (0), Climate Control (1), Lights Control (2), Cameras Control (3).
+      Cameras Control shows 6 live Reolink fluent streams in a HouseVoice-style
+      panel. Tweak requested: make the Front Door card match the camera cards'
+      aspect ratio. Set aspect_ratio: "75%" (4:3) on the Front Door card in the
+      left column, and on the three bottom-row center cards (Cul-de-sac View,
+      Side Yard, Garage). User confirmed both look good. Deployed via hab
+      dashboard view update control-panels 3.
+      Open gaps noted for a future session: (1) camera.mock_garage_fluent does
+      not exist — the Garage tile and right-column GARAGE button reference a
+      camera that is not in the registry (only unmatched real camera is
+      camera.reolink_duo_3_poe_fluent, currently unavailable); (2) QUICK VIEWS
+      buttons navigate to /housevoice-cameras/all, /front-yard, /backyard but no
+      housevoice-cameras dashboard exists (only security-cameras); (3) possible
+      duplicate camera entities (front_door_fluent vs _2, back_yard_fluent vs
+      outside_back_yard_fluent, culdesac_view_fluent vs _2, side_yard_fluent vs
+      porch_fluent) — user has not confirmed which are intentional.
+
+  - date: "2026-08-02"
+    session: "panel-presence-system"
+    summary: >
+      Built a mock panel-presence system for a future 10.1-inch PoE touchscreen
+      (HouseVoice panel). Reusable Browser Mod navigation scripts with a single
+      placeholder browser_id (housevoice-hall-panel) to swap when the real panel
+      registers. Added to configuration.yaml: 3 input_boolean helpers
+      (housevoice_panel_mock_presence, housevoice_panel_awake,
+      housevoice_panel_manual_hold) + timer.housevoice_panel_standby (4 min,
+      restore true). Added 7 scripts to scripts.yaml: wake (cancel timer, awake on,
+      navigate /my-floorplan), sleep (gated on manual_hold off + presence off,
+      navigate /housevoice-standby/Standby, awake off), start/cancel countdown,
+      and screen_on/dim/off placeholders (empty, no invented hardware services).
+      Added 3 automations: presence manager (presence on -> cancel+wake, presence
+      off -> start countdown), standby timer finished -> sleep script, manual hold
+      manager (hold on -> cancel, hold off -> start). Existing 8 automations
+      preserved. All 6 tests passed (wake, countdown start, cancel, timer->sleep,
+      manual hold suppresses sleep, releasing hold restarts countdown). Rollback
+      checkpoints in /config/backups/ (before/after-panel-presence). Dev card at
+      /config/www/floorplan/panel_dev_card.yaml (NOT on any dashboard). Future
+      swaps: mock_presence helper -> real binary_sensor; housevoice-hall-panel ->
+      real browser_id; screen scripts -> real hardware.
