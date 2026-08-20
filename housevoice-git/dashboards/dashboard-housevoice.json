@@ -1,0 +1,301 @@
+{
+  "button_card_templates": {
+    "hv_brand_compact": {
+      "card_mod": {
+        "style": ":host {\n  background: transparent !important;\n  background-color: transparent !important;\n  --ha-card-background: transparent !important;\n  --card-background-color: transparent !important;\n  --ha-card-border-color: transparent !important;\n  --ha-card-border-width: 0 !important;\n  --ha-card-box-shadow: none !important;\n}\n\nha-card,\nha-card:hover,\nha-card:focus,\nha-card:active,\n.card,\n.card-content,\n#container,\n#card,\n.element {\n  background: transparent !important;\n  background-color: transparent !important;\n  background-image: none !important;\n  border: 0 !important;\n  border-radius: 0 !important;\n  box-shadow: none !important;\n  backdrop-filter: none !important;\n  -webkit-backdrop-filter: none !important;\n  padding: 0 !important;\n  margin: 0 !important;\n  overflow: visible !important;\n}\n\n.hv-brand-lockup {\n  display: flex;\n  flex-direction: row;\n  align-items: center;\n  justify-content: flex-start;\n  font-family: Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;\n  line-height: 1;\n  white-space: nowrap;\n}\n\n.hv-brand-logo {\n  display: block;\n  flex: 0 0 auto;\n  object-fit: contain;\n  object-position: center;\n}\n\n.hv-brand-copy {\n  display: flex;\n  flex-direction: column;\n  align-items: flex-start;\n  justify-content: center;\n  flex: 0 0 auto;\n  min-width: 0;\n  line-height: 1;\n}\n\n.hv-brand-title {\n  font-weight: 500;\n  line-height: 1;\n  white-space: nowrap;\n}\n\n.hv-brand-command {\n  margin-top: 4px;\n  font-weight: 600;\n  line-height: 1;\n  white-space: nowrap;\n}"
+      },
+      "custom_fields": {
+        "brand": "[[[\nreturn `\n  <div\n    class=\"hv-brand-lockup\"\n    style=\"width:${variables.brand_width};height:${variables.brand_height};gap:${variables.logo_gap};\"\n  >\n    <img\n      class=\"hv-brand-logo\"\n      src=\"/local/housevoice/logo.svg?v=5\"\n      alt=\"HouseVoice\"\n      style=\"width:${variables.logo_width};height:${variables.logo_height};\"\n    />\n    <div class=\"hv-brand-copy\">\n      <div class=\"hv-brand-title\" style=\"color:${variables.title_color};font-size:${variables.title_size};letter-spacing:${variables.title_spacing};\">HOUSEVOICE</div>\n      <div class=\"hv-brand-command\" style=\"color:${variables.command_color};font-size:${variables.command_size};letter-spacing:${variables.command_spacing};\">COMMAND</div>\n    </div>\n  </div>\n`;\n]]]"
+      },
+      "hold_action": {
+        "action": "none"
+      },
+      "show_icon": false,
+      "show_label": false,
+      "show_name": false,
+      "show_state": false,
+      "styles": {
+        "card": [
+          {
+            "width": "[[[return variables.brand_width;]]]"
+          },
+          {
+            "height": "[[[return variables.brand_height;]]]"
+          },
+          {
+            "min-width": "0"
+          },
+          {
+            "min-height": "0"
+          },
+          {
+            "padding": "0"
+          },
+          {
+            "margin": "0"
+          },
+          {
+            "background": "rgba(0,0,0,0) !important"
+          },
+          {
+            "background-color": "rgba(0,0,0,0) !important"
+          },
+          {
+            "background-image": "none !important"
+          },
+          {
+            "border": "0 !important"
+          },
+          {
+            "border-radius": "0 !important"
+          },
+          {
+            "box-shadow": "none !important"
+          },
+          {
+            "backdrop-filter": "none !important"
+          },
+          {
+            "-webkit-backdrop-filter": "none !important"
+          },
+          {
+            "overflow": "visible"
+          },
+          {
+            "justify-self": "start"
+          },
+          {
+            "--ha-card-background": "rgba(0,0,0,0)"
+          },
+          {
+            "--card-background-color": "rgba(0,0,0,0)"
+          },
+          {
+            "--ha-card-border-color": "transparent"
+          },
+          {
+            "--ha-card-border-width": "0"
+          },
+          {
+            "--ha-card-box-shadow": "none"
+          }
+        ],
+        "custom_fields": {
+          "brand": [
+            {
+              "grid-area": "brand"
+            },
+            {
+              "width": "100%"
+            },
+            {
+              "height": "100%"
+            },
+            {
+              "align-self": "center"
+            },
+            {
+              "justify-self": "start"
+            }
+          ]
+        },
+        "grid": [
+          {
+            "grid-template-areas": "\"brand\""
+          },
+          {
+            "grid-template-columns": "1fr"
+          },
+          {
+            "grid-template-rows": "1fr"
+          },
+          {
+            "align-items": "center"
+          },
+          {
+            "justify-items": "start"
+          }
+        ]
+      },
+      "tap_action": {
+        "action": "none"
+      },
+      "variables": {
+        "brand_height": "38px",
+        "brand_width": "148px",
+        "command_color": "#53B9FF",
+        "command_size": "5px",
+        "command_spacing": "2.7px",
+        "logo_gap": "6px",
+        "logo_height": "28px",
+        "logo_width": "38px",
+        "title_color": "#F4F7FA",
+        "title_size": "9px",
+        "title_spacing": "2.6px"
+      }
+    },
+    "hv_brand_logo": {
+      "card_mod": {
+        "style": ":host {\n  background: transparent !important;\n  background-color: transparent !important;\n  --ha-card-background: transparent !important;\n  --card-background-color: transparent !important;\n  --ha-card-border-color: transparent !important;\n  --ha-card-border-width: 0 !important;\n  --ha-card-box-shadow: none !important;\n}\n\nha-card,\nha-card:hover,\nha-card:focus,\nha-card:active,\n.card,\n.card-content,\n#container,\n#card,\n.element {\n  background: transparent !important;\n  background-color: transparent !important;\n  background-image: none !important;\n  border: 0 !important;\n  border-radius: 0 !important;\n  box-shadow: none !important;\n  backdrop-filter: none !important;\n  -webkit-backdrop-filter: none !important;\n  padding: 0 !important;\n  margin: 0 !important;\n  overflow: visible !important;\n}\n\n.hv-brand-stack {\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  font-family: Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;\n  line-height: 1;\n  white-space: nowrap;\n}\n\n.hv-brand-logo-frame {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  overflow: visible;\n  margin: 0 0 -5px 0;\n}\n\n.hv-brand-logo {\n  display: block;\n  width: 100%;\n  height: 100%;\n  object-fit: contain;\n  object-position: center;\n  transform-origin: center center;\n}\n\n.hv-brand-title {\n  margin: 0 0 0 6px;\n  font-weight: 400;\n  line-height: 1;\n  white-space: nowrap;\n}\n\n.hv-brand-command {\n  margin: 7px 0 0 8px;\n  font-weight: 500;\n  line-height: 1;\n  white-space: nowrap;\n}"
+      },
+      "custom_fields": {
+        "brand": "[[[\nreturn `\n  <div\n    class=\"hv-brand-stack\"\n    style=\"\n      width:${variables.brand_width};\n      height:${variables.brand_height};\n    \"\n  >\n    <div\n      class=\"hv-brand-logo-frame\"\n      style=\"\n        width:${variables.logo_width};\n        height:${variables.logo_height};\n      \"\n    >\n      <img\n        class=\"hv-brand-logo\"\n        src=\"/local/housevoice/logo.svg?v=12\"\n        alt=\"HouseVoice\"\n        style=\"transform:scale(${variables.logo_scale});\"\n      />\n    </div>\n\n    <div\n      class=\"hv-brand-title\"\n      style=\"color:${variables.title_color};font-size:${variables.title_size};letter-spacing:${variables.title_spacing};\"\n    >HOUSEVOICE</div>\n\n    <div\n      class=\"hv-brand-command\"\n      style=\"color:${variables.command_color};font-size:${variables.command_size};letter-spacing:${variables.command_spacing};\"\n    >COMMAND</div>\n  </div>\n`;\n]]]"
+      },
+      "hold_action": {
+        "action": "none"
+      },
+      "show_icon": false,
+      "show_label": false,
+      "show_name": false,
+      "show_state": false,
+      "styles": {
+        "card": [
+          {
+            "width": "[[[return variables.brand_width;]]]"
+          },
+          {
+            "height": "[[[return variables.brand_height;]]]"
+          },
+          {
+            "min-width": "0"
+          },
+          {
+            "min-height": "0"
+          },
+          {
+            "padding": "0"
+          },
+          {
+            "margin": "0"
+          },
+          {
+            "background": "rgba(0,0,0,0) !important"
+          },
+          {
+            "background-color": "rgba(0,0,0,0) !important"
+          },
+          {
+            "background-image": "none !important"
+          },
+          {
+            "border": "0 !important"
+          },
+          {
+            "border-radius": "0 !important"
+          },
+          {
+            "box-shadow": "none !important"
+          },
+          {
+            "backdrop-filter": "none !important"
+          },
+          {
+            "-webkit-backdrop-filter": "none !important"
+          },
+          {
+            "overflow": "visible"
+          },
+          {
+            "--ha-card-background": "rgba(0,0,0,0)"
+          },
+          {
+            "--card-background-color": "rgba(0,0,0,0)"
+          },
+          {
+            "--ha-card-border-color": "transparent"
+          },
+          {
+            "--ha-card-border-width": "0"
+          },
+          {
+            "--ha-card-box-shadow": "none"
+          }
+        ],
+        "custom_fields": {
+          "brand": [
+            {
+              "grid-area": "brand"
+            },
+            {
+              "width": "100%"
+            },
+            {
+              "height": "100%"
+            },
+            {
+              "align-self": "center"
+            },
+            {
+              "justify-self": "center"
+            }
+          ]
+        },
+        "grid": [
+          {
+            "grid-template-areas": "\"brand\""
+          },
+          {
+            "grid-template-columns": "1fr"
+          },
+          {
+            "grid-template-rows": "1fr"
+          },
+          {
+            "align-items": "center"
+          },
+          {
+            "justify-items": "center"
+          }
+        ]
+      },
+      "tap_action": {
+        "action": "none"
+      },
+      "variables": {
+        "brand_height": "122px",
+        "brand_width": "220px",
+        "command_color": "#53B9FF",
+        "command_size": "12px",
+        "command_spacing": "7.2px",
+        "logo_height": "68px",
+        "logo_scale": "1.06",
+        "logo_width": "172px",
+        "title_color": "#F4F7FA",
+        "title_size": "17px",
+        "title_spacing": "6.2px"
+      }
+    }
+  },
+  "views": [
+    {
+      "max_columns": 4,
+      "path": "logo-test",
+      "sections": [
+        {
+          "cards": [
+            {
+              "heading": "LOGO 1",
+              "type": "heading"
+            },
+            {
+              "template": "hv_brand_logo",
+              "type": "custom:button-card"
+            },
+            {
+              "heading": "LOGO 2",
+              "type": "heading"
+            },
+            {
+              "template": "hv_brand_compact",
+              "type": "custom:button-card"
+            }
+          ],
+          "title": "Logo Options",
+          "type": "grid"
+        }
+      ],
+      "title": "Logo Options",
+      "type": "sections"
+    }
+  ]
+}

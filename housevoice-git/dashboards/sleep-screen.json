@@ -1,0 +1,59 @@
+{
+  "resources": [
+    {
+      "type": "module",
+      "url": "/local/community/card-mod/card-mod.js"
+    },
+    {
+      "type": "module",
+      "url": "/local/community/layout-card/layout-card.js"
+    }
+  ],
+  "views": [
+    {
+      "card_mod": {
+        "style": ":host { background: black !important; } ha-card { width: 100vw !important; height: 100vh !important; border-radius: 0 !important; overflow: hidden !important; }"
+      },
+      "cards": [
+        {
+          "elements": [
+            {
+              "image": "/local/floorplan/sleep-screen.png",
+              "style": {
+                "cursor": "pointer",
+                "height": "100%",
+                "left": "50%",
+                "opacity": "0",
+                "top": "50%",
+                "width": "100%"
+              },
+              "tap_action": {
+                "action": "navigate",
+                "navigation_path": "/my-floorplan"
+              },
+              "type": "image"
+            }
+          ],
+          "image": "/local/floorplan/sleep-screen.png",
+          "style": {
+            "ha-card": {
+              "border": "none",
+              "border-radius": "0",
+              "height": "100%",
+              "overflow": "hidden",
+              "width": "100%"
+            },
+            "host": {
+              "height": "100vh",
+              "overflow": "hidden",
+              "width": "100vw"
+            }
+          },
+          "type": "picture-elements"
+        }
+      ],
+      "title": "Sleep",
+      "type": "panel"
+    }
+  ]
+}

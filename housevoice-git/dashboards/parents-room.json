@@ -1,0 +1,380 @@
+{
+  "kiosk_mode": {
+    "kiosk": true,
+    "non_admin_settings": {
+      "kiosk": true
+    }
+  },
+  "resources": [
+    {
+      "type": "module",
+      "url": "/local/community/button-card/button-card.js"
+    },
+    {
+      "type": "module",
+      "url": "/local/community/card-mod/card-mod.js"
+    },
+    {
+      "type": "module",
+      "url": "/local/community/kiosk-mode/kiosk-mode.js"
+    }
+  ],
+  "views": [
+    {
+      "cards": [
+        {
+          "cards": [
+            {
+              "card_mod": {
+                "custom_fields": {
+                  "canvas": [
+                    {
+                      "width": "100%"
+                    },
+                    {
+                      "height": "100%"
+                    }
+                  ]
+                },
+                "style": ":host {\n  display: block !important;\n  width: 100vw !important;\n  height: 100vh !important;\n}\n\nha-card {\n  width: 100vw !important;\n  height: 100vh !important;\n}\n"
+              },
+              "custom_fields": {
+                "canvas": "[[[\n  const dateTime = states[\"sensor.date_time\"]?.state || \"\";\n  const timePart = dateTime.split(\", \")[1] || \"\";\n  const [hourRaw, minuteRaw] = timePart.split(\":\");\n  const hour = Number(hourRaw);\n  const minute = minuteRaw || \"00\";\n  const meridiem = hour >= 12 ? \"PM\" : \"AM\";\n  const displayHour = hour % 12 || 12;\n  const timeLabel = `${displayHour}:${minute}`;\n  const weather = states[\"weather.forecast_housevoice_weather\"];\n  const weatherState = weather?.state || \"\";\n  const weatherIcons = {\"clear-night\": \"mdi:weather-night\", sunny: \"mdi:weather-sunny\", partlycloudy: \"mdi:weather-partly-cloudy\", cloudy: \"mdi:weather-cloudy\", rainy: \"mdi:weather-rainy\", pouring: \"mdi:weather-pouring\", snowy: \"mdi:weather-snowy\", \"snowy-rainy\": \"mdi:weather-snowy-rainy\", lightning: \"mdi:weather-lightning\", \"lightning-rainy\": \"mdi:weather-lightning-rainy\", fog: \"mdi:weather-fog\", windy: \"mdi:weather-windy\", \"windy-variant\": \"mdi:weather-windy-variant\"};\n  const weatherLabels = {\"clear-night\": \"Clear Night\", sunny: \"Sunny\", partlycloudy: \"Partly Cloudy\", cloudy: \"Cloudy\", rainy: \"Rainy\", pouring: \"Pouring\", snowy: \"Snowy\", \"snowy-rainy\": \"Snowy Rain\", lightning: \"Lightning\", \"lightning-rainy\": \"Thunderstorms\", fog: \"Fog\", windy: \"Windy\", \"windy-variant\": \"Windy\"};\n  const weatherIcon = weatherIcons[weatherState] || \"mdi:weather-cloudy\";\n  const weatherLabel = weatherLabels[weatherState] || \"Unknown\";\n  const weatherTemperature = Number(weather?.attributes?.temperature);\n  const weatherHumidity = Number(weather?.attributes?.humidity);\n  const roomTemperature = Number(states[\"sensor.ikea_temp_sensor_temperature\"]?.state); const roomHumidity = Number(states[\"sensor.ikea_temp_sensor_humidity\"]?.state); const alarmState = states[\"alarm_control_panel.alarmo\"]?.state || \"unknown\"; const alarmLabels = { disarmed: \"Disarmed\", armed_home: \"Armed Home\", armed_away: \"Armed Away\", armed_night: \"Armed Night\", triggered: \"Triggered\", pending: \"Pending\", arming: \"Arming\" }; const alarmColor = { disarmed: \"#73e876\", armed_home: \"#ff8c00\", armed_away: \"#ff4444\", armed_night: \"#b966ff\", triggered: \"#ff0000\", pending: \"#ffaa00\", arming: \"#ffaa00\" }[alarmState] || \"#b966ff\"; const alarmLabel = alarmLabels[alarmState] || \"Unknown\"; const openLocks = [\"input_boolean.front_door_locked_mock\", \"input_boolean.back_door_locked_mock\", \"input_boolean.garage_entry_locked_mock\"].filter(id => states[id]?.state !== \"on\").length; const locksLabel = Number.isFinite(openLocks) ? (openLocks > 0 ? openLocks + \" Unlocked\" : \"All Locked\") : \"Unknown\"; const garageClosed = states[\"input_boolean.garage_door_closed_mock\"]?.state === \"on\"; const garageLabel = garageClosed ? \"Closed\" : \"Open\"; localStorage.setItem(\"housevoice_home\", \"/parents-room\");\n\n  return `\n<div class=\"parents-canvas\">\n  <div class=\"parents-brand\">\n    <img src=\"/local/housevoice/logo.svg?v=5\" alt=\"HouseVoice\">\n    <div>\n      <div class=\"brand-name\">HOUSEVOICE</div>\n      <div class=\"brand-room\">PARENTS' ROOM</div>\n    </div>\n  </div>\n\n  <div class=\"parents-weather\">\n    <span class=\"weather-time\">${timeLabel}</span>\n    <span class=\"weather-meridiem\">${meridiem}</span>\n    <ha-icon icon=\"${weatherIcon}\"></ha-icon>\n    <span class=\"weather-temp\">${Number.isFinite(weatherTemperature) ? Math.round(weatherTemperature) : \"--\"}°</span>\n  </div>\n\n  <section class=\"glass-panel glance-panel\">\n    <h2>AT A GLANCE</h2>\n    <div class=\"glance-row\"><ha-icon icon=\"mdi:shield-star-outline\"></ha-icon><span>Alarm</span><strong><span style=\"color:${alarmColor};\">${alarmLabel}</span></strong></div>\n    <div class=\"glance-row\"><ha-icon icon=\"mdi:lock-outline\"></ha-icon><span>Locks</span><strong><span style=\"color:${openLocks > 0 ? \"#ff5a52\" : \"#73e876\"};\">${locksLabel}</span></strong></div>\n    <div class=\"glance-row\"><ha-icon icon=\"mdi:garage\"></ha-icon><span>Garage</span><strong><span style=\"color:${garageClosed ? \"#73e876\" : \"#ff5a52\"};\">${garageLabel}</span></strong></div>\n    <div class=\"glance-row\"><ha-icon icon=\"mdi:thermometer\"></ha-icon><span>Indoor Temp</span><strong class=\"neutral\">${Number.isFinite(roomTemperature) ? Math.round(roomTemperature) : \"--\"}°</strong></div>\n    <div class=\"glance-row\"><ha-icon icon=\"mdi:water-outline\"></ha-icon><span>Humidity</span><strong class=\"neutral\">${Number.isFinite(roomHumidity) ? Math.round(roomHumidity) : \"--\"}%</strong></div>\n  </section>\n\n  <div class=\"center-message\">\n    <div class=\"greeting\">Good Evening</div>\n    <div class=\"greeting-subtitle\">Everything looks good.</div>\n  </div>\n\n  <section class=\"glass-panel quick-panel\">\n    <h2>QUICK ACTIONS</h2>\n    <div class=\"quick-action light-action\"><ha-icon icon=\"mdi:lightbulb-outline\"></ha-icon><div><b>BEDROOM LIGHT</b><span>Off</span></div></div>\n    <div class=\"quick-action music-action\"><ha-icon icon=\"mdi:music-note-outline\"></ha-icon><div><b>MUSIC</b><span>Not Playing</span></div></div>\n    <div class=\"quick-action intercom-action\"><ha-icon icon=\"mdi:cellphone-basic\"></ha-icon><div><b>INTERCOM</b><span>Choose Room</span></div></div>\n  </section>\n\n  <nav class=\"parents-nav\">\n    <a class=\"parents-nav-item alarm-nav\" href=\"/control-panels/alarm-control\"><ha-icon icon=\"mdi:shield-star-outline\"></ha-icon><span>ALARM</span></a>\n    <a class=\"parents-nav-item lights-nav\" href=\"/my-floorplan/lights-control\"><ha-icon icon=\"mdi:lightbulb-outline\"></ha-icon><span>LIGHTS</span></a>\n    <a class=\"parents-nav-item locks-nav\" href=\"/my-floorplan/locks-control\"><ha-icon icon=\"mdi:lock-outline\"></ha-icon><span>LOCKS</span></a>\n    <a class=\"parents-nav-item cameras-nav\" href=\"/my-floorplan/cameras-control\"><ha-icon icon=\"mdi:cctv\"></ha-icon><span>CAMERAS</span></a>\n    <a class=\"parents-nav-item temp-nav\" href=\"/my-floorplan/thermostat-control\"><ha-icon icon=\"mdi:thermometer\"></ha-icon><span>TEMP</span></a>\n  </nav>\n</div>\n`;\n]]]\n"
+              },
+              "extra_styles": ":host {\n  display: block;\n  width: 100%;\n  height: 100%;\n  overflow: hidden;\n}\n\n.parents-canvas {\n  position: absolute;\n  left: 50%;\n  top: 50%;\n  width: min(100vw, calc(100dvh * 1.6));\n  height: min(100dvh, calc(100vw / 1.6));\n  transform: translate(-50%, -50%);\n  overflow: hidden;\n  color: #f4f7fa;\n  font-family: Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif;\n  background:\n    linear-gradient(to bottom, rgba(3, 20, 52, .72) 0%, rgba(4, 23, 57, .58) 22%, rgba(1, 5, 14, .04) 48%, rgba(1, 5, 14, .20) 100%),\n    url('/local/housevoice/assets/references/banff%20at%20night.png') center center / cover no-repeat;\n}\n\n.parents-brand {\n  position: absolute;\n  left: 4.7%;\n  top: 4.2%;\n  display: flex;\n  align-items: center;\n  gap: 14px;\n}\n\n.parents-brand img {\n  width: 112px;\n  height: 68px;\n  object-fit: contain;\n}\n\n.brand-name {\n  font-size: 31px;\n  font-weight: 400;\n  letter-spacing: 9px;\n  white-space: nowrap;\n}\n\n.brand-room {\n  margin-top: 7px;\n  color: #53b9ff;\n  font-size: 15px;\n  font-weight: 500;\n  letter-spacing: 7px;\n  white-space: nowrap;\n}\n\n.parents-weather {\n  position: absolute;\n  top: 5.2%;\n  right: 4.6%;\n  display: flex;\n  align-items: baseline;\n  gap: 7px;\n  white-space: nowrap;\n}\n\n.parents-weather ha-icon {\n  align-self: center;\n  margin-left: 17px;\n  color: #e9eff5;\n  --mdc-icon-size: 35px;\n}\n\n.weather-time {\n  font-size: 52px;\n  font-weight: 300;\n  line-height: 1;\n}\n\n.weather-meridiem {\n  font-size: 21px;\n  font-weight: 300;\n}\n\n.weather-temp {\n  font-size: 39px;\n  font-weight: 300;\n}\n\n.glass-panel {\n  position: absolute;\n  box-sizing: border-box;\n  width: 24%;\n  height: 46.5%;\n  padding: 30px 30px;\n  border: 1px solid rgba(120, 170, 205, .28);\n  border-radius: 21px;\n  background: linear-gradient(145deg, rgba(7, 24, 42, .84), rgba(3, 15, 29, .76));\n  box-shadow: 0 12px 30px rgba(0, 0, 0, .24), inset 0 1px 0 rgba(255, 255, 255, .04);\n  backdrop-filter: blur(10px);\n}\n\n.glance-panel {\n  left: 5.2%;\n  top: 21.3%;\n}\n\n.quick-panel {\n  right: 5.2%;\n  top: 21.3%;\n  padding: 30px 19px 20px;\n}\n\nh2 {\n  margin: 0 0 18px;\n  color: #f1f5f8;\n  font-size: 18px;\n  font-weight: 400;\n  letter-spacing: 3px;\n}\n\n.glance-row {\n  display: grid;\n  grid-template-columns: 30px 1fr 108px;\n  align-items: center;\n  height: 19.2%;\n  border-bottom: 1px solid rgba(137, 169, 199, .165);\n  column-gap: 12px;\n  white-space: nowrap;\n}\n\n.glance-row:last-child {\n  border-bottom: 0;\n}\n\n.glance-row ha-icon {\n  color: #f0f5f8;\n  --mdc-icon-size: 30px;\n}\n\n.glance-row span {\n  font-size: 18px;\n  color: rgba(244, 247, 250, .92);\n}\n\n.glance-row strong {\n  color: #7ee87a;\n  font-size: 18px;\n  font-weight: 400;\n  justify-self: end;\n}\n\n.glance-row strong.neutral {\n  color: #f0f3f5;\n}\n\n.center-message {\n  position: absolute;\n  left: 50%;\n  top: calc(41.5% - 101px);\n  transform: translate(-50%, -50%);\n  text-align: center;\n  white-space: nowrap;\n}\n\n.greeting {\n  font-size: 37px;\n  font-weight: 300;\n}\n\n.greeting-subtitle {\n  margin-top: 12px;\n  color: rgba(235, 242, 250, .82);\n  font-size: 18px;\n  font-weight: 300;\n}\n\n.quick-action {\n  display: flex;\n  align-items: center;\n  gap: 9px;\n  box-sizing: border-box;\n  height: 84px;\n  margin-bottom: 12px;\n  padding: 0 14px;\n  border: 1px solid rgba(120, 165, 205, .35);\n  border-radius: 17px;\n  background: linear-gradient(135deg, rgba(17, 32, 50, .82), rgba(5, 17, 31, .76));\n  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .045), 0 5px 15px rgba(0, 0, 0, .18);\n}\n\n.quick-action:last-child {\n  margin-bottom: 0;\n}\n\n.quick-action ha-icon {\n  --mdc-icon-size: 40px;\n  flex: 0 0 60px;\n}\n\n.quick-action div {\n  display: flex;\n  flex-direction: column;\n  gap: 8px;\n}\n\n.quick-action b {\n  font-size: 18px;\n  font-weight: 500;\n  letter-spacing: .5px;\n}\n\n.quick-action span {\n  color: rgba(239, 232, 225, .78);\n  font-size: 16px;\n}\n\n.light-action {\n  border-color: rgba(255, 207, 111, .42);\n}\n\n.light-action ha-icon {\n  color: #ffd16e;\n}\n\n.music-action {\n  border-color: rgba(173, 126, 237, .5);\n}\n\n.music-action ha-icon {\n  color: #c795ff;\n}\n\n.intercom-action {\n  border-color: rgba(83, 185, 255, .45);\n}\n\n.intercom-action ha-icon,\n.intercom-action b {\n  color: #73caff;\n}\n\n.parents-nav {\n  position: absolute;\n  left: 5.2%;\n  right: 5.2%;\n  bottom: 6.5%;\n  display: grid;\n  grid-template-columns: repeat(5, 1fr);\n  height: 14.3%;\n  box-sizing: border-box;\n  border: 1px solid rgba(115, 160, 195, .28);\n  box-shadow: 0 10px 30px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .045);\n  border-radius: 18px;\n  background: linear-gradient(180deg, rgba(6, 22, 38, .90), rgba(2, 13, 25, .94));\n  backdrop-filter: blur(10px);\n}\n\n.parents-nav-item {\n  color: inherit;\n  text-decoration: none;\n  cursor: pointer;\n  display: flex;\n  flex-direction: column;\n  align-items: center;\n  justify-content: center;\n  gap: 20px;\n  border-right: 1px solid rgba(150, 185, 215, .16);\n  font-size: 18px;\n  letter-spacing: 1px;\n}\n\n.parents-nav-item span {\n  transform: translateY(-18px);\n}\n\n.parents-nav-item:last-child {\n  border-right: 0;\n}\n\n.parents-nav-item ha-icon {\n  --mdc-icon-size: 45px;\n  transform: translateY(6px);\n}\n\n.alarm-nav ha-icon {\n  color: #ff5a52;\n}\n\n.temp-nav ha-icon {\n  color: #73caff;\n}\n\n.lights-nav ha-icon {\n  color: #ffd16e;\n}\n\n.locks-nav ha-icon {\n  color: #82e66f;\n}\n\n.cameras-nav ha-icon {\n  color: #b966ff;\n}\n\n\n.music-action ha-icon,\n.intercom-action ha-icon {\n  margin-left: 0;\n  margin-right: 0;\n}\n\n\n.music-action ha-icon,\n.intercom-action ha-icon {\n  margin: 0 !important;\n  position: relative !important;\n  left: 0 !important;\n}\n\n\n\n\n.quick-action {\n  display: grid;\n  grid-template-columns: 60px 1fr;\n  column-gap: 9px;\n}\n\n.quick-action ha-icon {\n  width: 60px;\n  margin: 0 !important;\n  position: static !important;\n  left: auto !important;\n  transform: none !important;\n  justify-self: center;\n}\n\n.quick-action > div {\n  min-width: 0;\n  margin: 0;\n}\n\n\n.quick-action {\n  position: relative;\n}\n\n.quick-action > div {\n  position: absolute;\n  left: 88px;\n  top: 50%;\n  transform: translateY(-50%);\n}\n\n\n.quick-action > div {\n  left: 88px !important;\n  width: 190px;\n  align-items: flex-start !important;\n  text-align: left !important;\n}\n\n.quick-action > div b,\n.quick-action > div span {\n  display: block;\n  width: 100%;\n  text-align: left;\n}\n",
+              "show_icon": false,
+              "show_name": false,
+              "show_state": false,
+              "styles": {
+                "card": [
+                  {
+                    "width": "100vw"
+                  },
+                  {
+                    "height": "100vh"
+                  },
+                  {
+                    "min-height": "100vh"
+                  },
+                  {
+                    "padding": 0
+                  },
+                  {
+                    "margin": 0
+                  },
+                  {
+                    "background": "#01050e"
+                  },
+                  {
+                    "border": 0
+                  },
+                  {
+                    "box-shadow": "none"
+                  },
+                  {
+                    "border-radius": 0
+                  },
+                  {
+                    "overflow": "hidden"
+                  }
+                ]
+              },
+              "triggers_update": [
+                "alarm_control_panel.alarmo",
+                "input_boolean.back_door_locked_mock",
+                "input_boolean.front_door_locked_mock",
+                "input_boolean.garage_door_closed_mock",
+                "input_boolean.garage_entry_locked_mock",
+                "sensor.date_time",
+                "sensor.thermostat_temperature",
+                "weather.forecast_housevoice_weather"
+              ],
+              "type": "custom:button-card"
+            },
+            {
+              "show_icon": false,
+              "show_name": false,
+              "show_state": false,
+              "styles": {
+                "card": [
+                  {
+                    "position": "fixed"
+                  },
+                  {
+                    "left": "5.2vw"
+                  },
+                  {
+                    "top": "79.2vh"
+                  },
+                  {
+                    "width": "17.92vw"
+                  },
+                  {
+                    "height": "14.3vh"
+                  },
+                  {
+                    "padding": 0
+                  },
+                  {
+                    "margin": 0
+                  },
+                  {
+                    "background": "transparent"
+                  },
+                  {
+                    "border": "0"
+                  },
+                  {
+                    "box-shadow": "none"
+                  },
+                  {
+                    "z-index": 100
+                  },
+                  {
+                    "pointer-events": "auto"
+                  }
+                ]
+              },
+              "tap_action": {
+                "action": "fire-dom-event",
+                "browser_mod": {
+                  "data": {
+                    "code": "(() => { localStorage.setItem(\"housevoice_home\", \"/parents-room\"); localStorage.setItem(\"housevoice_panel_origin\", \"/parents-room\"); window.location.assign(\"/control-panels/alarm-control?housevoice_origin=parents\"); })()"
+                  },
+                  "service": "browser_mod.javascript"
+                }
+              },
+              "type": "custom:button-card"
+            },
+            {
+              "show_icon": false,
+              "show_name": false,
+              "show_state": false,
+              "styles": {
+                "card": [
+                  {
+                    "position": "fixed"
+                  },
+                  {
+                    "left": "23.12vw"
+                  },
+                  {
+                    "top": "79.2vh"
+                  },
+                  {
+                    "width": "17.92vw"
+                  },
+                  {
+                    "height": "14.3vh"
+                  },
+                  {
+                    "padding": 0
+                  },
+                  {
+                    "margin": 0
+                  },
+                  {
+                    "background": "transparent"
+                  },
+                  {
+                    "border": "0"
+                  },
+                  {
+                    "box-shadow": "none"
+                  },
+                  {
+                    "z-index": 100
+                  },
+                  {
+                    "pointer-events": "auto"
+                  }
+                ]
+              },
+              "tap_action": {
+                "action": "fire-dom-event",
+                "browser_mod": {
+                  "data": {
+                    "code": "(() => { localStorage.setItem(\"housevoice_home\", \"/parents-room\"); localStorage.setItem(\"housevoice_panel_origin\", \"/parents-room\"); window.location.assign(\"/control-panels/lights-control?housevoice_origin=parents\"); })()"
+                  },
+                  "service": "browser_mod.javascript"
+                }
+              },
+              "type": "custom:button-card"
+            },
+            {
+              "show_icon": false,
+              "show_name": false,
+              "show_state": false,
+              "styles": {
+                "card": [
+                  {
+                    "position": "fixed"
+                  },
+                  {
+                    "left": "41.04vw"
+                  },
+                  {
+                    "top": "79.2vh"
+                  },
+                  {
+                    "width": "17.92vw"
+                  },
+                  {
+                    "height": "14.3vh"
+                  },
+                  {
+                    "padding": 0
+                  },
+                  {
+                    "margin": 0
+                  },
+                  {
+                    "background": "transparent"
+                  },
+                  {
+                    "border": "0"
+                  },
+                  {
+                    "box-shadow": "none"
+                  },
+                  {
+                    "z-index": 100
+                  },
+                  {
+                    "pointer-events": "auto"
+                  }
+                ]
+              },
+              "tap_action": {
+                "action": "fire-dom-event",
+                "browser_mod": {
+                  "data": {
+                    "code": "(() => { localStorage.setItem(\"housevoice_home\", \"/parents-room\"); localStorage.setItem(\"housevoice_panel_origin\", \"/parents-room\"); window.location.assign(\"/control-panels/locks-control?housevoice_origin=parents\"); })()"
+                  },
+                  "service": "browser_mod.javascript"
+                }
+              },
+              "type": "custom:button-card"
+            },
+            {
+              "show_icon": false,
+              "show_name": false,
+              "show_state": false,
+              "styles": {
+                "card": [
+                  {
+                    "position": "fixed"
+                  },
+                  {
+                    "left": "58.96vw"
+                  },
+                  {
+                    "top": "79.2vh"
+                  },
+                  {
+                    "width": "17.92vw"
+                  },
+                  {
+                    "height": "14.3vh"
+                  },
+                  {
+                    "padding": 0
+                  },
+                  {
+                    "margin": 0
+                  },
+                  {
+                    "background": "transparent"
+                  },
+                  {
+                    "border": "0"
+                  },
+                  {
+                    "box-shadow": "none"
+                  },
+                  {
+                    "z-index": 100
+                  },
+                  {
+                    "pointer-events": "auto"
+                  }
+                ]
+              },
+              "tap_action": {
+                "action": "fire-dom-event",
+                "browser_mod": {
+                  "data": {
+                    "code": "(() => { localStorage.setItem(\"housevoice_home\", \"/parents-room\"); localStorage.setItem(\"housevoice_panel_origin\", \"/parents-room\"); window.location.assign(\"/control-panels/cameras-control?housevoice_origin=parents\"); })()"
+                  },
+                  "service": "browser_mod.javascript"
+                }
+              },
+              "type": "custom:button-card"
+            },
+            {
+              "show_icon": false,
+              "show_name": false,
+              "show_state": false,
+              "styles": {
+                "card": [
+                  {
+                    "position": "fixed"
+                  },
+                  {
+                    "left": "76.88vw"
+                  },
+                  {
+                    "top": "79.2vh"
+                  },
+                  {
+                    "width": "17.92vw"
+                  },
+                  {
+                    "height": "14.3vh"
+                  },
+                  {
+                    "padding": 0
+                  },
+                  {
+                    "margin": 0
+                  },
+                  {
+                    "background": "transparent"
+                  },
+                  {
+                    "border": "0"
+                  },
+                  {
+                    "box-shadow": "none"
+                  },
+                  {
+                    "z-index": 100
+                  },
+                  {
+                    "pointer-events": "auto"
+                  }
+                ]
+              },
+              "tap_action": {
+                "action": "fire-dom-event",
+                "browser_mod": {
+                  "data": {
+                    "code": "(() => { localStorage.setItem(\"housevoice_home\", \"/parents-room\"); localStorage.setItem(\"housevoice_panel_origin\", \"/parents-room\"); window.location.assign(\"/control-panels/thermostat-control?housevoice_origin=parents\"); })()"
+                  },
+                  "service": "browser_mod.javascript"
+                }
+              },
+              "type": "custom:button-card"
+            }
+          ],
+          "columns": 1,
+          "square": false,
+          "type": "grid"
+        }
+      ],
+      "path": "parents-room",
+      "title": "Parent's Room",
+      "type": "panel"
+    }
+  ]
+}

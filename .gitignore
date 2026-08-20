@@ -13,6 +13,19 @@ home-assistant.log*
 # Runtime and local tooling data
 .git/
 opencode/
+.HA_VERSION
+.ha_run.lock
+.cache/
+custom_components/hacs/
+www/community/
+
+# Certificates, private keys, and temporary files
+*.pem
+*.key
+*.crt
+*.tmp
+*.temp
+*.swp
 
 # Generated caches
 __pycache__/

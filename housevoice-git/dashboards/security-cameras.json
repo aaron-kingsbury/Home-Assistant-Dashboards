@@ -1,0 +1,61 @@
+{
+  "kiosk_mode": {
+    "hide_header": true,
+    "hide_sidebar": true
+  },
+  "views": [
+    {
+      "cards": [],
+      "max_columns": 4,
+      "sections": [
+        {
+          "cards": [
+            {
+              "camera_image": "camera.outside_back_yard_fluent",
+              "camera_view": "live",
+              "entity": "camera.outside_back_yard_fluent",
+              "fit_mode": "fill",
+              "name": {
+                "type": "device"
+              },
+              "show_name": true,
+              "show_state": true,
+              "type": "picture-entity"
+            },
+            {
+              "camera_image": "camera.outside_back_yard_fluent",
+              "camera_view": "live",
+              "entity": "camera.front_door_fluent",
+              "fit_mode": "contain",
+              "grid_options": {
+                "columns": 9,
+                "rows": "auto"
+              },
+              "show_name": true,
+              "show_state": true,
+              "type": "picture-entity"
+            },
+            {
+              "entity": "light.outside_back_yard_floodlight",
+              "grid_options": {
+                "columns": 3,
+                "rows": "auto"
+              },
+              "icon": "mdi:light-flood-down",
+              "show_icon": true,
+              "show_name": true,
+              "show_state": true,
+              "theme": "Frosted Glass Dark Lite",
+              "type": "button"
+            }
+          ],
+          "column_span": 1,
+          "theme": "Frosted Glass Dark Lite",
+          "type": "grid"
+        }
+      ],
+      "title": "Security Cameras",
+      "type": "sections"
+    }
+  ]
+}
