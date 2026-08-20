@@ -672,7 +672,7 @@
       "cards": [
         {
           "card_mod": {
-            "style": "ha-card { width: 100%; height: 100%; padding: 0; margin: 0; background: transparent; border: 0; box-shadow: none; }"
+            "style": "ha-card { width: 100%; height: 100%; padding: 0; margin: 0; background: transparent; border: 0; box-shadow: none; } ha-card { --music-controls-x: 0px; --music-controls-y: 40px; }"
           },
           "cards": [
             {
@@ -680,9 +680,9 @@
                 "style": "ha-card { width: 100% !important; height: 100% !important; min-width: 0 !important; min-height: 0 !important; } ha-card .mini-canvas { width: min(100vw, calc(100dvh * 2)) !important; height: min(100dvh, calc(100vw / 2)) !important; min-width: 0 !important; min-height: 0 !important; aspect-ratio: 2 / 1; left: 50%; top: 50%; transform: translate(-50%, -50%); } ha-card .mini-canvas .lights, ha-card .mini-canvas .intercom { right: 2.2% !important; } ha-card .mini-card .mini-copy { grid-area: title / title / body / body; display: flex; flex-direction: column; justify-content: center; gap: 4px; } ha-card .mini-card .mini-eyebrow, ha-card .mini-card .mini-title, ha-card .mini-card .mini-sub { grid-area: auto; } ha-card .mini-clock .date { margin-top: 32px; }"
               },
               "custom_fields": {
-                "canvas": "[[[ if (!window.__housevoiceAutoRefresh) { window.__housevoiceAutoRefresh = setTimeout(() => window.location.reload(), 30000); } const mediaPlayer = states[\"media_player.cora_s_room_display_media_player\"]; const attrs = mediaPlayer ? mediaPlayer.attributes : {}; const status = mediaPlayer ? mediaPlayer.state : \"unavailable\"; const title = attrs.media_title || (status === \"unavailable\" ? \"Music unavailable\" : \"Ready to Play\"); const subtitle = attrs.media_artist || attrs.media_album_name || (status === \"unavailable\" ? \"Check the room player\" : \"Choose something below\"); const volume = Math.round((Number(attrs.volume_level) || 0.65) * 100); return `<div class=\"mini-canvas\"><div class=\"mini-brand\"><span class=\"mini-brand-icon\">⌂</span><span>HOUSEVOICE <b>MINI</b></span></div>  <div class='mini-weather'><span class='mini-weather-icon'>${({'clear-night':'☾',sunny:'☀',partlycloudy:'☁',cloudy:'☁',rainy:'☂',pouring:'☂',snowy:'❄','snowy-rainy':'❄',lightning:'⚡','lightning-rainy':'⚡',fog:'≋',windy:'〰','windy-variant':'〰'})[states['weather.forecast_housevoice_weather']?.state] || '?'}</span><span><strong>${Math.round(Number(states['weather.forecast_housevoice_weather']?.attributes?.temperature) || 0)}°</strong><br>${({'clear-night':'Clear Night',sunny:'Sunny',partlycloudy:'Partly Cloudy',cloudy:'Cloudy',rainy:'Rainy',pouring:'Pouring',snowy:'Snowy','snowy-rainy':'Snowy Rain',lightning:'Lightning','lightning-rainy':'Thunderstorms',fog:'Fog',windy:'Windy','windy-variant':'Windy'})[states['weather.forecast_housevoice_weather']?.state] || 'Unknown'}</span></div><div class=\"music-body\"><section class=\"now-playing\"><div class=\"music-kicker\">♪ NOW PLAYING ♪</div><div class=\"music-card\"><div class=\"album-art\"><div class=\"album-fallback\">♫<span>✦ · ✦</span></div><img src=\"${attrs.entity_picture || \"\"}\" alt=\"\" onerror=\"this.style.display=\\x27none\\x27\"></div><div class=\"track-copy\"><div class=\"track-title\">${title}</div><div class=\"track-subtitle\">${subtitle}</div><div class=\"waveform\"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><div class=\"track-state\">${status}</div></div></section><div class=\"playback-controls\"><div class=\"play-button secondary\" onclick=\"this.getRootNode().host.hass.callService(\\x27media_player.media_previous_track\\x27,{entity_id:\\x27media_player.cora_s_room_display_media_player\\x27})\">‹</div><div class=\\\"play-button primary\\\" onclick=\\\"this.getRootNode().host.hass.callService(\\x27media_player.media_play_pause\\x27,{entity_id:\\x27media_player.cora_s_room_display_media_player\\x27})\\\"></div><div class=\"play-button secondary\" onclick=\"this.getRootNode().host.hass.callService(\\x27media_player.media_next_track\\x27,{entity_id:\\x27media_player.cora_s_room_display_media_player\\x27})\">›</div></div><div class=\"volume-row\"><span class=\"volume-icon\">🔊</span><input type=\"range\" min=\"0\" max=\"100\" value=\"${volume}\" oninput=\"this.nextElementSibling.textContent = this.value + \\x27%\\x27\" onchange=\"this.getRootNode().host.hass.callService(\\x27media_player.volume_set\\x27,{entity_id:\\x27media_player.cora_s_room_display_media_player\\x27,volume_level:Number(this.value)/100})\"><span>${volume}%</span></div><div class=\"quick-grid\"><div class=\"quick-play dance\" onclick=\"this.getRootNode().host.hass.callService(\\x27music_assistant.play_media\\x27,{entity_id:\\x27media_player.cora_s_room_display_media_player\\x27,media_id:\\x27library://playlist/67\\x27,media_type:\\x27playlist\\x27,enqueue:\\x27replace\\x27})\"><span>♨</span><b>DANCE PARTY</b></div><div class=\"quick-play chill\" onclick=\"this.getRootNode().host.hass.callService(\\x27music_assistant.play_media\\x27,{entity_id:\\x27media_player.cora_s_room_display_media_player\\x27,media_id:\\x27library://playlist/68\\x27,media_type:\\x27playlist\\x27,enqueue:\\x27replace\\x27})\"><span>☁</span><b>CHILL</b></div><div class=\"quick-play sleep-sounds\" onclick=\"this.getRootNode().host.hass.callService(\\x27music_assistant.play_media\\x27,{entity_id:\\x27media_player.cora_s_room_display_media_player\\x27,media_id:\\x27library://playlist/69\\x27,media_type:\\x27playlist\\x27,enqueue:\\x27replace\\x27})\"><span>☾</span><b>SLEEP SOUNDS</b></div></div></div><div class=\"mini-bottom home\" onclick=\"event.stopPropagation();window.location.href='/kids-rooms/home';return false\"><div class=\"bottom-icon\">⌂</div><div><div class=\"mini-title\">Home</div><div class=\"mini-sub blue\">Dashboard</div></div></div><div class=\"mini-bottom music\" onclick=\"event.stopPropagation();window.location.href='/kids-rooms/music';return false\"><div class=\"bottom-icon\">♫</div><div><div class=\"mini-title\">Music</div><div class=\"mini-sub blue\">Listen &amp; Play</div></div></div><div class=\"mini-bottom timer\" onclick=\"event.stopPropagation();window.location.href='/kids-rooms/timer';return false\"><div class=\"bottom-icon\">◴</div><div><div class=\"mini-title\">Timer</div><div class=\"mini-sub blue\">Set a timer</div></div></div><div class=\"mini-bottom clock\" onclick=\"event.stopPropagation();window.location.href='/kids-rooms/clock';return false\"><div class=\"bottom-icon\">◷</div><div><div class=\"mini-title\">Clock</div><div class=\"mini-sub blue\">View time</div></div></div><div class=\"mini-dots\"><span>•</span><span>•</span><strong>★</strong><span>•</span><span>•</span></div></div>`; ]]]"
+                "canvas": "[[[ if (!window.__housevoiceAutoRefresh) { window.__housevoiceAutoRefresh = setTimeout(() => window.location.reload(), 30000); } const mediaPlayer = states[\"media_player.cora_s_room_display_media_player\"]; const attrs = mediaPlayer ? mediaPlayer.attributes : {}; const status = mediaPlayer ? mediaPlayer.state : \"unavailable\"; const title = attrs.media_title || (status === \"unavailable\" ? \"Music unavailable\" : \"Ready to Play\"); const subtitle = attrs.media_artist || attrs.media_album_name || (status === \"unavailable\" ? \"Check the room player\" : \"Choose something below\"); const volume = Math.round(Number(attrs.volume_level || 0) * 100); return `<div class=\"mini-canvas\"><div class=\"mini-brand\"><span class=\"mini-brand-icon\">⌂</span><span>HOUSEVOICE <b>MINI</b></span></div>  <div class='mini-weather'><span class='mini-weather-icon'>${({'clear-night':'☾',sunny:'☀',partlycloudy:'☁',cloudy:'☁',rainy:'☂',pouring:'☂',snowy:'❄','snowy-rainy':'❄',lightning:'⚡','lightning-rainy':'⚡',fog:'≋',windy:'〰','windy-variant':'〰'})[states['weather.forecast_housevoice_weather']?.state] || '?'}</span><span><strong>${Math.round(Number(states['weather.forecast_housevoice_weather']?.attributes?.temperature) || 0)}°</strong><br>${({'clear-night':'Clear Night',sunny:'Sunny',partlycloudy:'Partly Cloudy',cloudy:'Cloudy',rainy:'Rainy',pouring:'Pouring',snowy:'Snowy','snowy-rainy':'Snowy Rain',lightning:'Lightning','lightning-rainy':'Thunderstorms',fog:'Fog',windy:'Windy','windy-variant':'Windy'})[states['weather.forecast_housevoice_weather']?.state] || 'Unknown'}</span></div><div class=\"music-body\"><section class=\"now-playing\"><div class=\"music-kicker\">♪ NOW PLAYING ♪</div><div class=\"music-card\"><div class=\"album-art\"><div class=\"album-fallback\">♫<span>✦ · ✦</span></div><img src=\"${attrs.entity_picture || \"\"}\" alt=\"\" onerror=\"this.style.display=\\x27none\\x27\"></div><div class=\"track-copy\"><div class=\"track-title\">${title}</div><div class=\"track-subtitle\">${subtitle}</div><div class=\"waveform\"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><div class=\"track-state\">${status}</div></div></section><div class=\"playback-controls\"><div class=\"volume-indicator\">${volume === 0 ? 'MUTED' : 'VOL ' + volume + '%'}</div><div class=\"play-button secondary\" ontouchend=\"event.preventDefault(); this.click(); return false\" onclick=\"this.getRootNode().host.hass.callService(\\x27media_player.media_previous_track\\x27,{entity_id:\\x27media_player.cora_s_room_display_media_player\\x27})\">‹</div><div class=\\\"play-button primary ${status === 'playing' ? 'pause' : 'play'}\\\" ontouchend=\\\"event.preventDefault(); this.click(); return false\\\" onclick=\\\"this.getRootNode().host.hass.callService(\\x27media_player.media_play_pause\\x27,{entity_id:\\x27media_player.cora_s_room_display_media_player\\x27})\\\"></div><div class=\"play-button secondary\" ontouchend=\"event.preventDefault(); this.click(); return false\" onclick=\"this.getRootNode().host.hass.callService(\\x27media_player.media_next_track\\x27,{entity_id:\\x27media_player.cora_s_room_display_media_player\\x27})\">›</div></div><div class=\"quick-grid\"><div class=\"quick-play dance\" ontouchend=\"event.preventDefault(); this.click(); return false\" onclick=\"this.getRootNode().host.hass.callService(\\x27music_assistant.play_media\\x27,{entity_id:\\x27media_player.cora_s_room_display_media_player\\x27,media_id:\\x27library://playlist/67\\x27,media_type:\\x27playlist\\x27,enqueue:\\x27replace\\x27})\"><span>♨</span><b>DANCE PARTY</b></div><div class=\"quick-play chill\" ontouchend=\"event.preventDefault(); this.click(); return false\" onclick=\"this.getRootNode().host.hass.callService(\\x27music_assistant.play_media\\x27,{entity_id:\\x27media_player.cora_s_room_display_media_player\\x27,media_id:\\x27library://playlist/68\\x27,media_type:\\x27playlist\\x27,enqueue:\\x27replace\\x27})\"><span>☁</span><b>CHILL</b></div><div class=\"quick-play sleep-sounds\" ontouchend=\"event.preventDefault(); this.click(); return false\" onclick=\"this.getRootNode().host.hass.callService(\\x27music_assistant.play_media\\x27,{entity_id:\\x27media_player.cora_s_room_display_media_player\\x27,media_id:\\x27library://playlist/69\\x27,media_type:\\x27playlist\\x27,enqueue:\\x27replace\\x27})\"><span>☾</span><b>SLEEP SOUNDS</b></div></div></div><div class=\"mini-bottom home\" ontouchend=\"event.preventDefault(); this.click(); return false\" onclick=\"event.stopPropagation();window.location.href='/kids-rooms/home';return false\"><div class=\"bottom-icon\">⌂</div><div><div class=\"mini-title\">Home</div><div class=\"mini-sub blue\">Dashboard</div></div></div><div class=\"mini-bottom music\" ontouchend=\"event.preventDefault(); this.click(); return false\" onclick=\"event.stopPropagation();window.location.href='/kids-rooms/music';return false\"><div class=\"bottom-icon\">♫</div><div><div class=\"mini-title\">Music</div><div class=\"mini-sub blue\">Listen &amp; Play</div></div></div><div class=\"mini-bottom timer\" ontouchend=\"event.preventDefault(); this.click(); return false\" onclick=\"event.stopPropagation();window.location.href='/kids-rooms/timer';return false\"><div class=\"bottom-icon\">◴</div><div><div class=\"mini-title\">Timer</div><div class=\"mini-sub blue\">Set a timer</div></div></div><div class=\"mini-bottom clock\" ontouchend=\"event.preventDefault(); this.click(); return false\" onclick=\"event.stopPropagation();window.location.href='/kids-rooms/clock';return false\"><div class=\"bottom-icon\">◷</div><div><div class=\"mini-title\">Clock</div><div class=\"mini-sub blue\">View time</div></div></div><div class=\"mini-dots\"><span>•</span><span>•</span><strong>★</strong><span>•</span><span>•</span></div></div>`; ]]]"
               },
-              "extra_styles": ".mini-canvas { margin: auto; position: relative; width: min(100vw, calc(100dvh * 2)); height: min(100dvh, calc(100vw / 2)); min-width: 0; min-height: 0; overflow: hidden; box-sizing: border-box; color: #f4f7ff; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: radial-gradient(circle at 50% 44%, rgba(7, 24, 64, .72) 0%, rgba(1, 5, 18, .98) 48%, #00030d 100%); } .mini-brand { position: absolute; left: 2.1%; top: 2.8%; width: 28%; height: 10%; display: flex; align-items: center; gap: 12px; color: #f4f7ff; font-size: 24px; font-weight: 400; white-space: nowrap; } .mini-brand b { color: #00aaff; font-weight: 400; } .mini-brand-icon { color: #00aaff; font-size: 44px; line-height: 1; text-shadow: 0 0 8px rgba(0, 170, 255, .8); } .mini-weather { position: absolute; right: 4.8%; top: 2.2%; width: 18%; height: 10%; display: flex; align-items: center; gap: 10px; color: #d9edff; font-size: 15px; line-height: 1.45; white-space: nowrap; } .mini-weather strong { font-size: 24px; font-weight: 400; } .mini-weather-icon { color: #d9edff; font-size: 39px; text-shadow: 0 0 7px rgba(160, 220, 255, .7); } .mini-card { position: absolute; display: grid; grid-template-columns: 30% 1fr 42px; grid-template-rows: 1fr 1fr; grid-template-areas: 'art title arrow' 'art body arrow'; align-items: center; column-gap: 8px; box-sizing: border-box; padding: 10px 18px; border-radius: 16px; } .bedtime, .intercom { left: 2.2%; width: 28.3%; height: 21.3%; background: linear-gradient(135deg, rgba(30, 8, 54, .84), rgba(3, 7, 22, .88)); border: 1px solid #6b25c5; box-shadow: 0 0 14px rgba(112, 38, 219, .24); } .bedtime { top: 16.9%; } .morning { left: 2.2%; top: 40.5%; width: 28.3%; height: 21.3%; background: linear-gradient(135deg, rgba(57, 39, 5, .84), rgba(10, 8, 3, .88)); border: 1px solid #c18a00; box-shadow: 0 0 14px rgba(223, 166, 0, .2); } .lights { right: 4%; top: 16.9%; width: 28.3%; height: 21.3%; background: linear-gradient(135deg, rgba(2, 42, 40, .84), rgba(2, 12, 20, .88)); border: 1px solid #00a879; box-shadow: 0 0 14px rgba(0, 211, 145, .2); } .intercom { left: auto; right: 4%; top: 40.5%; } .mini-art { grid-area: art; display: flex; align-items: center; justify-content: center; font-size: 72px; line-height: 1; } .moon, .robot { color: #d695ff; text-shadow: 0 0 9px rgba(192, 89, 255, .8); } .sun { color: #ffe000; text-shadow: 0 0 9px rgba(255, 206, 0, .8); } .lamp { color: #55f5b3; text-shadow: 0 0 9px rgba(0, 244, 170, .8); } .mini-copy { min-width: 0; } .mini-eyebrow { grid-area: title; font-size: 13px; letter-spacing: .5px; white-space: nowrap; } .mini-title { grid-area: body; color: #f4f7ff; font-size: 15px; line-height: 1.35; white-space: nowrap; } .mini-sub { color: #f4f7ff; font-size: 15px; line-height: 1.35; white-space: nowrap; } .violet { color: #d695ff; } .gold { color: #ffe000; } .green { color: #00f0ad; } .blue { color: #22b5ff; } .mini-chevron { grid-area: arrow; width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; font-size: 36px; line-height: 30px; } .violet-border { color: #a34cff; } .gold-border { color: #c18a00; } .green-border { color: #00a879; } .mini-clock { position: absolute; left: 36.5%; top: 18%; width: 27%; height: 30%; display: flex; flex-direction: column; align-items: center; justify-content: center; } .mini-clock .time { color: #d9edff; font-size: 98px; font-weight: 300; line-height: .9; letter-spacing: -5px; text-shadow: 0 0 8px #49aaff, 0 0 20px #1674ff; white-space: nowrap; } .mini-clock .time span { margin-left: 4px; color: #168cff; font-size: 20px; letter-spacing: 0; } .mini-clock .date { margin-top: 25px; color: #d9edff; font-size: 16px; white-space: nowrap; } .mini-bottom { position: absolute; top: 69%; height: 20.2%; display: flex; align-items: center; gap: 18px; box-sizing: border-box; padding: 12px 20px; background: rgba(2, 9, 24, .72); border: 1px solid #315f94; border-radius: 16px; box-shadow: 0 0 12px rgba(51, 123, 198, .18); } .mini-bottom .bottom-icon { width: 58px; height: 58px; display: grid; place-items: center; flex: 0 0 58px; border: 1px solid #315f94; border-radius: 50%; color: #94ceff; font-size: 42px; line-height: 1; text-shadow: 0 0 6px rgba(120, 201, 255, .8); } .home { left: 2.3%; width: 22.9%; } .music { left: 50.7%; width: 22.9%; } .timer { left: 26.5%; width: 22.9%; } .clock { right: 2.3%; width: 22.9%; } .mini-dots { position: absolute; left: 39%; top: 92.3%; width: 22%; height: 5%; display: flex; align-items: center; justify-content: center; gap: 23px; color: #168cff; font-size: 24px; line-height: 1; text-shadow: 0 0 8px rgba(0, 133, 255, .9); } .mini-dots strong { font-size: 31px; } .mini-brand-icon { display: block; width: 48px; height: 48px; font-size: 0; background: url(/local/kids-rooms/assets/icons/mini-logo.svg) center / contain no-repeat; } .mini-art { font-size: 0; background-position: center; background-size: contain; background-repeat: no-repeat; } .mini-art.moon { background-image: url(/local/kids-rooms/assets/icons/bedtime.svg); } .mini-art.sun { background-image: url(/local/kids-rooms/assets/icons/morning.svg); } .mini-art.lamp { background-image: url(/local/kids-rooms/assets/icons/night-light.svg); } .mini-art.robot { background-image: url(/local/kids-rooms/assets/icons/walkie.svg); } .mini-bottom .bottom-icon { font-size: 0; background-position: center; background-size: 48px 48px; background-repeat: no-repeat; } .mini-bottom.home .bottom-icon { background-image: url(/local/kids-rooms/assets/icons/home.svg?v=5); } .mini-bottom.music .bottom-icon { background-image: url(/local/kids-rooms/assets/icons/music.svg?v=5); } .mini-bottom.timer .bottom-icon { background-image: url(/local/kids-rooms/assets/icons/timer.svg?v=5); } .mini-bottom.clock .bottom-icon { background-image: url(/local/kids-rooms/assets/icons/clock.svg?v=5); } .mini-card .mini-art { width: 74px; height: 74px; flex: 0 0 74px; } .mini-card { grid-template-columns: 30% minmax(0, 1fr); grid-template-areas: \\\"art title\\\" \\\"art body\\\"; } .mini-chevron { display: none; } .mini-eyebrow, .mini-sub { display: none; } .mini-card .mini-title { grid-area: auto; font-size: 17px; } .mini-bottom > .mini-title { grid-area: auto; font-size: 16px; } .mini-bottom .bottom-icon { border: 0; border-radius: 0; } .mini-card .mini-title { font-size: 20px; font-weight: 500; } .mini-bottom > .mini-title { font-size: 18px; font-weight: 500; } .mini-bottom::after { content: \"★\"; position: absolute; top: 10px; right: 14px; color: #58c8ff; font-size: 12px; line-height: 1; text-shadow: 0 0 7px rgba(88, 200, 255, .9); } .mini-bottom::after { font-size: 18px; } .mini-bottom > .mini-title { font-size: 20px; } .mini-bottom > .mini-title { font-size: 24px !important; line-height: 1.1; } .mini-bottom .mini-title { font-size: 24px !important; line-height: 1.1 !important; } .mini-bottom .bottom-copy { display: flex; flex-direction: column; gap: 3px; min-width: 0; } .mini-bottom .mini-title { font-size: 24px !important; line-height: 1.1 !important; } .mini-bottom .mini-sub { display: block; color: #22b5ff; font-size: 11px; line-height: 1.1; white-space: nowrap; } .mini-card .mini-title { font-size: 28px !important; line-height: 1.1; font-weight: 500; } .mini-card::after { content: \"\"; position: absolute; right: 18px; bottom: 14px; width: 46px; height: 10px; border-top: 2px solid currentColor; border-radius: 50%; opacity: .75; transform: rotate(-8deg); } .bedtime::after, .intercom::after { color: #c878ff; } .morning::after { color: #ffd32e; transform: rotate(8deg); } .lights::after { color: #4dffc0; transform: rotate(-4deg); } .mini-card::after { left: 50%; right: auto; bottom: 30px; transform: translateX(-50%) rotate(-8deg); } .morning::after { transform: translateX(-50%) rotate(8deg); } .lights::after { transform: translateX(-50%) rotate(-4deg); } .mini-card::after { bottom: 18px; } .mini-card::after { left: 68%; } .mini-card::after { width: 72px; height: 14px; bottom: 10px; border-top-width: 3px; }.music-body{position:absolute;left:2.3%;right:2.3%;top:13%;bottom:28%;display:flex;flex-direction:column;align-items:center;overflow:hidden;color:#f4f8ff}.now-playing{width:780px;max-width:82%;height:112px}.music-kicker{text-align:center;color:#b28cff;font-size:12px;letter-spacing:2px;height:18px;line-height:18px}.music-kicker span{color:#48b8ff;font-size:15px}.music-card{position:relative;height:92px;padding:9px 18px;display:flex;align-items:center;gap:18px;background:rgba(5,18,35,.72);border:1px solid rgba(70,160,255,.3);border-radius:22px;box-shadow:0 0 18px rgba(40,130,255,.1),inset 0 1px 0 rgba(255,255,255,.035);box-sizing:border-box}.album-art{position:relative;width:78px;height:78px;flex:0 0 78px;overflow:hidden;border-radius:14px;background:linear-gradient(135deg,#301d63,#075a91);display:grid;place-items:center}.album-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.album-fallback{color:#d7a8ff;font-size:39px;text-align:center;text-shadow:0 0 12px rgba(100,175,255,.8)}.album-fallback span{display:block;color:#58c8ff;font-size:12px;letter-spacing:4px}.track-copy{min-width:0;flex:1}.track-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f4f8ff;font-size:24px;font-weight:600}.track-subtitle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:3px;color:#48b8ff;font-size:15px}.track-state{align-self:flex-start;margin-top:8px;color:rgba(217,237,255,.5);font-size:10px;text-transform:uppercase;letter-spacing:1px}.waveform{display:flex;align-items:center;gap:3px;height:20px;margin-top:5px;opacity:.35}.waveform.active{opacity:.85}.waveform i{display:block;width:5px;border-radius:4px;background:linear-gradient(#48b8ff,#b26cff)}.waveform i:nth-child(1),.waveform i:nth-child(8){height:7px}.waveform i:nth-child(2),.waveform i:nth-child(11){height:13px}.waveform i:nth-child(3),.waveform i:nth-child(6),.waveform i:nth-child(10),.waveform i:nth-child(14){height:18px}.waveform i:nth-child(4),.waveform i:nth-child(9){height:10px}.waveform i:nth-child(5),.waveform i:nth-child(12){height:15px}.waveform i:nth-child(7),.waveform i:nth-child(13){height:6px}.playback-controls{height:58px;display:flex;align-items:center;justify-content:center;gap:24px}.play-button{display:grid;place-items:center;border-radius:50%;cursor:pointer;color:#d9edff;font-size:29px;line-height:1;user-select:none}.play-button.secondary{width:48px;height:48px;background:rgba(15,30,55,.75);border:1px solid rgba(100,150,210,.3)}.play-button.primary{width:62px;height:62px;background:rgba(15,75,145,.22);border:2px solid #2ea8ff;box-shadow:0 0 16px rgba(46,168,255,.45);font-size:0}.play-button.primary:after{content:\"▶\";font-size:24px;margin-left:3px}.playback-controls.disabled{opacity:.35}.volume-row{width:430px;height:30px;display:flex;align-items:center;gap:10px}.volume-icon{font-size:17px}.volume-row input{width:350px;height:44px;accent-color:#48b8ff;cursor:pointer}.volume-row>span:last-child{width:40px;color:#d9edff;font-size:13px}.volume-row.disabled{opacity:.35}.quick-label{margin-top:1px;margin-bottom:4px;color:#b28cff;font-size:11px;letter-spacing:2px}.quick-grid{width:780px;max-width:82%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.quick-play{height:48px;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:16px;border:1px solid rgba(100,150,210,.3);background:rgba(5,18,35,.78);color:#f4f8ff;cursor:pointer;box-sizing:border-box}.quick-play span{font-size:22px}.quick-play b{font-size:12px;letter-spacing:.3px;font-weight:500}.quick-play.dance{border-color:rgba(219,104,255,.48);color:#e5b6ff}.quick-play.chill{border-color:rgba(94,209,255,.42);color:#a9eaff}.quick-play.stories{border-color:rgba(126,127,255,.45);color:#c3c6ff}.quick-play.bedtime{border-color:rgba(86,116,221,.45);color:#aabaff}\n .quick-play.bedtime{position:static;left:auto;top:auto;width:auto;height:48px} .music-body{align-items:flex-start}.now-playing{width:650px;max-width:none;align-self:flex-start}.playback-controls{width:650px}.volume-row{align-self:flex-start;margin-left:110px}.quick-label{position:absolute;right:3%;top:0;margin:0}.quick-grid{position:absolute;right:0;top:20px;width:220px;max-width:none;grid-template-columns:1fr;gap:7px}.quick-play{height:45px}.quick-play.sleep-sounds{position:static;left:auto;top:auto;width:auto;height:45px} .music-body{top:16%} .now-playing,.playback-controls,.volume-row{transform:translateY(24px)} .mini-bottom{cursor:pointer} .mini-bottom{cursor:pointer;pointer-events:auto;touch-action:manipulation;z-index:20} .nav-hit{position:absolute;top:69%;height:20.2%;display:block;z-index:30;touch-action:manipulation}.home-hit{left:2.3%;width:22.9%}.music-hit{left:50.7%;width:22.9%}.timer-hit{left:26.5%;width:22.9%}.clock-hit{right:2.3%;width:22.9%} #canvas,.custom-field{pointer-events:auto!important} .mini-bottom.music{border-color:rgba(72,92,122,.55)}.mini-bottom.music::after{color:#ffd45a;text-shadow:0 0 7px rgba(255,212,90,.9)} .music-body .playback-controls,.music-body .volume-row{transform:translateY(42px)} .music-body{bottom:31%}.music-body .now-playing{transform:translateY(12px)}.music-body .playback-controls,.music-body .volume-row{transform:translateY(20px)} .music-body{transform:translateY(-15px)} .quick-grid{width:165px} .now-playing{width:585px} .now-playing{transform:translateY(2px)}.music-body .playback-controls,.music-body .volume-row{transform:translateY(15px)} .now-playing{width:556px} .now-playing{width:566px} .quick-grid{gap:12px} .quick-play{height:56px} .quick-play.sleep-sounds{height:56px} .quick-grid{top:15px} .play-button.primary.pause:after{content:\"II\";font-size:18px;letter-spacing:3px;margin-left:3px}",
+              "extra_styles": ".mini-canvas { margin: auto; position: relative; width: min(100vw, calc(100dvh * 2)); height: min(100dvh, calc(100vw / 2)); min-width: 0; min-height: 0; overflow: hidden; box-sizing: border-box; color: #f4f7ff; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: radial-gradient(circle at 50% 44%, rgba(7, 24, 64, .72) 0%, rgba(1, 5, 18, .98) 48%, #00030d 100%); } .mini-brand { position: absolute; left: 2.1%; top: 2.8%; width: 28%; height: 10%; display: flex; align-items: center; gap: 12px; color: #f4f7ff; font-size: 24px; font-weight: 400; white-space: nowrap; } .mini-brand b { color: #00aaff; font-weight: 400; } .mini-brand-icon { color: #00aaff; font-size: 44px; line-height: 1; text-shadow: 0 0 8px rgba(0, 170, 255, .8); } .mini-weather { position: absolute; right: 4.8%; top: 2.2%; width: 18%; height: 10%; display: flex; align-items: center; gap: 10px; color: #d9edff; font-size: 15px; line-height: 1.45; white-space: nowrap; } .mini-weather strong { font-size: 24px; font-weight: 400; } .mini-weather-icon { color: #d9edff; font-size: 39px; text-shadow: 0 0 7px rgba(160, 220, 255, .7); } .mini-card { position: absolute; display: grid; grid-template-columns: 30% 1fr 42px; grid-template-rows: 1fr 1fr; grid-template-areas: 'art title arrow' 'art body arrow'; align-items: center; column-gap: 8px; box-sizing: border-box; padding: 10px 18px; border-radius: 16px; } .bedtime, .intercom { left: 2.2%; width: 28.3%; height: 21.3%; background: linear-gradient(135deg, rgba(30, 8, 54, .84), rgba(3, 7, 22, .88)); border: 1px solid #6b25c5; box-shadow: 0 0 14px rgba(112, 38, 219, .24); } .bedtime { top: 16.9%; } .morning { left: 2.2%; top: 40.5%; width: 28.3%; height: 21.3%; background: linear-gradient(135deg, rgba(57, 39, 5, .84), rgba(10, 8, 3, .88)); border: 1px solid #c18a00; box-shadow: 0 0 14px rgba(223, 166, 0, .2); } .lights { right: 4%; top: 16.9%; width: 28.3%; height: 21.3%; background: linear-gradient(135deg, rgba(2, 42, 40, .84), rgba(2, 12, 20, .88)); border: 1px solid #00a879; box-shadow: 0 0 14px rgba(0, 211, 145, .2); } .intercom { left: auto; right: 4%; top: 40.5%; } .mini-art { grid-area: art; display: flex; align-items: center; justify-content: center; font-size: 72px; line-height: 1; } .moon, .robot { color: #d695ff; text-shadow: 0 0 9px rgba(192, 89, 255, .8); } .sun { color: #ffe000; text-shadow: 0 0 9px rgba(255, 206, 0, .8); } .lamp { color: #55f5b3; text-shadow: 0 0 9px rgba(0, 244, 170, .8); } .mini-copy { min-width: 0; } .mini-eyebrow { grid-area: title; font-size: 13px; letter-spacing: .5px; white-space: nowrap; } .mini-title { grid-area: body; color: #f4f7ff; font-size: 15px; line-height: 1.35; white-space: nowrap; } .mini-sub { color: #f4f7ff; font-size: 15px; line-height: 1.35; white-space: nowrap; } .violet { color: #d695ff; } .gold { color: #ffe000; } .green { color: #00f0ad; } .blue { color: #22b5ff; } .mini-chevron { grid-area: arrow; width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; font-size: 36px; line-height: 30px; } .violet-border { color: #a34cff; } .gold-border { color: #c18a00; } .green-border { color: #00a879; } .mini-clock { position: absolute; left: 36.5%; top: 18%; width: 27%; height: 30%; display: flex; flex-direction: column; align-items: center; justify-content: center; } .mini-clock .time { color: #d9edff; font-size: 98px; font-weight: 300; line-height: .9; letter-spacing: -5px; text-shadow: 0 0 8px #49aaff, 0 0 20px #1674ff; white-space: nowrap; } .mini-clock .time span { margin-left: 4px; color: #168cff; font-size: 20px; letter-spacing: 0; } .mini-clock .date { margin-top: 25px; color: #d9edff; font-size: 16px; white-space: nowrap; } .mini-bottom { position: absolute; top: 69%; height: 20.2%; display: flex; align-items: center; gap: 18px; box-sizing: border-box; padding: 12px 20px; background: rgba(2, 9, 24, .72); border: 1px solid #315f94; border-radius: 16px; box-shadow: 0 0 12px rgba(51, 123, 198, .18); } .mini-bottom .bottom-icon { width: 58px; height: 58px; display: grid; place-items: center; flex: 0 0 58px; border: 1px solid #315f94; border-radius: 50%; color: #94ceff; font-size: 42px; line-height: 1; text-shadow: 0 0 6px rgba(120, 201, 255, .8); } .home { left: 2.3%; width: 22.9%; } .music { left: 50.7%; width: 22.9%; } .timer { left: 26.5%; width: 22.9%; } .clock { right: 2.3%; width: 22.9%; } .mini-dots { position: absolute; left: 39%; top: 92.3%; width: 22%; height: 5%; display: flex; align-items: center; justify-content: center; gap: 23px; color: #168cff; font-size: 24px; line-height: 1; text-shadow: 0 0 8px rgba(0, 133, 255, .9); } .mini-dots strong { font-size: 31px; } .mini-brand-icon { display: block; width: 48px; height: 48px; font-size: 0; background: url(/local/kids-rooms/assets/icons/mini-logo.svg) center / contain no-repeat; } .mini-art { font-size: 0; background-position: center; background-size: contain; background-repeat: no-repeat; } .mini-art.moon { background-image: url(/local/kids-rooms/assets/icons/bedtime.svg); } .mini-art.sun { background-image: url(/local/kids-rooms/assets/icons/morning.svg); } .mini-art.lamp { background-image: url(/local/kids-rooms/assets/icons/night-light.svg); } .mini-art.robot { background-image: url(/local/kids-rooms/assets/icons/walkie.svg); } .mini-bottom .bottom-icon { font-size: 0; background-position: center; background-size: 48px 48px; background-repeat: no-repeat; } .mini-bottom.home .bottom-icon { background-image: url(/local/kids-rooms/assets/icons/home.svg?v=5); } .mini-bottom.music .bottom-icon { background-image: url(/local/kids-rooms/assets/icons/music.svg?v=5); } .mini-bottom.timer .bottom-icon { background-image: url(/local/kids-rooms/assets/icons/timer.svg?v=5); } .mini-bottom.clock .bottom-icon { background-image: url(/local/kids-rooms/assets/icons/clock.svg?v=5); } .mini-card .mini-art { width: 74px; height: 74px; flex: 0 0 74px; } .mini-card { grid-template-columns: 30% minmax(0, 1fr); grid-template-areas: \\\"art title\\\" \\\"art body\\\"; } .mini-chevron { display: none; } .mini-eyebrow, .mini-sub { display: none; } .mini-card .mini-title { grid-area: auto; font-size: 17px; } .mini-bottom > .mini-title { grid-area: auto; font-size: 16px; } .mini-bottom .bottom-icon { border: 0; border-radius: 0; } .mini-card .mini-title { font-size: 20px; font-weight: 500; } .mini-bottom > .mini-title { font-size: 18px; font-weight: 500; } .mini-bottom::after { content: \"★\"; position: absolute; top: 10px; right: 14px; color: #58c8ff; font-size: 12px; line-height: 1; text-shadow: 0 0 7px rgba(88, 200, 255, .9); } .mini-bottom::after { font-size: 18px; } .mini-bottom > .mini-title { font-size: 20px; } .mini-bottom > .mini-title { font-size: 24px !important; line-height: 1.1; } .mini-bottom .mini-title { font-size: 24px !important; line-height: 1.1 !important; } .mini-bottom .bottom-copy { display: flex; flex-direction: column; gap: 3px; min-width: 0; } .mini-bottom .mini-title { font-size: 24px !important; line-height: 1.1 !important; } .mini-bottom .mini-sub { display: block; color: #22b5ff; font-size: 11px; line-height: 1.1; white-space: nowrap; } .mini-card .mini-title { font-size: 28px !important; line-height: 1.1; font-weight: 500; } .mini-card::after { content: \"\"; position: absolute; right: 18px; bottom: 14px; width: 46px; height: 10px; border-top: 2px solid currentColor; border-radius: 50%; opacity: .75; transform: rotate(-8deg); } .bedtime::after, .intercom::after { color: #c878ff; } .morning::after { color: #ffd32e; transform: rotate(8deg); } .lights::after { color: #4dffc0; transform: rotate(-4deg); } .mini-card::after { left: 50%; right: auto; bottom: 30px; transform: translateX(-50%) rotate(-8deg); } .morning::after { transform: translateX(-50%) rotate(8deg); } .lights::after { transform: translateX(-50%) rotate(-4deg); } .mini-card::after { bottom: 18px; } .mini-card::after { left: 68%; } .mini-card::after { width: 72px; height: 14px; bottom: 10px; border-top-width: 3px; }.music-body{position:absolute;left:2.3%;right:2.3%;top:13%;bottom:28%;display:flex;flex-direction:column;align-items:center;overflow:hidden;color:#f4f8ff}.now-playing{width:780px;max-width:82%;height:112px}.music-kicker{text-align:center;color:#b28cff;font-size:12px;letter-spacing:2px;height:18px;line-height:18px}.music-kicker span{color:#48b8ff;font-size:15px}.music-card{position:relative;height:92px;padding:9px 18px;display:flex;align-items:center;gap:18px;background:rgba(5,18,35,.72);border:1px solid rgba(70,160,255,.3);border-radius:22px;box-shadow:0 0 18px rgba(40,130,255,.1),inset 0 1px 0 rgba(255,255,255,.035);box-sizing:border-box}.album-art{position:relative;width:78px;height:78px;flex:0 0 78px;overflow:hidden;border-radius:14px;background:linear-gradient(135deg,#301d63,#075a91);display:grid;place-items:center}.album-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.album-fallback{color:#d7a8ff;font-size:39px;text-align:center;text-shadow:0 0 12px rgba(100,175,255,.8)}.album-fallback span{display:block;color:#58c8ff;font-size:12px;letter-spacing:4px}.track-copy{min-width:0;flex:1}.track-title{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f4f8ff;font-size:24px;font-weight:600}.track-subtitle{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:3px;color:#48b8ff;font-size:15px}.track-state{align-self:flex-start;margin-top:8px;color:rgba(217,237,255,.5);font-size:10px;text-transform:uppercase;letter-spacing:1px}.waveform{display:flex;align-items:center;gap:3px;height:20px;margin-top:5px;opacity:.35}.waveform.active{opacity:.85}.waveform i{display:block;width:5px;border-radius:4px;background:linear-gradient(#48b8ff,#b26cff)}.waveform i:nth-child(1),.waveform i:nth-child(8){height:7px}.waveform i:nth-child(2),.waveform i:nth-child(11){height:13px}.waveform i:nth-child(3),.waveform i:nth-child(6),.waveform i:nth-child(10),.waveform i:nth-child(14){height:18px}.waveform i:nth-child(4),.waveform i:nth-child(9){height:10px}.waveform i:nth-child(5),.waveform i:nth-child(12){height:15px}.waveform i:nth-child(7),.waveform i:nth-child(13){height:6px}.playback-controls{height:58px;position:relative;display:flex;align-items:center;justify-content:center;gap:24px}.play-button{display:grid;place-items:center;border-radius:50%;cursor:pointer;color:#d9edff;font-size:29px;line-height:1;user-select:none}.play-button.secondary{width:48px;height:48px;background:rgba(15,30,55,.75);border:1px solid rgba(100,150,210,.3)}.play-button.primary{width:62px;height:62px;background:rgba(15,75,145,.22);border:2px solid #2ea8ff;box-shadow:0 0 16px rgba(46,168,255,.45);font-size:0}.play-button.primary:after{content:\"▶\";font-size:24px;margin-left:3px}.playback-controls.disabled{opacity:.35}.volume-row{width:430px;height:30px;display:flex;align-items:center;gap:10px}.volume-icon{font-size:17px}.volume-row input{width:350px;height:44px;accent-color:#48b8ff;cursor:pointer}.volume-row>span:last-child{width:40px;color:#d9edff;font-size:13px}.volume-row.disabled{opacity:.35}.quick-label{margin-top:1px;margin-bottom:4px;color:#b28cff;font-size:11px;letter-spacing:2px}.quick-grid{width:780px;max-width:82%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.quick-play{height:48px;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:16px;border:1px solid rgba(100,150,210,.3);background:rgba(5,18,35,.78);color:#f4f8ff;cursor:pointer;box-sizing:border-box}.quick-play span{font-size:22px}.quick-play b{font-size:12px;letter-spacing:.3px;font-weight:500}.quick-play.dance{border-color:rgba(219,104,255,.48);color:#e5b6ff}.quick-play.chill{border-color:rgba(94,209,255,.42);color:#a9eaff}.quick-play.stories{border-color:rgba(126,127,255,.45);color:#c3c6ff}.quick-play.bedtime{border-color:rgba(86,116,221,.45);color:#aabaff}\n .quick-play.bedtime{position:static;left:auto;top:auto;width:auto;height:48px} .music-body{align-items:flex-start}.now-playing{width:650px;max-width:none;align-self:flex-start}.playback-controls{width:650px}.volume-row{align-self:flex-start;margin-left:110px}.quick-label{position:absolute;right:3%;top:0;margin:0}.quick-grid{position:absolute;right:0;top:20px;width:220px;max-width:none;grid-template-columns:1fr;gap:7px}.quick-play{height:45px}.quick-play.sleep-sounds{position:static;left:auto;top:auto;width:auto;height:45px} .music-body{top:16%} .now-playing,.playback-controls,.volume-row{transform:translateY(24px)} .mini-bottom{cursor:pointer} .mini-bottom{cursor:pointer;pointer-events:auto;touch-action:manipulation;z-index:20} .nav-hit{position:absolute;top:69%;height:20.2%;display:block;z-index:30;touch-action:manipulation}.home-hit{left:2.3%;width:22.9%}.music-hit{left:50.7%;width:22.9%}.timer-hit{left:26.5%;width:22.9%}.clock-hit{right:2.3%;width:22.9%} #canvas,.custom-field{pointer-events:auto!important} .mini-bottom.music{border-color:rgba(72,92,122,.55)}.mini-bottom.music::after{color:#ffd45a;text-shadow:0 0 7px rgba(255,212,90,.9)} .music-body .playback-controls,.music-body .volume-row{transform:translateY(42px)} .music-body{bottom:31%}.music-body .now-playing{transform:translateY(12px)}.music-body .playback-controls,.music-body .volume-row{transform:translateY(20px)} .music-body{transform:translateY(-15px)} .quick-grid{width:165px} .now-playing{width:585px} .now-playing{transform:translateY(2px)}.music-body .playback-controls,.music-body .volume-row{transform:translate(var(--music-controls-x, 0px),calc(15px + var(--music-controls-y, 0px)))} .now-playing{width:556px} .now-playing{width:566px} .quick-grid{gap:12px} .quick-play{height:56px} .quick-play.sleep-sounds{height:56px} .quick-grid{top:15px} .play-button.primary.pause:after{content:\"II\";font-size:18px;letter-spacing:3px;margin-left:3px} .volume-indicator{position:absolute;left:calc(50% - 248px);display:inline-flex;align-items:center;justify-content:center;min-width:87px;height:45px;padding:0 7px;box-sizing:border-box;border:1px solid rgba(72,184,255,.35);border-radius:999px;background:rgba(5,18,35,.78);color:#8fd7ff;font-size:18px;font-weight:600;letter-spacing:.2px;box-shadow:0 0 10px rgba(72,184,255,.12);}",
               "show_icon": false,
               "show_name": false,
               "show_state": false,
@@ -769,67 +769,9 @@
               "type": "custom:button-card"
             },
             {
-              "icon": "mdi:pause",
-              "show_name": false,
-              "show_state": false,
-              "styles": {
-                "card": [
-                  {
-                    "position": "fixed"
-                  },
-                  {
-                    "left": "38.5vw"
-                  },
-                  {
-                    "top": "29.3vh"
-                  },
-                  {
-                    "width": "48px"
-                  },
-                  {
-                    "height": "48px"
-                  },
-                  {
-                    "padding": 0
-                  },
-                  {
-                    "margin": 0
-                  },
-                  {
-                    "background": "rgba(15,30,55,.75)"
-                  },
-                  {
-                    "border": "1px solid rgba(100,150,210,.3)"
-                  },
-                  {
-                    "box-shadow": "none"
-                  },
-                  {
-                    "z-index": 110
-                  },
-                  {
-                    "pointer-events": "auto"
-                  }
-                ],
-                "icon": [
-                  {
-                    "color": "#d9edff"
-                  },
-                  {
-                    "width": "24px"
-                  }
-                ]
+              "card_mod": {
+                "style": "ha-card { pointer-events: auto !important; touch-action: manipulation !important; }"
               },
-              "tap_action": {
-                "action": "call-service",
-                "service": "media_player.media_pause",
-                "service_data": {
-                  "entity_id": "media_player.cora_s_room_display_media_player"
-                }
-              },
-              "type": "custom:button-card"
-            },
-            {
               "show_icon": false,
               "show_name": false,
               "styles": {
@@ -838,16 +780,16 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "19.2vw"
+                    "left": "calc(19.2vw + 85px + var(--music-controls-x, 0px))"
                   },
                   {
-                    "top": "29.3vh"
+                    "top": "calc(29.3vh + 61px + var(--music-controls-y, 0px))"
                   },
                   {
-                    "width": "48px"
+                    "width": "55px"
                   },
                   {
-                    "height": "48px"
+                    "height": "55px"
                   },
                   {
                     "padding": 0
@@ -862,6 +804,9 @@
                     "border": 0
                   },
                   {
+                    "border-radius": "50%"
+                  },
+                  {
                     "box-shadow": "none"
                   },
                   {
@@ -869,6 +814,9 @@
                   },
                   {
                     "pointer-events": "auto"
+                  },
+                  {
+                    "touch-action": "manipulation"
                   }
                 ]
               },
@@ -882,6 +830,9 @@
               "type": "custom:button-card"
             },
             {
+              "card_mod": {
+                "style": "ha-card { pointer-events: auto !important; touch-action: manipulation !important; }"
+              },
               "show_icon": false,
               "show_name": false,
               "styles": {
@@ -890,16 +841,16 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "25.1vw"
+                    "left": "calc(25.1vw + 112px + var(--music-controls-x, 0px))"
                   },
                   {
-                    "top": "29.3vh"
+                    "top": "calc(29.3vh + 52px + var(--music-controls-y, 0px))"
                   },
                   {
-                    "width": "62px"
+                    "width": "68px"
                   },
                   {
-                    "height": "62px"
+                    "height": "68px"
                   },
                   {
                     "padding": 0
@@ -914,6 +865,9 @@
                     "border": 0
                   },
                   {
+                    "border-radius": "50%"
+                  },
+                  {
                     "box-shadow": "none"
                   },
                   {
@@ -921,6 +875,9 @@
                   },
                   {
                     "pointer-events": "auto"
+                  },
+                  {
+                    "touch-action": "manipulation"
                   }
                 ]
               },
@@ -934,6 +891,9 @@
               "type": "custom:button-card"
             },
             {
+              "card_mod": {
+                "style": "ha-card { pointer-events: auto !important; touch-action: manipulation !important; }"
+              },
               "show_icon": false,
               "show_name": false,
               "styles": {
@@ -942,16 +902,16 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "32.1vw"
+                    "left": "calc(32.1vw + 145px + var(--music-controls-x, 0px))"
                   },
                   {
-                    "top": "29.3vh"
+                    "top": "calc(29.3vh + 61px + var(--music-controls-y, 0px))"
                   },
                   {
-                    "width": "48px"
+                    "width": "55px"
                   },
                   {
-                    "height": "48px"
+                    "height": "55px"
                   },
                   {
                     "padding": 0
@@ -966,6 +926,9 @@
                     "border": 0
                   },
                   {
+                    "border-radius": "50%"
+                  },
+                  {
                     "box-shadow": "none"
                   },
                   {
@@ -973,6 +936,9 @@
                   },
                   {
                     "pointer-events": "auto"
+                  },
+                  {
+                    "touch-action": "manipulation"
                   }
                 ]
               },
@@ -986,6 +952,9 @@
               "type": "custom:button-card"
             },
             {
+              "card_mod": {
+                "style": "ha-card { pointer-events: auto !important; touch-action: manipulation !important; }"
+              },
               "show_icon": false,
               "show_name": false,
               "styles": {
@@ -1006,25 +975,28 @@
                     "height": "20.2vh"
                   },
                   {
-                    "padding": "0"
+                    "padding": 0
                   },
                   {
-                    "margin": "0"
+                    "margin": 0
                   },
                   {
                     "background": "transparent"
                   },
                   {
-                    "border": "0"
+                    "border": 0
                   },
                   {
                     "box-shadow": "none"
                   },
                   {
-                    "z-index": "100"
+                    "z-index": 100
                   },
                   {
                     "pointer-events": "auto"
+                  },
+                  {
+                    "touch-action": "manipulation"
                   }
                 ]
               },
@@ -1035,55 +1007,9 @@
               "type": "custom:button-card"
             },
             {
-              "show_icon": false,
-              "show_name": false,
-              "styles": {
-                "card": [
-                  {
-                    "position": "fixed"
-                  },
-                  {
-                    "left": "50.7vw"
-                  },
-                  {
-                    "top": "69vh"
-                  },
-                  {
-                    "width": "22.9vw"
-                  },
-                  {
-                    "height": "20.2vh"
-                  },
-                  {
-                    "padding": "0"
-                  },
-                  {
-                    "margin": "0"
-                  },
-                  {
-                    "background": "transparent"
-                  },
-                  {
-                    "border": "0"
-                  },
-                  {
-                    "box-shadow": "none"
-                  },
-                  {
-                    "z-index": "100"
-                  },
-                  {
-                    "pointer-events": "auto"
-                  }
-                ]
+              "card_mod": {
+                "style": "ha-card { pointer-events: auto !important; touch-action: manipulation !important; }"
               },
-              "tap_action": {
-                "action": "navigate",
-                "navigation_path": "/kids-rooms/music"
-              },
-              "type": "custom:button-card"
-            },
-            {
               "show_icon": false,
               "show_name": false,
               "styles": {
@@ -1104,25 +1030,28 @@
                     "height": "20.2vh"
                   },
                   {
-                    "padding": "0"
+                    "padding": 0
                   },
                   {
-                    "margin": "0"
+                    "margin": 0
                   },
                   {
                     "background": "transparent"
                   },
                   {
-                    "border": "0"
+                    "border": 0
                   },
                   {
                     "box-shadow": "none"
                   },
                   {
-                    "z-index": "100"
+                    "z-index": 100
                   },
                   {
                     "pointer-events": "auto"
+                  },
+                  {
+                    "touch-action": "manipulation"
                   }
                 ]
               },
@@ -1133,6 +1062,64 @@
               "type": "custom:button-card"
             },
             {
+              "card_mod": {
+                "style": "ha-card { pointer-events: auto !important; touch-action: manipulation !important; }"
+              },
+              "show_icon": false,
+              "show_name": false,
+              "styles": {
+                "card": [
+                  {
+                    "position": "fixed"
+                  },
+                  {
+                    "left": "50.7vw"
+                  },
+                  {
+                    "top": "69vh"
+                  },
+                  {
+                    "width": "22.9vw"
+                  },
+                  {
+                    "height": "20.2vh"
+                  },
+                  {
+                    "padding": 0
+                  },
+                  {
+                    "margin": 0
+                  },
+                  {
+                    "background": "transparent"
+                  },
+                  {
+                    "border": 0
+                  },
+                  {
+                    "box-shadow": "none"
+                  },
+                  {
+                    "z-index": 100
+                  },
+                  {
+                    "pointer-events": "auto"
+                  },
+                  {
+                    "touch-action": "manipulation"
+                  }
+                ]
+              },
+              "tap_action": {
+                "action": "navigate",
+                "navigation_path": "/kids-rooms/music"
+              },
+              "type": "custom:button-card"
+            },
+            {
+              "card_mod": {
+                "style": "ha-card { pointer-events: auto !important; touch-action: manipulation !important; }"
+              },
               "show_icon": false,
               "show_name": false,
               "styles": {
@@ -1153,25 +1140,28 @@
                     "height": "20.2vh"
                   },
                   {
-                    "padding": "0"
+                    "padding": 0
                   },
                   {
-                    "margin": "0"
+                    "margin": 0
                   },
                   {
                     "background": "transparent"
                   },
                   {
-                    "border": "0"
+                    "border": 0
                   },
                   {
                     "box-shadow": "none"
                   },
                   {
-                    "z-index": "100"
+                    "z-index": 100
                   },
                   {
                     "pointer-events": "auto"
+                  },
+                  {
+                    "touch-action": "manipulation"
                   }
                 ]
               },
