@@ -261,7 +261,7 @@
   triggers:
     - event: start
       trigger: homeassistant
-    - minutes: /15
+    - minutes: /5
       trigger: time_pattern
   actions:
     - action: calendar.get_events
@@ -281,7 +281,7 @@
           | replace('|', '/') | replace('
 
           ', ' ') | truncate(34, True, '...') %}{% set ns.lines = ns.lines + [title
-          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:4] | join('
+          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:6] | join('
 
           ') }}"
       target:
@@ -296,7 +296,7 @@
           | replace('|', '/') | replace('
 
           ', ' ') | truncate(34, True, '...') %}{% set ns.lines = ns.lines + [title
-          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:4] | join('
+          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:6] | join('
 
           ') }}"
       target:
@@ -311,7 +311,7 @@
           | replace('|', '/') | replace('
 
           ', ' ') | truncate(34, True, '...') %}{% set ns.lines = ns.lines + [title
-          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:4] | join('
+          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:6] | join('
 
           ') }}"
       target:
@@ -326,7 +326,7 @@
           | replace('|', '/') | replace('
 
           ', ' ') | truncate(34, True, '...') %}{% set ns.lines = ns.lines + [title
-          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:4] | join('
+          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:6] | join('
 
           ') }}"
       target:
@@ -341,7 +341,7 @@
           | replace('|', '/') | replace('
 
           ', ' ') | truncate(34, True, '...') %}{% set ns.lines = ns.lines + [title
-          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:4] | join('
+          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:6] | join('
 
           ') }}"
       target:
@@ -356,7 +356,7 @@
           | replace('|', '/') | replace('
 
           ', ' ') | truncate(34, True, '...') %}{% set ns.lines = ns.lines + [title
-          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:4] | join('
+          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:6] | join('
 
           ') }}"
       target:
@@ -371,7 +371,7 @@
           | replace('|', '/') | replace('
 
           ', ' ') | truncate(34, True, '...') %}{% set ns.lines = ns.lines + [title
-          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:4] | join('
+          ~ '||' ~ when] %}{% endif %}{% endfor %}{{ ns.lines[:6] | join('
 
           ') }}"
       target:
@@ -395,13 +395,41 @@
           | default([]) %}\n  {% set start = event.start %}\n  {% if next_week_start
           <= start[:10] <= next_week_end %}\n    {% set when = 'All day' if start |
           length == 10 else (as_datetime(start) | as_local).strftime('%-I:%M %p') %}\n
-          \   {% set date_label = as_datetime(start[:10]).strftime('%a %-m/%-d') %}\n
+          \   {% set date_label = as_datetime(start[:10]).strftime('%a') %}\n
           \   {% set title = event.summary | default('Untitled') | replace('|', '/')
           | replace('\\n', ' ') | truncate(34, True, '...') %}\n    {% set ns.lines
           = ns.lines + [date_label ~ '||' ~ title ~ '||' ~ when] %}\n  {% endif %}\n{%
-          endfor %} {{ ns.lines[:4] | join('\\n') }}"
+          endfor %} {{ ns.lines[:6] | join('\\n') }}"
       target:
         entity_id: input_text.calendar_next_week_events
+    - action: input_text.set_value
+      data:
+        value:
+          "{% set ns = namespace(lines=[]) %} {% for event in family_calendar['calendar.kingsbury_mindy_gmail_com']['events']
+          | default([]) %}\n  {% set start = event.start %}\n  {% if next_week_start
+          <= start[:10] <= next_week_end %}\n    {% set when = 'All day' if start |
+          length == 10 else (as_datetime(start) | as_local).strftime('%-I:%M %p') %}\n
+          \   {% set date_label = as_datetime(start[:10]).strftime('%a') %}\n
+          \   {% set title = event.summary | default('Untitled') | replace('|', '/')
+          | replace('\\n', ' ') | truncate(34, True, '...') %}\n    {% set ns.lines
+          = ns.lines + [date_label ~ '||' ~ title ~ '||' ~ when] %}\n  {% endif %}\n{%
+          endfor %} {{ ns.lines[6:12] | join('\\n') }}"
+      target:
+        entity_id: input_text.calendar_next_week_events_2
+    - action: input_text.set_value
+      data:
+        value:
+          "{% set ns = namespace(lines=[]) %} {% for event in family_calendar['calendar.kingsbury_mindy_gmail_com']['events']
+          | default([]) %}\n  {% set start = event.start %}\n  {% if next_week_start
+          <= start[:10] <= next_week_end %}\n    {% set when = 'All day' if start |
+          length == 10 else (as_datetime(start) | as_local).strftime('%-I:%M %p') %}\n
+          \   {% set date_label = as_datetime(start[:10]).strftime('%a') %}\n
+          \   {% set title = event.summary | default('Untitled') | replace('|', '/')
+          | replace('\\n', ' ') | truncate(34, True, '...') %}\n    {% set ns.lines
+          = ns.lines + [date_label ~ '||' ~ title ~ '||' ~ when] %}\n  {% endif %}\n{%
+          endfor %} {{ ns.lines[12:18] | join('\\n') }}"
+      target:
+        entity_id: input_text.calendar_next_week_events_3
     - action: input_text.set_value
       data:
         value:
