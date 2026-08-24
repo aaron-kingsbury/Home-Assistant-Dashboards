@@ -1494,7 +1494,7 @@
                     "left": "42.27vw"
                   },
                   {
-                    "top": "calc(19.5vh - 2px)"
+                    "top": "calc(19.5vh - 12px)"
                   },
                   {
                     "width": "9.8vw"
@@ -1512,10 +1512,10 @@
                     "background": "transparent"
                   },
                   {
-                    "border": "0"
+                    "border": "2px solid #ff3030"
                   },
                   {
-                    "box-shadow": "none"
+                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
                   },
                   {
                     "z-index": "110"
@@ -1549,7 +1549,7 @@
                     "left": "42.27vw"
                   },
                   {
-                    "top": "calc(34.5vh + 1px)"
+                    "top": "calc(34.5vh + 11px)"
                   },
                   {
                     "width": "9.8vw"
@@ -1567,10 +1567,10 @@
                     "background": "transparent"
                   },
                   {
-                    "border": "0"
+                    "border": "2px solid #ff3030"
                   },
                   {
-                    "box-shadow": "none"
+                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
                   },
                   {
                     "z-index": "110"
@@ -1601,10 +1601,10 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "57.23vw"
+                    "left": "calc(57.23vw + 5px)"
                   },
                   {
-                    "top": "calc(19.5vh - 2px)"
+                    "top": "calc(19.5vh - 12px)"
                   },
                   {
                     "width": "9.8vw"
@@ -1622,10 +1622,10 @@
                     "background": "transparent"
                   },
                   {
-                    "border": "0"
+                    "border": "2px solid #ff3030"
                   },
                   {
-                    "box-shadow": "none"
+                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
                   },
                   {
                     "z-index": "110"
@@ -1656,10 +1656,10 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "57.23vw"
+                    "left": "calc(57.23vw + 5px)"
                   },
                   {
-                    "top": "calc(34.5vh + 1px)"
+                    "top": "calc(34.5vh + 11px)"
                   },
                   {
                     "width": "9.8vw"
@@ -1677,10 +1677,10 @@
                     "background": "transparent"
                   },
                   {
-                    "border": "0"
+                    "border": "2px solid #ff3030"
                   },
                   {
-                    "box-shadow": "none"
+                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
                   },
                   {
                     "z-index": "110"
@@ -1711,16 +1711,16 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "36.05vw"
+                    "left": "calc(44.250516vw - 54.600344px)"
                   },
                   {
-                    "top": "calc(45.5vh + 32px)"
+                    "top": "calc(39.15785vh + 49.126px)"
                   },
                   {
-                    "width": "10.2vw"
+                    "width": "calc(8.95993704vw - 5.97329136px)"
                   },
                   {
-                    "height": "8.5vh"
+                    "height": "calc(13.590129vh - 8.91156px)"
                   },
                   {
                     "padding": "0"
@@ -1745,6 +1745,15 @@
                   },
                   {
                     "cursor": "pointer"
+                  },
+                  {
+                    "border": "2px solid #ff3030"
+                  },
+                  {
+                    "border-radius": "11px"
+                  },
+                  {
+                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
                   }
                 ]
               },
@@ -1780,16 +1789,16 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "49.6vw"
+                    "left": "calc(52.530516vw - 47.120344px)"
                   },
                   {
-                    "top": "calc(45.5vh + 32px)"
+                    "top": "calc(39.15785vh + 49.126px)"
                   },
                   {
-                    "width": "10.5vw"
+                    "width": "calc(8.95993704vw - 5.97329136px)"
                   },
                   {
-                    "height": "8.5vh"
+                    "height": "calc(13.590129vh - 8.91156px)"
                   },
                   {
                     "padding": "0"
@@ -1814,6 +1823,15 @@
                   },
                   {
                     "cursor": "pointer"
+                  },
+                  {
+                    "border": "2px solid #ff3030"
+                  },
+                  {
+                    "border-radius": "11px"
+                  },
+                  {
+                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
                   }
                 ]
               },
@@ -1849,16 +1867,16 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "63.05vw"
+                    "left": "calc(60.810516vw - 39.640344px)"
                   },
                   {
-                    "top": "calc(45.5vh + 32px)"
+                    "top": "calc(39.15785vh + 49.126px)"
                   },
                   {
-                    "width": "10.5vw"
+                    "width": "calc(8.95993704vw - 5.97329136px)"
                   },
                   {
-                    "height": "8.5vh"
+                    "height": "calc(13.590129vh - 8.91156px)"
                   },
                   {
                     "padding": "0"
@@ -1883,6 +1901,15 @@
                   },
                   {
                     "cursor": "pointer"
+                  },
+                  {
+                    "border": "2px solid #ff3030"
+                  },
+                  {
+                    "border-radius": "11px"
+                  },
+                  {
+                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
                   }
                 ]
               },
@@ -1918,16 +1945,16 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "76.55vw"
+                    "left": "calc(69.090516vw - 30.160344px)"
                   },
                   {
-                    "top": "calc(45.5vh + 32px)"
+                    "top": "calc(39.15785vh + 49.126px)"
                   },
                   {
-                    "width": "11.5vw"
+                    "width": "calc(8.95993704vw - 5.97329136px)"
                   },
                   {
-                    "height": "8.5vh"
+                    "height": "calc(13.590129vh - 8.91156px)"
                   },
                   {
                     "padding": "0"
@@ -1952,6 +1979,15 @@
                   },
                   {
                     "cursor": "pointer"
+                  },
+                  {
+                    "border": "2px solid #ff3030"
+                  },
+                  {
+                    "border-radius": "11px"
+                  },
+                  {
+                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
                   }
                 ]
               },
@@ -1988,16 +2024,16 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "79.5vw"
+                    "left": "calc(79.5vw + 4px)"
                   },
                   {
-                    "top": "calc(21vh + 12px)"
+                    "top": "calc(21vh + 4px)"
                   },
                   {
                     "width": "16.7vw"
                   },
                   {
-                    "height": "10vh"
+                    "height": "calc(20vh - 4px)"
                   },
                   {
                     "padding": "0"
@@ -2009,10 +2045,10 @@
                     "background": "transparent"
                   },
                   {
-                    "border": "0"
+                    "border": "2px solid #ff3030"
                   },
                   {
-                    "box-shadow": "none"
+                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
                   },
                   {
                     "z-index": "110"
@@ -2044,16 +2080,16 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "79.5vw"
+                    "left": "calc(79.5vw + 4px)"
                   },
                   {
-                    "top": "calc(21vh + 12px)"
+                    "top": "calc(21vh + 4px)"
                   },
                   {
                     "width": "16.7vw"
                   },
                   {
-                    "height": "10vh"
+                    "height": "calc(20vh - 4px)"
                   },
                   {
                     "padding": "0"
@@ -2100,16 +2136,16 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "79.5vw"
+                    "left": "calc(79.5vw + 4px)"
                   },
                   {
-                    "top": "calc(21vh + 12px)"
+                    "top": "calc(21vh + 4px)"
                   },
                   {
                     "width": "16.7vw"
                   },
                   {
-                    "height": "10vh"
+                    "height": "calc(20vh - 4px)"
                   },
                   {
                     "padding": "0"
@@ -2121,10 +2157,10 @@
                     "background": "transparent"
                   },
                   {
-                    "border": "0"
+                    "border": "2px solid #ff3030"
                   },
                   {
-                    "box-shadow": "none"
+                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
                   },
                   {
                     "z-index": "110"
@@ -2155,13 +2191,13 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "86.67vw"
+                    "left": "calc(79.5vw + 4px)"
                   },
                   {
-                    "top": "calc(32vh - 6px)"
+                    "top": "calc(32vh + 44px)"
                   },
                   {
-                    "width": "29.6vw"
+                    "width": "16.7vw"
                   },
                   {
                     "height": "11.5vh"
@@ -2176,10 +2212,10 @@
                     "background": "transparent"
                   },
                   {
-                    "border": "0"
+                    "border": "2px solid #ff3030"
                   },
                   {
-                    "box-shadow": "none"
+                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
                   },
                   {
                     "z-index": "110"
