@@ -1195,9 +1195,9 @@
                 "style": "ha-card { width: 100% !important; height: 100% !important; min-width: 0 !important; min-height: 0 !important; } ha-card .mini-canvas { width: min(100vw, calc(100dvh * 2)) !important; height: min(100dvh, calc(100vw / 2)) !important; min-width: 0 !important; min-height: 0 !important; aspect-ratio: 2 / 1; left: 50%; top: 50%; transform: translate(-50%, -50%); } ha-card .mini-canvas .lights, ha-card .mini-canvas .intercom { right: 2.2% !important; } ha-card .mini-card .mini-copy { grid-area: title / title / body / body; display: flex; flex-direction: column; justify-content: center; gap: 4px; } ha-card .mini-card .mini-eyebrow, ha-card .mini-card .mini-title, ha-card .mini-card .mini-sub { grid-area: auto; } ha-card .mini-clock .date { margin-top: 32px; }"
               },
               "custom_fields": {
-                "canvas": "[[[ if (!window.__housevoiceAutoRefresh) { window.__housevoiceAutoRefresh = setTimeout(() => window.location.reload(), 30000); } const timer = states[\"timer.housevoice_kids_timer\"] || {}; const attrs = timer.attributes || {}; const tick = Number(states[\"sensor.housevoice_timer_tick\"]?.state || Math.floor(Date.now() / 1000)); const selectedMinutes = Number(states[\"input_number.housevoice_timer_minutes\"]?.state || 1); const selectedSeconds = Number(states[\"input_number.housevoice_timer_seconds\"]?.state || 0); const selectedSecondsText = String(selectedSeconds).padStart(2, \"0\"); const remainingParts = String(attrs.remaining || \"0:00:00\").split(\":\").map(Number); const pausedSeconds = remainingParts.length === 3 ? remainingParts[0] * 3600 + remainingParts[1] * 60 + remainingParts[2] : remainingParts[0] * 60 + remainingParts[1]; const fallbackSeconds = timer.state === \"paused\" && attrs.remaining ? pausedSeconds : selectedMinutes * 60 + selectedSeconds; const totalSeconds = timer.state === \"active\" && attrs.finishes_at ? Math.max(0, Math.ceil(Date.parse(attrs.finishes_at) / 1000 - tick)) : fallbackSeconds; const timerText = Math.floor(totalSeconds / 60) + \":\" + String(totalSeconds % 60).padStart(2, \"0\"); const timerStatus = timer.state === \"active\" ? \"Running\" : timer.state === \"paused\" ? \"Paused\" : \"Ready to start\"; const timerActionText = timer.state === \"active\" ? \"Ⅱ Pause\" : timer.state === \"paused\" ? \"▶ Resume\" : \"▶ Start\"; const timerClick = timer.state === \"active\" ? \"this.getRootNode().host.hass.callService('timer','pause',{entity_id:'timer.housevoice_kids_timer'})\" : timer.state === \"paused\" ? \"this.getRootNode().host.hass.callService('timer','start',{entity_id:'timer.housevoice_kids_timer'})\" : \"this.getRootNode().host.hass.callService('script','turn_on',{entity_id:'script.housevoice_timer_start_selected'})\"; return `\n<div class=\"mini-canvas\">\n  <div class=\"mini-brand\"><span class=\"mini-brand-icon\">⌂</span><span>HOUSEVOICE <b>MINI</b></span></div>  <div class='mini-weather'><span class='mini-weather-icon'>${({'clear-night':'☾',sunny:'☀',partlycloudy:'☁',cloudy:'☁',rainy:'☂',pouring:'☂',snowy:'❄','snowy-rainy':'❄',lightning:'⚡','lightning-rainy':'⚡',fog:'≋',windy:'〰','windy-variant':'〰'})[states['weather.forecast_housevoice_weather']?.state] || '?'}</span><span><strong>${Math.round(Number(states['weather.forecast_housevoice_weather']?.attributes?.temperature) || 0)}°</strong><br>${({'clear-night':'Clear Night',sunny:'Sunny',partlycloudy:'Partly Cloudy',cloudy:'Cloudy',rainy:'Rainy',pouring:'Pouring',snowy:'Snowy','snowy-rainy':'Snowy Rain',lightning:'Lightning','lightning-rainy':'Thunderstorms',fog:'Fog',windy:'Windy','windy-variant':'Windy'})[states['weather.forecast_housevoice_weather']?.state] || 'Unknown'}</span></div>\\n\\n  <div class=\"timer-body\"><section class=\"timer-display\"><div class=\"timer-kicker\"><span>★</span> TIMER</div><div class=\"timer-value\">${timerText}</div><div class=\"timer-status\">${timerStatus}</div></section><section class=\"timer-picker-area\"><div class=\"timer-picker-panel\"><div class=\"duration-column\"><div class=\"duration-label\">MIN</div><div class=\"duration-adjust\" onclick=\"this.getRootNode().host.hass.callService('input_number','increment',{entity_id:'input_number.housevoice_timer_minutes'})\">+</div><div class=\"duration-value\">${selectedMinutes}</div><div class=\"duration-adjust\" onclick=\"this.getRootNode().host.hass.callService('input_number','decrement',{entity_id:'input_number.housevoice_timer_minutes'})\">−</div></div><div class=\"duration-divider\">:</div><div class=\"duration-column\"><div class=\"duration-label\">SEC</div><div class=\"duration-adjust\" onclick=\"this.getRootNode().host.hass.callService('input_number','increment',{entity_id:'input_number.housevoice_timer_seconds'})\">+</div><div class=\"duration-value\">${selectedSecondsText}</div><div class=\"duration-adjust\" onclick=\"this.getRootNode().host.hass.callService('input_number','decrement',{entity_id:'input_number.housevoice_timer_seconds'})\">−</div></div></div><div class=\"timer-presets\"><div class=\"timer-preset\" onclick=\"this.getRootNode().host.hass.callService('input_number','set_value',{entity_id:'input_number.housevoice_timer_minutes',value:5});this.getRootNode().host.hass.callService('input_number','set_value',{entity_id:'input_number.housevoice_timer_seconds',value:0})\">5 min</div><div class=\"timer-preset\" onclick=\"this.getRootNode().host.hass.callService('input_number','set_value',{entity_id:'input_number.housevoice_timer_minutes',value:10});this.getRootNode().host.hass.callService('input_number','set_value',{entity_id:'input_number.housevoice_timer_seconds',value:0})\">10 min</div><div class=\"timer-preset active\" onclick=\"this.getRootNode().host.hass.callService('input_number','set_value',{entity_id:'input_number.housevoice_timer_minutes',value:15});this.getRootNode().host.hass.callService('input_number','set_value',{entity_id:'input_number.housevoice_timer_seconds',value:0})\"><b>★</b>15 min</div><div class=\"timer-preset\" onclick=\"this.getRootNode().host.hass.callService('input_number','set_value',{entity_id:'input_number.housevoice_timer_minutes',value:30});this.getRootNode().host.hass.callService('input_number','set_value',{entity_id:'input_number.housevoice_timer_seconds',value:0})\">30 min</div></div></section><section class=\"timer-actions\"><div class=\"timer-start\" onclick='${timerClick}'>${timerActionText}</div><div class=\"timer-cancel\" onclick=\"this.getRootNode().host.hass.callService('timer','cancel',{entity_id:'timer.housevoice_kids_timer'})\">Reset</div></section></div>\\n\\n  <div class=\"mini-bottom home\" onclick=\"event.stopPropagation();window.location.href='/kids-rooms/home';return false\"><div class=\"bottom-icon\">⌂</div><div><div class=\"mini-title\">Home</div><div class=\"mini-sub blue\">Dashboard</div></div></div>\n  <div class=\"mini-bottom music\" onclick=\"event.stopPropagation();window.location.href='/kids-rooms/music';return false\"><div class=\"bottom-icon\">♫</div><div><div class=\"mini-title\">Music</div><div class=\"mini-sub blue\">Listen &amp; Play</div></div></div>\n  <div class=\"mini-bottom timer\" onclick=\"event.stopPropagation();window.location.href='/kids-rooms/timer';return false\"><div class=\"bottom-icon\">◴</div><div><div class=\"mini-title\">Timer</div><div class=\"mini-sub blue\">Set a timer</div></div></div>\n  <div class=\"mini-bottom clock\" onclick=\"event.stopPropagation();window.location.href='/kids-rooms/clock';return false\"><div class=\"bottom-icon\">◷</div><div><div class=\"mini-title\">Clock</div><div class=\"mini-sub blue\">View time</div></div></div>\n  <div class=\"mini-dots\"><span>•</span><span>•</span><strong>★</strong><span>•</span><span>•</span></div>\n</div>\n`; ]]]"
+                "canvas": "[[[ if (!window.__housevoiceAutoRefresh) { window.__housevoiceAutoRefresh = setTimeout(() => window.location.reload(), 30000); } const timer = states[\"timer.housevoice_kids_timer\"] || {}; const attrs = timer.attributes || {}; const tick = Number(states[\"sensor.housevoice_timer_tick\"]?.state || Math.floor(Date.now() / 1000)); const selectedMinutes = Number(states[\"input_number.housevoice_timer_minutes\"]?.state || 1); const selectedSeconds = Number(states[\"input_number.housevoice_timer_seconds\"]?.state || 0); const selectedSecondsText = String(selectedSeconds).padStart(2, \"0\"); const remainingParts = String(attrs.remaining || \"0:00:00\").split(\":\").map(Number); const pausedSeconds = remainingParts.length === 3 ? remainingParts[0] * 3600 + remainingParts[1] * 60 + remainingParts[2] : remainingParts[0] * 60 + remainingParts[1]; const fallbackSeconds = timer.state === \"paused\" && attrs.remaining ? pausedSeconds : selectedMinutes * 60 + selectedSeconds; const computedSeconds = timer.state === \"active\" && attrs.finishes_at ? Math.max(0, Math.ceil(Date.parse(attrs.finishes_at) / 1000 - tick)) : fallbackSeconds; const totalSeconds = timer.state === \"idle\" && attrs.last_transition === \"finished\" ? 0 : computedSeconds; const timerText = Math.floor(totalSeconds / 60) + \":\" + String(totalSeconds % 60).padStart(2, \"0\"); const timerStatus = timer.state === \"active\" ? \"Running\" : timer.state === \"paused\" ? \"Paused\" : \"Ready to start\"; const timerActionText = timer.state === \"active\" ? \"Ⅱ Pause\" : timer.state === \"paused\" ? \"▶ Resume\" : \"▶ Start\"; const timerClick = timer.state === \"active\" ? \"this.getRootNode().host.hass.callService('timer','pause',{entity_id:'timer.housevoice_kids_timer'})\" : timer.state === \"paused\" ? \"this.getRootNode().host.hass.callService('timer','start',{entity_id:'timer.housevoice_kids_timer'})\" : \"this.getRootNode().host.hass.callService('script','turn_on',{entity_id:'script.housevoice_timer_start_selected'})\"; return `\n<div class=\"mini-canvas\">\n  <div class=\"mini-brand\"><span class=\"mini-brand-icon\">⌂</span><span>HOUSEVOICE <b>MINI</b></span></div>  <div class='mini-weather'><span class='mini-weather-icon'>${({'clear-night':'☾',sunny:'☀',partlycloudy:'☁',cloudy:'☁',rainy:'☂',pouring:'☂',snowy:'❄','snowy-rainy':'❄',lightning:'⚡','lightning-rainy':'⚡',fog:'≋',windy:'〰','windy-variant':'〰'})[states['weather.forecast_housevoice_weather']?.state] || '?'}</span><span><strong>${Math.round(Number(states['weather.forecast_housevoice_weather']?.attributes?.temperature) || 0)}°</strong><br>${({'clear-night':'Clear Night',sunny:'Sunny',partlycloudy:'Partly Cloudy',cloudy:'Cloudy',rainy:'Rainy',pouring:'Pouring',snowy:'Snowy','snowy-rainy':'Snowy Rain',lightning:'Lightning','lightning-rainy':'Thunderstorms',fog:'Fog',windy:'Windy','windy-variant':'Windy'})[states['weather.forecast_housevoice_weather']?.state] || 'Unknown'}</span></div>\\n\\n  <div class=\"timer-body\"><section class=\"timer-display\"><div class=\"timer-kicker\"><span>★</span> TIMER</div><div class=\"timer-value\">${timerText}</div><div class=\"timer-status\">${timerStatus}</div></section><section class=\"timer-picker-area\"><div class=\"timer-picker-panel\"><div class=\"duration-column\"><div class=\"duration-label\">MIN</div><div class=\"duration-adjust\" onclick=\"this.getRootNode().host.hass.callService('input_number','increment',{entity_id:'input_number.housevoice_timer_minutes'})\">+</div><div class=\"duration-value\">${selectedMinutes}</div><div class=\"duration-adjust\" onclick=\"this.getRootNode().host.hass.callService('input_number','decrement',{entity_id:'input_number.housevoice_timer_minutes'})\">−</div></div><div class=\"duration-divider\">:</div><div class=\"duration-column\"><div class=\"duration-label\">SEC</div><div class=\"duration-adjust\" onclick=\"this.getRootNode().host.hass.callService('input_number','increment',{entity_id:'input_number.housevoice_timer_seconds'})\">+</div><div class=\"duration-value\">${selectedSecondsText}</div><div class=\"duration-adjust\" onclick=\"this.getRootNode().host.hass.callService('input_number','decrement',{entity_id:'input_number.housevoice_timer_seconds'})\">−</div></div></div><div class=\"timer-presets\"><div class=\"timer-preset\" onclick=\"this.getRootNode().host.hass.callService('input_number','set_value',{entity_id:'input_number.housevoice_timer_minutes',value:5});this.getRootNode().host.hass.callService('input_number','set_value',{entity_id:'input_number.housevoice_timer_seconds',value:0})\">5 min</div><div class=\"timer-preset\" onclick=\"this.getRootNode().host.hass.callService('input_number','set_value',{entity_id:'input_number.housevoice_timer_minutes',value:10});this.getRootNode().host.hass.callService('input_number','set_value',{entity_id:'input_number.housevoice_timer_seconds',value:0})\">10 min</div><div class=\"timer-preset active\" onclick=\"this.getRootNode().host.hass.callService('input_number','set_value',{entity_id:'input_number.housevoice_timer_minutes',value:15});this.getRootNode().host.hass.callService('input_number','set_value',{entity_id:'input_number.housevoice_timer_seconds',value:0})\"><b>★</b>15 min</div><div class=\"timer-preset\" onclick=\"this.getRootNode().host.hass.callService('input_number','set_value',{entity_id:'input_number.housevoice_timer_minutes',value:30});this.getRootNode().host.hass.callService('input_number','set_value',{entity_id:'input_number.housevoice_timer_seconds',value:0})\">30 min</div></div></section><section class=\"timer-actions\"><div class=\"timer-start\" onclick='${timerClick}'>${timerActionText}</div><div class=\"timer-cancel\" onclick=\"this.getRootNode().host.hass.callService('timer','cancel',{entity_id:'timer.housevoice_kids_timer'})\">Reset</div></section></div>\\n\\n  <div class=\"mini-bottom home\" onclick=\"event.stopPropagation();window.location.href='/kids-rooms/home';return false\"><div class=\"bottom-icon\">⌂</div><div><div class=\"mini-title\">Home</div><div class=\"mini-sub blue\">Dashboard</div></div></div>\n  <div class=\"mini-bottom music\" onclick=\"event.stopPropagation();window.location.href='/kids-rooms/music';return false\"><div class=\"bottom-icon\">♫</div><div><div class=\"mini-title\">Music</div><div class=\"mini-sub blue\">Listen &amp; Play</div></div></div>\n  <div class=\"mini-bottom timer\" onclick=\"event.stopPropagation();window.location.href='/kids-rooms/timer';return false\"><div class=\"bottom-icon\">◴</div><div><div class=\"mini-title\">Timer</div><div class=\"mini-sub blue\">Set a timer</div></div></div>\n  <div class=\"mini-bottom clock\" onclick=\"event.stopPropagation();window.location.href='/kids-rooms/clock';return false\"><div class=\"bottom-icon\">◷</div><div><div class=\"mini-title\">Clock</div><div class=\"mini-sub blue\">View time</div></div></div>\n  <div class=\"mini-dots\"><span>•</span><span>•</span><strong>★</strong><span>•</span><span>•</span></div>\n</div>\n`; ]]]"
               },
-              "extra_styles": ".mini-canvas { margin: auto; position: relative; width: min(100vw, calc(100dvh * 2)); height: min(100dvh, calc(100vw / 2)); min-width: 0; min-height: 0; overflow: hidden; box-sizing: border-box; color: #f4f7ff; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: radial-gradient(circle at 50% 44%, rgba(7, 24, 64, .72) 0%, rgba(1, 5, 18, .98) 48%, #00030d 100%); } .mini-brand { position: absolute; left: 2.1%; top: 2.8%; width: 28%; height: 10%; display: flex; align-items: center; gap: 12px; color: #f4f7ff; font-size: 24px; font-weight: 400; white-space: nowrap; } .mini-brand b { color: #00aaff; font-weight: 400; } .mini-brand-icon { color: #00aaff; font-size: 44px; line-height: 1; text-shadow: 0 0 8px rgba(0, 170, 255, .8); } .mini-weather { position: absolute; right: 4.8%; top: 2.2%; width: 18%; height: 10%; display: flex; align-items: center; gap: 10px; color: #d9edff; font-size: 15px; line-height: 1.45; white-space: nowrap; } .mini-weather strong { font-size: 24px; font-weight: 400; } .mini-weather-icon { color: #d9edff; font-size: 39px; text-shadow: 0 0 7px rgba(160, 220, 255, .7); } .mini-card { position: absolute; display: grid; grid-template-columns: 30% 1fr 42px; grid-template-rows: 1fr 1fr; grid-template-areas: 'art title arrow' 'art body arrow'; align-items: center; column-gap: 8px; box-sizing: border-box; padding: 10px 18px; border-radius: 16px; } .bedtime, .intercom { left: 2.2%; width: 28.3%; height: 21.3%; background: linear-gradient(135deg, rgba(30, 8, 54, .84), rgba(3, 7, 22, .88)); border: 1px solid #6b25c5; box-shadow: 0 0 14px rgba(112, 38, 219, .24); } .bedtime { top: 16.9%; } .morning { left: 2.2%; top: 40.5%; width: 28.3%; height: 21.3%; background: linear-gradient(135deg, rgba(57, 39, 5, .84), rgba(10, 8, 3, .88)); border: 1px solid #c18a00; box-shadow: 0 0 14px rgba(223, 166, 0, .2); } .lights { right: 4%; top: 16.9%; width: 28.3%; height: 21.3%; background: linear-gradient(135deg, rgba(2, 42, 40, .84), rgba(2, 12, 20, .88)); border: 1px solid #00a879; box-shadow: 0 0 14px rgba(0, 211, 145, .2); } .intercom { left: auto; right: 4%; top: 40.5%; } .mini-art { grid-area: art; display: flex; align-items: center; justify-content: center; font-size: 72px; line-height: 1; } .moon, .robot { color: #d695ff; text-shadow: 0 0 9px rgba(192, 89, 255, .8); } .sun { color: #ffe000; text-shadow: 0 0 9px rgba(255, 206, 0, .8); } .lamp { color: #55f5b3; text-shadow: 0 0 9px rgba(0, 244, 170, .8); } .mini-copy { min-width: 0; } .mini-eyebrow { grid-area: title; font-size: 13px; letter-spacing: .5px; white-space: nowrap; } .mini-title { grid-area: body; color: #f4f7ff; font-size: 15px; line-height: 1.35; white-space: nowrap; } .mini-sub { color: #f4f7ff; font-size: 15px; line-height: 1.35; white-space: nowrap; } .violet { color: #d695ff; } .gold { color: #ffe000; } .green { color: #00f0ad; } .blue { color: #22b5ff; } .mini-chevron { grid-area: arrow; width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; font-size: 36px; line-height: 30px; } .violet-border { color: #a34cff; } .gold-border { color: #c18a00; } .green-border { color: #00a879; } .mini-clock { position: absolute; left: 36.5%; top: 18%; width: 27%; height: 30%; display: flex; flex-direction: column; align-items: center; justify-content: center; } .mini-clock .time { color: #d9edff; font-size: 98px; font-weight: 300; line-height: .9; letter-spacing: -5px; text-shadow: 0 0 8px #49aaff, 0 0 20px #1674ff; white-space: nowrap; } .mini-clock .time span { margin-left: 4px; color: #168cff; font-size: 20px; letter-spacing: 0; } .mini-clock .date { margin-top: 25px; color: #d9edff; font-size: 16px; white-space: nowrap; } .mini-bottom { position: absolute; top: 69%; height: 20.2%; display: flex; align-items: center; gap: 18px; box-sizing: border-box; padding: 12px 20px; background: rgba(2, 9, 24, .72); border: 1px solid #315f94; border-radius: 16px; box-shadow: 0 0 12px rgba(51, 123, 198, .18); } .mini-bottom .bottom-icon { width: 58px; height: 58px; display: grid; place-items: center; flex: 0 0 58px; border: 1px solid #315f94; border-radius: 50%; color: #94ceff; font-size: 42px; line-height: 1; text-shadow: 0 0 6px rgba(120, 201, 255, .8); } .home { left: 2.3%; width: 22.9%; } .music { left: 50.7%; width: 22.9%; } .timer { left: 26.5%; width: 22.9%; } .clock { right: 2.3%; width: 22.9%; } .mini-dots { position: absolute; left: 39%; top: 92.3%; width: 22%; height: 5%; display: flex; align-items: center; justify-content: center; gap: 23px; color: #168cff; font-size: 24px; line-height: 1; text-shadow: 0 0 8px rgba(0, 133, 255, .9); } .mini-dots strong { font-size: 31px; } .mini-brand-icon { display: block; width: 48px; height: 48px; font-size: 0; background: url(/local/kids-rooms/assets/icons/mini-logo.svg) center / contain no-repeat; } .mini-art { font-size: 0; background-position: center; background-size: contain; background-repeat: no-repeat; } .mini-art.moon { background-image: url(/local/kids-rooms/assets/icons/bedtime.svg); } .mini-art.sun { background-image: url(/local/kids-rooms/assets/icons/morning.svg); } .mini-art.lamp { background-image: url(/local/kids-rooms/assets/icons/night-light.svg); } .mini-art.robot { background-image: url(/local/kids-rooms/assets/icons/walkie.svg); } .mini-bottom .bottom-icon { font-size: 0; background-position: center; background-size: 48px 48px; background-repeat: no-repeat; } .mini-bottom.home .bottom-icon { background-image: url(/local/kids-rooms/assets/icons/home.svg?v=5); } .mini-bottom.music .bottom-icon { background-image: url(/local/kids-rooms/assets/icons/music.svg?v=5); } .mini-bottom.timer .bottom-icon { background-image: url(/local/kids-rooms/assets/icons/timer.svg?v=5); } .mini-bottom.clock .bottom-icon { background-image: url(/local/kids-rooms/assets/icons/clock.svg?v=5); } .mini-card .mini-art { width: 74px; height: 74px; flex: 0 0 74px; } .mini-card { grid-template-columns: 30% minmax(0, 1fr); grid-template-areas: \\\"art title\\\" \\\"art body\\\"; } .mini-chevron { display: none; } .mini-eyebrow, .mini-sub { display: none; } .mini-card .mini-title { grid-area: auto; font-size: 17px; } .mini-bottom > .mini-title { grid-area: auto; font-size: 16px; } .mini-bottom .bottom-icon { border: 0; border-radius: 0; } .mini-card .mini-title { font-size: 20px; font-weight: 500; } .mini-bottom > .mini-title { font-size: 18px; font-weight: 500; } .mini-bottom::after { content: \"★\"; position: absolute; top: 10px; right: 14px; color: #58c8ff; font-size: 12px; line-height: 1; text-shadow: 0 0 7px rgba(88, 200, 255, .9); } .mini-bottom::after { font-size: 18px; } .mini-bottom > .mini-title { font-size: 20px; } .mini-bottom > .mini-title { font-size: 24px !important; line-height: 1.1; } .mini-bottom .mini-title { font-size: 24px !important; line-height: 1.1 !important; } .mini-bottom .bottom-copy { display: flex; flex-direction: column; gap: 3px; min-width: 0; } .mini-bottom .mini-title { font-size: 24px !important; line-height: 1.1 !important; } .mini-bottom .mini-sub { display: block; color: #22b5ff; font-size: 11px; line-height: 1.1; white-space: nowrap; } .mini-card .mini-title { font-size: 28px !important; line-height: 1.1; font-weight: 500; } .mini-card::after { content: \"\"; position: absolute; right: 18px; bottom: 14px; width: 46px; height: 10px; border-top: 2px solid currentColor; border-radius: 50%; opacity: .75; transform: rotate(-8deg); } .bedtime::after, .intercom::after { color: #c878ff; } .morning::after { color: #ffd32e; transform: rotate(8deg); } .lights::after { color: #4dffc0; transform: rotate(-4deg); } .mini-card::after { left: 50%; right: auto; bottom: 30px; transform: translateX(-50%) rotate(-8deg); } .morning::after { transform: translateX(-50%) rotate(8deg); } .lights::after { transform: translateX(-50%) rotate(-4deg); } .mini-card::after { bottom: 18px; } .mini-card::after { left: 68%; } .mini-card::after { width: 72px; height: 14px; bottom: 10px; border-top-width: 3px; } .timer-body{position:absolute;left:4%;right:4%;top:15%;bottom:28%;display:grid;grid-template-columns:46% 34% 20%;grid-template-areas:\"display picker actions\";align-items:center;gap:16px;overflow:hidden}.timer-display{grid-area:display;display:flex;flex-direction:column;align-items:center;justify-content:center}.timer-kicker{color:#d695ff;font-size:15px;letter-spacing:2px;margin-bottom:8px}.timer-kicker span{color:#ffd45a}.timer-value{color:#d9f4ff;font-size:102px;font-weight:300;line-height:.9;letter-spacing:-5px;text-shadow:0 0 8px rgba(56,175,255,.75),0 0 22px rgba(56,175,255,.38)}.timer-status{margin-top:18px;color:#d9edff;font-size:20px}.timer-picker-area{grid-area:picker;display:flex;flex-direction:column;align-items:center;gap:14px}.timer-wheel-panel{position:relative;display:grid;grid-template-columns:1fr 28px 1fr;align-items:center;width:100%;max-width:330px;height:185px;padding:0 22px;box-sizing:border-box;overflow:hidden;background:rgba(5,18,35,.72);border:1px solid rgba(70,160,255,.65);border-radius:22px;box-shadow:0 0 18px rgba(40,130,255,.18),inset 0 1px 0 rgba(255,255,255,.04)}.timer-wheel-column{height:100%;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;z-index:2}.timer-wheel-column::-webkit-scrollbar{display:none}.timer-wheel-value{height:34px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;color:#d9f4ff;font-size:22px}.timer-wheel-value.selected{font-size:30px;font-weight:600}.timer-wheel-value.muted{color:rgba(217,244,255,.42);transform:scale(.82)}.timer-wheel-divider{z-index:3;color:#d9f4ff;font-size:28px;text-align:center}.timer-wheel-highlight{position:absolute;left:14px;right:14px;top:74px;height:38px;background:rgba(20,115,220,.16);border:1px solid rgba(55,175,255,.9);border-radius:14px;box-shadow:0 0 15px rgba(55,175,255,.28);pointer-events:none;z-index:1}.timer-presets{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;width:100%;max-width:330px}.timer-preset{height:42px;display:flex;align-items:center;justify-content:center;color:#b9d8ee;font-size:13px;background:rgba(5,18,35,.72);border:1px solid rgba(70,130,185,.45);border-radius:11px}.timer-preset.active{color:#f4f7ff;border-color:#c878ff;box-shadow:0 0 12px rgba(192,89,255,.3)}.timer-preset b{color:#ffd45a;margin-right:3px}.timer-actions{grid-area:actions;display:flex;flex-direction:column;gap:14px;padding:0 8px}.timer-start,.timer-cancel{display:flex;align-items:center;justify-content:center;border-radius:14px}.timer-start{height:68px;color:#f4f7ff;font-size:22px;background:linear-gradient(135deg,#167dcc,#075b9e);border:1px solid #58b9ff;box-shadow:0 0 18px rgba(40,150,255,.4)}.timer-cancel{height:42px;color:rgba(210,225,238,.7);font-size:15px;background:rgba(5,18,35,.72);border:1px solid rgba(100,130,160,.45)} .timer-body{grid-template-columns:46fr 34fr 20fr}.timer-actions{min-width:0;padding:0} .mini-bottom{cursor:pointer} .mini-bottom{cursor:pointer;pointer-events:auto;touch-action:manipulation;z-index:20} .nav-hit{position:absolute;top:69%;height:20.2%;display:block;z-index:30;touch-action:manipulation}.home-hit{left:2.3%;width:22.9%}.music-hit{left:50.7%;width:22.9%}.timer-hit{left:26.5%;width:22.9%}.clock-hit{right:2.3%;width:22.9%} #canvas,.custom-field{pointer-events:auto!important} .mini-bottom.timer{border-color:rgba(72,92,122,.55)}.mini-bottom.timer::after{color:#ffd45a;text-shadow:0 0 7px rgba(255,212,90,.9)} .timer-picker-area{transform:translateX(-40px)} .timer-picker-area{transform:translate(-40px,-10px)} .timer-picker-area{transform:translate(-40px,-20px)} .timer-wheel-panel{height:155px}.timer-wheel-value{height:29px}.timer-wheel-highlight{top:58px;height:36px} .timer-picker-area{transform:translate(-40px,-10px)} .timer-picker-area{transform:translate(-40px,-10px)}.timer-picker-panel{display:flex;align-items:center;justify-content:center;gap:16px;width:290px;height:155px;box-sizing:border-box;background:rgba(5,18,35,.72);border:1px solid rgba(70,160,255,.65);border-radius:22px;box-shadow:0 0 18px rgba(40,130,255,.18),inset 0 1px 0 rgba(255,255,255,.04)}.duration-column{width:82px;display:flex;flex-direction:column;align-items:center;gap:4px}.duration-label{color:#b9d8ee;font-size:11px;letter-spacing:1.5px}.duration-adjust{width:70px;height:30px;display:flex;align-items:center;justify-content:center;color:#58b9ff;font-size:25px;line-height:1;border:1px solid rgba(70,130,185,.45);border-radius:10px;background:rgba(5,18,35,.55)}.duration-value{width:78px;height:43px;display:flex;align-items:center;justify-content:center;color:#f4f8ff;font-size:32px;font-weight:600;background:rgba(20,115,220,.16);border:1px solid rgba(55,175,255,.9);border-radius:12px;box-shadow:0 0 15px rgba(55,175,255,.28)}.duration-divider{color:#d9f4ff;font-size:30px;margin-top:18px} .timer-body{top:13%;bottom:31%}.timer-display,.timer-actions{transform:translateY(-10px)}.timer-picker-area{transform:translate(-40px,-20px)} .timer-body{overflow:visible}",
+              "extra_styles": ".mini-canvas { margin: auto; position: relative; width: min(100vw, calc(100dvh * 2)); height: min(100dvh, calc(100vw / 2)); min-width: 0; min-height: 0; overflow: hidden; box-sizing: border-box; color: #f4f7ff; font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: radial-gradient(circle at 50% 44%, rgba(7, 24, 64, .72) 0%, rgba(1, 5, 18, .98) 48%, #00030d 100%); } .mini-brand { position: absolute; left: 2.1%; top: 2.8%; width: 28%; height: 10%; display: flex; align-items: center; gap: 12px; color: #f4f7ff; font-size: 24px; font-weight: 400; white-space: nowrap; } .mini-brand b { color: #00aaff; font-weight: 400; } .mini-brand-icon { color: #00aaff; font-size: 44px; line-height: 1; text-shadow: 0 0 8px rgba(0, 170, 255, .8); } .mini-weather { position: absolute; right: 4.8%; top: 2.2%; width: 18%; height: 10%; display: flex; align-items: center; gap: 10px; color: #d9edff; font-size: 15px; line-height: 1.45; white-space: nowrap; } .mini-weather strong { font-size: 24px; font-weight: 400; } .mini-weather-icon { color: #d9edff; font-size: 39px; text-shadow: 0 0 7px rgba(160, 220, 255, .7); } .mini-card { position: absolute; display: grid; grid-template-columns: 30% 1fr 42px; grid-template-rows: 1fr 1fr; grid-template-areas: 'art title arrow' 'art body arrow'; align-items: center; column-gap: 8px; box-sizing: border-box; padding: 10px 18px; border-radius: 16px; } .bedtime, .intercom { left: 2.2%; width: 28.3%; height: 21.3%; background: linear-gradient(135deg, rgba(30, 8, 54, .84), rgba(3, 7, 22, .88)); border: 1px solid #6b25c5; box-shadow: 0 0 14px rgba(112, 38, 219, .24); } .bedtime { top: 16.9%; } .morning { left: 2.2%; top: 40.5%; width: 28.3%; height: 21.3%; background: linear-gradient(135deg, rgba(57, 39, 5, .84), rgba(10, 8, 3, .88)); border: 1px solid #c18a00; box-shadow: 0 0 14px rgba(223, 166, 0, .2); } .lights { right: 4%; top: 16.9%; width: 28.3%; height: 21.3%; background: linear-gradient(135deg, rgba(2, 42, 40, .84), rgba(2, 12, 20, .88)); border: 1px solid #00a879; box-shadow: 0 0 14px rgba(0, 211, 145, .2); } .intercom { left: auto; right: 4%; top: 40.5%; } .mini-art { grid-area: art; display: flex; align-items: center; justify-content: center; font-size: 72px; line-height: 1; } .moon, .robot { color: #d695ff; text-shadow: 0 0 9px rgba(192, 89, 255, .8); } .sun { color: #ffe000; text-shadow: 0 0 9px rgba(255, 206, 0, .8); } .lamp { color: #55f5b3; text-shadow: 0 0 9px rgba(0, 244, 170, .8); } .mini-copy { min-width: 0; } .mini-eyebrow { grid-area: title; font-size: 13px; letter-spacing: .5px; white-space: nowrap; } .mini-title { grid-area: body; color: #f4f7ff; font-size: 15px; line-height: 1.35; white-space: nowrap; } .mini-sub { color: #f4f7ff; font-size: 15px; line-height: 1.35; white-space: nowrap; } .violet { color: #d695ff; } .gold { color: #ffe000; } .green { color: #00f0ad; } .blue { color: #22b5ff; } .mini-chevron { grid-area: arrow; width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid currentColor; border-radius: 50%; font-size: 36px; line-height: 30px; } .violet-border { color: #a34cff; } .gold-border { color: #c18a00; } .green-border { color: #00a879; } .mini-clock { position: absolute; left: 36.5%; top: 18%; width: 27%; height: 30%; display: flex; flex-direction: column; align-items: center; justify-content: center; } .mini-clock .time { color: #d9edff; font-size: 98px; font-weight: 300; line-height: .9; letter-spacing: -5px; text-shadow: 0 0 8px #49aaff, 0 0 20px #1674ff; white-space: nowrap; } .mini-clock .time span { margin-left: 4px; color: #168cff; font-size: 20px; letter-spacing: 0; } .mini-clock .date { margin-top: 25px; color: #d9edff; font-size: 16px; white-space: nowrap; } .mini-bottom { position: absolute; top: 69%; height: 20.2%; display: flex; align-items: center; gap: 18px; box-sizing: border-box; padding: 12px 20px; background: rgba(2, 9, 24, .72); border: 1px solid #315f94; border-radius: 16px; box-shadow: 0 0 12px rgba(51, 123, 198, .18); } .mini-bottom .bottom-icon { width: 58px; height: 58px; display: grid; place-items: center; flex: 0 0 58px; border: 1px solid #315f94; border-radius: 50%; color: #94ceff; font-size: 42px; line-height: 1; text-shadow: 0 0 6px rgba(120, 201, 255, .8); } .home { left: 2.3%; width: 22.9%; } .music { left: 50.7%; width: 22.9%; } .timer { left: 26.5%; width: 22.9%; } .clock { right: 2.3%; width: 22.9%; } .mini-dots { position: absolute; left: 39%; top: 92.3%; width: 22%; height: 5%; display: flex; align-items: center; justify-content: center; gap: 23px; color: #168cff; font-size: 24px; line-height: 1; text-shadow: 0 0 8px rgba(0, 133, 255, .9); } .mini-dots strong { font-size: 31px; } .mini-brand-icon { display: block; width: 48px; height: 48px; font-size: 0; background: url(/local/kids-rooms/assets/icons/mini-logo.svg) center / contain no-repeat; } .mini-art { font-size: 0; background-position: center; background-size: contain; background-repeat: no-repeat; } .mini-art.moon { background-image: url(/local/kids-rooms/assets/icons/bedtime.svg); } .mini-art.sun { background-image: url(/local/kids-rooms/assets/icons/morning.svg); } .mini-art.lamp { background-image: url(/local/kids-rooms/assets/icons/night-light.svg); } .mini-art.robot { background-image: url(/local/kids-rooms/assets/icons/walkie.svg); } .mini-bottom .bottom-icon { font-size: 0; background-position: center; background-size: 48px 48px; background-repeat: no-repeat; } .mini-bottom.home .bottom-icon { background-image: url(/local/kids-rooms/assets/icons/home.svg?v=5); } .mini-bottom.music .bottom-icon { background-image: url(/local/kids-rooms/assets/icons/music.svg?v=5); } .mini-bottom.timer .bottom-icon { background-image: url(/local/kids-rooms/assets/icons/timer.svg?v=5); } .mini-bottom.clock .bottom-icon { background-image: url(/local/kids-rooms/assets/icons/clock.svg?v=5); } .mini-card .mini-art { width: 74px; height: 74px; flex: 0 0 74px; } .mini-card { grid-template-columns: 30% minmax(0, 1fr); grid-template-areas: \\\"art title\\\" \\\"art body\\\"; } .mini-chevron { display: none; } .mini-eyebrow, .mini-sub { display: none; } .mini-card .mini-title { grid-area: auto; font-size: 17px; } .mini-bottom > .mini-title { grid-area: auto; font-size: 16px; } .mini-bottom .bottom-icon { border: 0; border-radius: 0; } .mini-card .mini-title { font-size: 20px; font-weight: 500; } .mini-bottom > .mini-title { font-size: 18px; font-weight: 500; } .mini-bottom::after { content: \"★\"; position: absolute; top: 10px; right: 14px; color: #58c8ff; font-size: 12px; line-height: 1; text-shadow: 0 0 7px rgba(88, 200, 255, .9); } .mini-bottom::after { font-size: 18px; } .mini-bottom > .mini-title { font-size: 20px; } .mini-bottom > .mini-title { font-size: 24px !important; line-height: 1.1; } .mini-bottom .mini-title { font-size: 24px !important; line-height: 1.1 !important; } .mini-bottom .bottom-copy { display: flex; flex-direction: column; gap: 3px; min-width: 0; } .mini-bottom .mini-title { font-size: 24px !important; line-height: 1.1 !important; } .mini-bottom .mini-sub { display: block; color: #22b5ff; font-size: 11px; line-height: 1.1; white-space: nowrap; } .mini-card .mini-title { font-size: 28px !important; line-height: 1.1; font-weight: 500; } .mini-card::after { content: \"\"; position: absolute; right: 18px; bottom: 14px; width: 46px; height: 10px; border-top: 2px solid currentColor; border-radius: 50%; opacity: .75; transform: rotate(-8deg); } .bedtime::after, .intercom::after { color: #c878ff; } .morning::after { color: #ffd32e; transform: rotate(8deg); } .lights::after { color: #4dffc0; transform: rotate(-4deg); } .mini-card::after { left: 50%; right: auto; bottom: 30px; transform: translateX(-50%) rotate(-8deg); } .morning::after { transform: translateX(-50%) rotate(8deg); } .lights::after { transform: translateX(-50%) rotate(-4deg); } .mini-card::after { bottom: 18px; } .mini-card::after { left: 68%; } .mini-card::after { width: 72px; height: 14px; bottom: 10px; border-top-width: 3px; } .timer-body{position:absolute;left:4%;right:4%;top:15%;bottom:28%;display:grid;grid-template-columns:46% 34% 20%;grid-template-areas:\"display picker actions\";align-items:center;gap:16px;overflow:hidden}.timer-display{grid-area:display;display:flex;flex-direction:column;align-items:center;justify-content:center}.timer-kicker{color:#d695ff;font-size:15px;letter-spacing:2px;margin-bottom:8px}.timer-kicker span{color:#ffd45a}.timer-value{color:#d9f4ff;font-size:102px;font-weight:300;line-height:.9;letter-spacing:-5px;text-shadow:0 0 8px rgba(56,175,255,.75),0 0 22px rgba(56,175,255,.38)}.timer-status{margin-top:18px;color:#d9edff;font-size:20px}.timer-picker-area{grid-area:picker;display:flex;flex-direction:column;align-items:center;gap:14px}.timer-wheel-panel{position:relative;display:grid;grid-template-columns:1fr 28px 1fr;align-items:center;width:100%;max-width:330px;height:185px;padding:0 22px;box-sizing:border-box;overflow:hidden;background:rgba(5,18,35,.72);border:1px solid rgba(70,160,255,.65);border-radius:22px;box-shadow:0 0 18px rgba(40,130,255,.18),inset 0 1px 0 rgba(255,255,255,.04)}.timer-wheel-column{height:100%;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;z-index:2}.timer-wheel-column::-webkit-scrollbar{display:none}.timer-wheel-value{height:34px;display:flex;align-items:center;justify-content:center;scroll-snap-align:center;color:#d9f4ff;font-size:22px}.timer-wheel-value.selected{font-size:30px;font-weight:600}.timer-wheel-value.muted{color:rgba(217,244,255,.42);transform:scale(.82)}.timer-wheel-divider{z-index:3;color:#d9f4ff;font-size:28px;text-align:center}.timer-wheel-highlight{position:absolute;left:14px;right:14px;top:74px;height:38px;background:rgba(20,115,220,.16);border:1px solid rgba(55,175,255,.9);border-radius:14px;box-shadow:0 0 15px rgba(55,175,255,.28);pointer-events:none;z-index:1}.timer-presets{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;width:100%;max-width:330px}.timer-preset{height:42px;display:flex;align-items:center;justify-content:center;color:#b9d8ee;font-size:13px;background:rgba(5,18,35,.72);border:1px solid rgba(70,130,185,.45);border-radius:11px}.timer-preset.active{color:#f4f7ff;border-color:#c878ff;box-shadow:0 0 12px rgba(192,89,255,.3)}.timer-preset b{color:#ffd45a;margin-right:3px}.timer-actions{grid-area:actions;display:flex;flex-direction:column;gap:14px;padding:0 8px}.timer-start,.timer-cancel{display:flex;align-items:center;justify-content:center;border-radius:14px}.timer-start{height:68px;color:#f4f7ff;font-size:22px;background:linear-gradient(135deg,#167dcc,#075b9e);border:1px solid #58b9ff;box-shadow:0 0 18px rgba(40,150,255,.4)}.timer-cancel{height:42px;color:rgba(210,225,238,.7);font-size:15px;background:rgba(5,18,35,.72);border:1px solid rgba(100,130,160,.45)} .timer-body{grid-template-columns:46fr 34fr 20fr}.timer-actions{min-width:0;padding:0} .mini-bottom{cursor:pointer} .mini-bottom{cursor:pointer;pointer-events:auto;touch-action:manipulation;z-index:20} .nav-hit{position:absolute;top:69%;height:20.2%;display:block;z-index:30;touch-action:manipulation}.home-hit{left:2.3%;width:22.9%}.music-hit{left:50.7%;width:22.9%}.timer-hit{left:26.5%;width:22.9%}.clock-hit{right:2.3%;width:22.9%} #canvas,.custom-field{pointer-events:auto!important} .mini-bottom.timer{border-color:rgba(72,92,122,.55)}.mini-bottom.timer::after{color:#ffd45a;text-shadow:0 0 7px rgba(255,212,90,.9)} .timer-picker-area{transform:translateX(-40px)} .timer-picker-area{transform:translate(-40px,-10px)} .timer-picker-area{transform:translate(-40px,-20px)} .timer-wheel-panel{height:155px}.timer-wheel-value{height:29px}.timer-wheel-highlight{top:58px;height:36px} .timer-picker-area{transform:translate(-40px,-10px)} .timer-picker-area{transform:translate(-40px,-10px)}.timer-picker-panel{display:flex;align-items:center;justify-content:center;gap:16px;width:290px;height:155px;box-sizing:border-box;background:rgba(5,18,35,.72);border:1px solid rgba(70,160,255,.65);border-radius:22px;box-shadow:0 0 18px rgba(40,130,255,.18),inset 0 1px 0 rgba(255,255,255,.04)}.duration-column{width:82px;display:flex;flex-direction:column;align-items:center;gap:4px}.duration-label{color:#b9d8ee;font-size:11px;letter-spacing:1.5px}.duration-adjust{width:70px;height:30px;display:flex;align-items:center;justify-content:center;color:#58b9ff;font-size:25px;line-height:1;border:1px solid rgba(70,130,185,.45);border-radius:10px;background:rgba(5,18,35,.55)}.duration-value{width:78px;height:43px;display:flex;align-items:center;justify-content:center;color:#f4f8ff;font-size:32px;font-weight:600;background:rgba(20,115,220,.16);border:1px solid rgba(55,175,255,.9);border-radius:12px;box-shadow:0 0 15px rgba(55,175,255,.28)}.duration-divider{color:#d9f4ff;font-size:30px;margin-top:18px} .timer-body{top:13%;bottom:31%}.timer-display,.timer-actions{transform:translateY(-10px)}.timer-picker-area{transform:translate(-40px,-20px)} .timer-body{overflow:visible} .timer-picker-panel .duration-column:first-child .duration-adjust:nth-of-type(2){border:2px solid #ff3030;box-shadow:0 0 8px rgba(255,48,48,.75)} .timer-picker-panel .duration-column:first-child .duration-adjust:nth-of-type(3),.timer-picker-panel .duration-column:nth-child(3) .duration-adjust:nth-of-type(2),.timer-picker-panel .duration-column:nth-child(3) .duration-adjust:nth-of-type(3){border:2px solid #ff3030;box-shadow:0 0 8px rgba(255,48,48,.75)} .timer-picker-panel .duration-column:first-child .duration-adjust:nth-of-type(4),.timer-picker-panel .duration-column:nth-child(3) .duration-adjust:nth-of-type(4){border:2px solid #ff3030;box-shadow:0 0 8px rgba(255,48,48,.75)} .timer-presets .timer-preset:nth-child(1),.timer-presets .timer-preset:nth-child(2),.timer-presets .timer-preset:nth-child(3),.timer-presets .timer-preset:nth-child(4){border:2px solid #ff3030;box-shadow:0 0 8px rgba(255,48,48,.75)} .timer-start,.timer-cancel{border:2px solid #ff3030;box-shadow:0 0 8px rgba(255,48,48,.75)} .duration-adjust,.timer-preset,.timer-start,.timer-cancel{pointer-events:auto!important;cursor:pointer;position:relative;z-index:50} .timer-picker-panel .duration-column:nth-child(3) .duration-adjust:nth-of-type(2){border:1px solid rgba(70,130,185,.45);box-shadow:none} .timer-picker-panel .duration-column:first-child .duration-adjust:nth-of-type(2){border:1px solid rgba(70,130,185,.45);box-shadow:none} .timer-picker-panel .duration-column:first-child .duration-adjust:nth-of-type(4),.timer-picker-panel .duration-column:nth-child(3) .duration-adjust:nth-of-type(4){border:1px solid rgba(70,130,185,.45);box-shadow:none} .timer-start{border:1px solid #58b9ff;box-shadow:0 0 18px rgba(40,150,255,.4)} .timer-cancel{border:1px solid rgba(100,130,160,.45);box-shadow:none} .timer-presets .timer-preset:nth-child(1){border:1px solid rgba(70,130,185,.45);box-shadow:none} .timer-presets .timer-preset:nth-child(2){border:1px solid rgba(70,130,185,.45);box-shadow:none} .timer-presets .timer-preset:nth-child(3){border:1px solid rgba(70,130,185,.45);box-shadow:none} .timer-presets .timer-preset:nth-child(4){border:1px solid rgba(70,130,185,.45);box-shadow:none} .timer-display{transform:translate(-30px,-10px)}",
               "show_icon": false,
               "show_name": false,
               "show_state": false,
@@ -1491,16 +1491,16 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "42.27vw"
+                    "left": "calc(42.27vw + 3px)"
                   },
                   {
-                    "top": "calc(19.5vh - 12px)"
+                    "top": "calc(19.5vh - 16px)"
                   },
                   {
-                    "width": "9.8vw"
+                    "width": "74px"
                   },
                   {
-                    "height": "7.2vh"
+                    "height": "34px"
                   },
                   {
                     "padding": "0"
@@ -1510,12 +1510,6 @@
                   },
                   {
                     "background": "transparent"
-                  },
-                  {
-                    "border": "2px solid #ff3030"
-                  },
-                  {
-                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
                   },
                   {
                     "z-index": "110"
@@ -1525,217 +1519,55 @@
                   },
                   {
                     "cursor": "pointer"
-                  }
-                ]
-              },
-              "tap_action": {
-                "action": "call-service",
-                "service": "input_number.increment",
-                "service_data": {
-                  "entity_id": "input_number.housevoice_timer_minutes"
-                }
-              },
-              "type": "custom:button-card"
-            },
-            {
-              "show_icon": false,
-              "show_name": false,
-              "styles": {
-                "card": [
-                  {
-                    "position": "fixed"
                   },
                   {
-                    "left": "42.27vw"
-                  },
-                  {
-                    "top": "calc(34.5vh + 11px)"
-                  },
-                  {
-                    "width": "9.8vw"
-                  },
-                  {
-                    "height": "7.2vh"
-                  },
-                  {
-                    "padding": "0"
-                  },
-                  {
-                    "margin": "0"
-                  },
-                  {
-                    "background": "transparent"
-                  },
-                  {
-                    "border": "2px solid #ff3030"
-                  },
-                  {
-                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
-                  },
-                  {
-                    "z-index": "110"
-                  },
-                  {
-                    "pointer-events": "auto"
-                  },
-                  {
-                    "cursor": "pointer"
-                  }
-                ]
-              },
-              "tap_action": {
-                "action": "call-service",
-                "service": "input_number.decrement",
-                "service_data": {
-                  "entity_id": "input_number.housevoice_timer_minutes"
-                }
-              },
-              "type": "custom:button-card"
-            },
-            {
-              "show_icon": false,
-              "show_name": false,
-              "styles": {
-                "card": [
-                  {
-                    "position": "fixed"
-                  },
-                  {
-                    "left": "calc(57.23vw + 5px)"
-                  },
-                  {
-                    "top": "calc(19.5vh - 12px)"
-                  },
-                  {
-                    "width": "9.8vw"
-                  },
-                  {
-                    "height": "7.2vh"
-                  },
-                  {
-                    "padding": "0"
-                  },
-                  {
-                    "margin": "0"
-                  },
-                  {
-                    "background": "transparent"
-                  },
-                  {
-                    "border": "2px solid #ff3030"
-                  },
-                  {
-                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
-                  },
-                  {
-                    "z-index": "110"
-                  },
-                  {
-                    "pointer-events": "auto"
-                  },
-                  {
-                    "cursor": "pointer"
-                  }
-                ]
-              },
-              "tap_action": {
-                "action": "call-service",
-                "service": "input_number.increment",
-                "service_data": {
-                  "entity_id": "input_number.housevoice_timer_seconds"
-                }
-              },
-              "type": "custom:button-card"
-            },
-            {
-              "show_icon": false,
-              "show_name": false,
-              "styles": {
-                "card": [
-                  {
-                    "position": "fixed"
-                  },
-                  {
-                    "left": "calc(57.23vw + 5px)"
-                  },
-                  {
-                    "top": "calc(34.5vh + 11px)"
-                  },
-                  {
-                    "width": "9.8vw"
-                  },
-                  {
-                    "height": "7.2vh"
-                  },
-                  {
-                    "padding": "0"
-                  },
-                  {
-                    "margin": "0"
-                  },
-                  {
-                    "background": "transparent"
-                  },
-                  {
-                    "border": "2px solid #ff3030"
-                  },
-                  {
-                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
-                  },
-                  {
-                    "z-index": "110"
-                  },
-                  {
-                    "pointer-events": "auto"
-                  },
-                  {
-                    "cursor": "pointer"
-                  }
-                ]
-              },
-              "tap_action": {
-                "action": "call-service",
-                "service": "input_number.decrement",
-                "service_data": {
-                  "entity_id": "input_number.housevoice_timer_seconds"
-                }
-              },
-              "type": "custom:button-card"
-            },
-            {
-              "show_icon": false,
-              "show_name": false,
-              "styles": {
-                "card": [
-                  {
-                    "position": "fixed"
-                  },
-                  {
-                    "left": "calc(44.250516vw - 54.600344px)"
-                  },
-                  {
-                    "top": "calc(39.15785vh + 49.126px)"
-                  },
-                  {
-                    "width": "calc(8.95993704vw - 5.97329136px)"
-                  },
-                  {
-                    "height": "calc(13.590129vh - 8.91156px)"
-                  },
-                  {
-                    "padding": "0"
-                  },
-                  {
-                    "margin": "0"
-                  },
-                  {
-                    "background": "transparent"
+                    "border-radius": "10px"
                   },
                   {
                     "border": "0"
                   },
                   {
                     "box-shadow": "none"
+                  }
+                ]
+              },
+              "tap_action": {
+                "action": "call-service",
+                "service": "input_number.increment",
+                "service_data": {
+                  "entity_id": "input_number.housevoice_timer_minutes"
+                }
+              },
+              "type": "custom:button-card"
+            },
+            {
+              "show_icon": false,
+              "show_name": false,
+              "styles": {
+                "card": [
+                  {
+                    "position": "fixed"
+                  },
+                  {
+                    "left": "calc(57.23vw + 5px)"
+                  },
+                  {
+                    "top": "calc(19.5vh - 17px)"
+                  },
+                  {
+                    "width": "74px"
+                  },
+                  {
+                    "height": "34px"
+                  },
+                  {
+                    "padding": "0"
+                  },
+                  {
+                    "margin": "0"
+                  },
+                  {
+                    "background": "transparent"
                   },
                   {
                     "z-index": "110"
@@ -1747,13 +1579,315 @@
                     "cursor": "pointer"
                   },
                   {
-                    "border": "2px solid #ff3030"
+                    "border-radius": "10px"
+                  },
+                  {
+                    "border": "0"
+                  },
+                  {
+                    "box-shadow": "none"
+                  }
+                ]
+              },
+              "tap_action": {
+                "action": "call-service",
+                "service": "input_number.increment",
+                "service_data": {
+                  "entity_id": "input_number.housevoice_timer_seconds"
+                }
+              },
+              "type": "custom:button-card"
+            },
+            {
+              "show_icon": false,
+              "show_name": false,
+              "styles": {
+                "card": [
+                  {
+                    "position": "fixed"
+                  },
+                  {
+                    "left": "calc(42.27vw + 3px)"
+                  },
+                  {
+                    "top": "calc(34.5vh + 9px)"
+                  },
+                  {
+                    "width": "74px"
+                  },
+                  {
+                    "height": "34px"
+                  },
+                  {
+                    "padding": "0"
+                  },
+                  {
+                    "margin": "0"
+                  },
+                  {
+                    "background": "transparent"
+                  },
+                  {
+                    "border-radius": "10px"
+                  },
+                  {
+                    "z-index": "110"
+                  },
+                  {
+                    "pointer-events": "auto"
+                  },
+                  {
+                    "cursor": "pointer"
+                  },
+                  {
+                    "border": "0"
+                  },
+                  {
+                    "box-shadow": "none"
+                  }
+                ]
+              },
+              "tap_action": {
+                "action": "call-service",
+                "service": "input_number.decrement",
+                "service_data": {
+                  "entity_id": "input_number.housevoice_timer_minutes"
+                }
+              },
+              "type": "custom:button-card"
+            },
+            {
+              "show_icon": false,
+              "show_name": false,
+              "styles": {
+                "card": [
+                  {
+                    "position": "fixed"
+                  },
+                  {
+                    "left": "calc(57.23vw + 5px)"
+                  },
+                  {
+                    "top": "calc(34.5vh + 11px)"
+                  },
+                  {
+                    "width": "74px"
+                  },
+                  {
+                    "height": "34px"
+                  },
+                  {
+                    "padding": "0"
+                  },
+                  {
+                    "margin": "0"
+                  },
+                  {
+                    "background": "transparent"
+                  },
+                  {
+                    "border-radius": "10px"
+                  },
+                  {
+                    "z-index": "110"
+                  },
+                  {
+                    "pointer-events": "auto"
+                  },
+                  {
+                    "cursor": "pointer"
+                  },
+                  {
+                    "border": "0"
+                  },
+                  {
+                    "box-shadow": "none"
+                  }
+                ]
+              },
+              "tap_action": {
+                "action": "call-service",
+                "service": "input_number.decrement",
+                "service_data": {
+                  "entity_id": "input_number.housevoice_timer_seconds"
+                }
+              },
+              "type": "custom:button-card"
+            },
+            {
+              "show_icon": false,
+              "show_name": false,
+              "styles": {
+                "card": [
+                  {
+                    "position": "fixed"
+                  },
+                  {
+                    "left": "calc(78.1vw + 17px)"
+                  },
+                  {
+                    "top": "calc(21vh + 4px)"
+                  },
+                  {
+                    "width": "calc(17.8vw - 15px)"
+                  },
+                  {
+                    "height": "68px"
+                  },
+                  {
+                    "padding": "0"
+                  },
+                  {
+                    "margin": "0"
+                  },
+                  {
+                    "background": "transparent"
+                  },
+                  {
+                    "border-radius": "14px"
+                  },
+                  {
+                    "z-index": "110"
+                  },
+                  {
+                    "pointer-events": "auto"
+                  },
+                  {
+                    "cursor": "pointer"
+                  },
+                  {
+                    "border": "0"
+                  },
+                  {
+                    "box-shadow": "none"
+                  }
+                ]
+              },
+              "tap_action": {
+                "action": "call-service",
+                "service": "[[[ const state = states[\"timer.housevoice_kids_timer\"]?.state; return state === \"active\" ? \"timer.pause\" : state === \"paused\" ? \"timer.start\" : \"script.turn_on\"; ]]]",
+                "service_data": {
+                  "entity_id": "[[[ const state = states[\"timer.housevoice_kids_timer\"]?.state; return state === \"active\" ? \"timer.housevoice_kids_timer\" : state === \"paused\" ? \"timer.housevoice_kids_timer\" : \"script.housevoice_timer_start_selected\"; ]]]"
+                }
+              },
+              "type": "custom:button-card"
+            },
+            {
+              "show_icon": false,
+              "show_name": false,
+              "styles": {
+                "card": [
+                  {
+                    "position": "fixed"
+                  },
+                  {
+                    "left": "calc(78.1vw + 17px)"
+                  },
+                  {
+                    "top": "calc(21vh + 88px)"
+                  },
+                  {
+                    "width": "calc(17.8vw - 15px)"
+                  },
+                  {
+                    "height": "42px"
+                  },
+                  {
+                    "padding": "0"
+                  },
+                  {
+                    "margin": "0"
+                  },
+                  {
+                    "background": "transparent"
+                  },
+                  {
+                    "border-radius": "14px"
+                  },
+                  {
+                    "z-index": "110"
+                  },
+                  {
+                    "pointer-events": "auto"
+                  },
+                  {
+                    "cursor": "pointer"
+                  },
+                  {
+                    "border": "0"
+                  },
+                  {
+                    "box-shadow": "none"
+                  }
+                ]
+              },
+              "tap_action": {
+                "action": "multi-actions",
+                "actions": [
+                  {
+                    "action": "call-service",
+                    "service": "script.turn_on",
+                    "service_data": {
+                      "entity_id": "script.housevoice_timer_start_selected"
+                    }
+                  },
+                  {
+                    "action": "call-service",
+                    "service": "timer.cancel",
+                    "service_data": {
+                      "entity_id": "timer.housevoice_kids_timer"
+                    }
+                  }
+                ]
+              },
+              "type": "custom:button-card"
+            },
+            {
+              "show_icon": false,
+              "show_name": false,
+              "styles": {
+                "card": [
+                  {
+                    "position": "fixed"
+                  },
+                  {
+                    "left": "calc(45.6vw - 72px)"
+                  },
+                  {
+                    "top": "calc(39.15785vh + 48px)"
+                  },
+                  {
+                    "width": "69px"
+                  },
+                  {
+                    "height": "44px"
+                  },
+                  {
+                    "padding": "0"
+                  },
+                  {
+                    "margin": "0"
+                  },
+                  {
+                    "background": "transparent"
                   },
                   {
                     "border-radius": "11px"
                   },
                   {
-                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
+                    "z-index": "110"
+                  },
+                  {
+                    "pointer-events": "auto"
+                  },
+                  {
+                    "cursor": "pointer"
+                  },
+                  {
+                    "border": "0"
+                  },
+                  {
+                    "box-shadow": "none"
                   }
                 ]
               },
@@ -1789,16 +1923,16 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "calc(52.530516vw - 47.120344px)"
+                    "left": "calc(45.6vw + 2px)"
                   },
                   {
-                    "top": "calc(39.15785vh + 49.126px)"
+                    "top": "calc(39.15785vh + 48px)"
                   },
                   {
-                    "width": "calc(8.95993704vw - 5.97329136px)"
+                    "width": "69px"
                   },
                   {
-                    "height": "calc(13.590129vh - 8.91156px)"
+                    "height": "44px"
                   },
                   {
                     "padding": "0"
@@ -1810,10 +1944,7 @@
                     "background": "transparent"
                   },
                   {
-                    "border": "0"
-                  },
-                  {
-                    "box-shadow": "none"
+                    "border-radius": "11px"
                   },
                   {
                     "z-index": "110"
@@ -1825,13 +1956,10 @@
                     "cursor": "pointer"
                   },
                   {
-                    "border": "2px solid #ff3030"
+                    "border": "0"
                   },
                   {
-                    "border-radius": "11px"
-                  },
-                  {
-                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
+                    "box-shadow": "none"
                   }
                 ]
               },
@@ -1867,16 +1995,16 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "calc(60.810516vw - 39.640344px)"
+                    "left": "calc(45.6vw + 76px)"
                   },
                   {
-                    "top": "calc(39.15785vh + 49.126px)"
+                    "top": "calc(39.15785vh + 48px)"
                   },
                   {
-                    "width": "calc(8.95993704vw - 5.97329136px)"
+                    "width": "69px"
                   },
                   {
-                    "height": "calc(13.590129vh - 8.91156px)"
+                    "height": "44px"
                   },
                   {
                     "padding": "0"
@@ -1888,10 +2016,7 @@
                     "background": "transparent"
                   },
                   {
-                    "border": "0"
-                  },
-                  {
-                    "box-shadow": "none"
+                    "border-radius": "11px"
                   },
                   {
                     "z-index": "110"
@@ -1903,13 +2028,10 @@
                     "cursor": "pointer"
                   },
                   {
-                    "border": "2px solid #ff3030"
+                    "border": "0"
                   },
                   {
-                    "border-radius": "11px"
-                  },
-                  {
-                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
+                    "box-shadow": "none"
                   }
                 ]
               },
@@ -1945,16 +2067,16 @@
                     "position": "fixed"
                   },
                   {
-                    "left": "calc(69.090516vw - 30.160344px)"
+                    "left": "calc(45.6vw + 150px)"
                   },
                   {
-                    "top": "calc(39.15785vh + 49.126px)"
+                    "top": "calc(39.15785vh + 48px)"
                   },
                   {
-                    "width": "calc(8.95993704vw - 5.97329136px)"
+                    "width": "69px"
                   },
                   {
-                    "height": "calc(13.590129vh - 8.91156px)"
+                    "height": "44px"
                   },
                   {
                     "padding": "0"
@@ -1966,10 +2088,7 @@
                     "background": "transparent"
                   },
                   {
-                    "border": "0"
-                  },
-                  {
-                    "box-shadow": "none"
+                    "border-radius": "11px"
                   },
                   {
                     "z-index": "110"
@@ -1981,13 +2100,10 @@
                     "cursor": "pointer"
                   },
                   {
-                    "border": "2px solid #ff3030"
+                    "border": "0"
                   },
                   {
-                    "border-radius": "11px"
-                  },
-                  {
-                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
+                    "box-shadow": "none"
                   }
                 ]
               },
@@ -2013,229 +2129,6 @@
                 ]
               },
               "type": "custom:button-card"
-            },
-            {
-              "hidden": "[[[ return [\"active\", \"paused\"].includes(states[\"timer.housevoice_kids_timer\"]?.state); ]]]",
-              "show_icon": false,
-              "show_name": false,
-              "styles": {
-                "card": [
-                  {
-                    "position": "fixed"
-                  },
-                  {
-                    "left": "calc(79.5vw + 4px)"
-                  },
-                  {
-                    "top": "calc(21vh + 4px)"
-                  },
-                  {
-                    "width": "16.7vw"
-                  },
-                  {
-                    "height": "calc(20vh - 4px)"
-                  },
-                  {
-                    "padding": "0"
-                  },
-                  {
-                    "margin": "0"
-                  },
-                  {
-                    "background": "transparent"
-                  },
-                  {
-                    "border": "2px solid #ff3030"
-                  },
-                  {
-                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
-                  },
-                  {
-                    "z-index": "110"
-                  },
-                  {
-                    "pointer-events": "auto"
-                  },
-                  {
-                    "cursor": "pointer"
-                  }
-                ]
-              },
-              "tap_action": {
-                "action": "call-service",
-                "service": "script.turn_on",
-                "service_data": {
-                  "entity_id": "script.housevoice_timer_start_selected"
-                }
-              },
-              "type": "custom:button-card"
-            },
-            {
-              "hidden": "[[[ return states[\"timer.housevoice_kids_timer\"]?.state !== \"active\"; ]]]",
-              "show_icon": false,
-              "show_name": false,
-              "styles": {
-                "card": [
-                  {
-                    "position": "fixed"
-                  },
-                  {
-                    "left": "calc(79.5vw + 4px)"
-                  },
-                  {
-                    "top": "calc(21vh + 4px)"
-                  },
-                  {
-                    "width": "16.7vw"
-                  },
-                  {
-                    "height": "calc(20vh - 4px)"
-                  },
-                  {
-                    "padding": "0"
-                  },
-                  {
-                    "margin": "0"
-                  },
-                  {
-                    "background": "transparent"
-                  },
-                  {
-                    "border": "0"
-                  },
-                  {
-                    "box-shadow": "none"
-                  },
-                  {
-                    "z-index": "110"
-                  },
-                  {
-                    "pointer-events": "auto"
-                  },
-                  {
-                    "cursor": "pointer"
-                  }
-                ]
-              },
-              "tap_action": {
-                "action": "call-service",
-                "service": "timer.pause",
-                "service_data": {
-                  "entity_id": "timer.housevoice_kids_timer"
-                }
-              },
-              "type": "custom:button-card"
-            },
-            {
-              "hidden": "[[[ return states[\"timer.housevoice_kids_timer\"]?.state !== \"paused\"; ]]]",
-              "show_icon": false,
-              "show_name": false,
-              "styles": {
-                "card": [
-                  {
-                    "position": "fixed"
-                  },
-                  {
-                    "left": "calc(79.5vw + 4px)"
-                  },
-                  {
-                    "top": "calc(21vh + 4px)"
-                  },
-                  {
-                    "width": "16.7vw"
-                  },
-                  {
-                    "height": "calc(20vh - 4px)"
-                  },
-                  {
-                    "padding": "0"
-                  },
-                  {
-                    "margin": "0"
-                  },
-                  {
-                    "background": "transparent"
-                  },
-                  {
-                    "border": "2px solid #ff3030"
-                  },
-                  {
-                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
-                  },
-                  {
-                    "z-index": "110"
-                  },
-                  {
-                    "pointer-events": "auto"
-                  },
-                  {
-                    "cursor": "pointer"
-                  }
-                ]
-              },
-              "tap_action": {
-                "action": "call-service",
-                "service": "timer.start",
-                "service_data": {
-                  "entity_id": "timer.housevoice_kids_timer"
-                }
-              },
-              "type": "custom:button-card"
-            },
-            {
-              "show_icon": false,
-              "show_name": false,
-              "styles": {
-                "card": [
-                  {
-                    "position": "fixed"
-                  },
-                  {
-                    "left": "calc(79.5vw + 4px)"
-                  },
-                  {
-                    "top": "calc(32vh + 44px)"
-                  },
-                  {
-                    "width": "16.7vw"
-                  },
-                  {
-                    "height": "11.5vh"
-                  },
-                  {
-                    "padding": "0"
-                  },
-                  {
-                    "margin": "0"
-                  },
-                  {
-                    "background": "transparent"
-                  },
-                  {
-                    "border": "2px solid #ff3030"
-                  },
-                  {
-                    "box-shadow": "0 0 8px rgba(255,48,48,.75)"
-                  },
-                  {
-                    "z-index": "110"
-                  },
-                  {
-                    "pointer-events": "auto"
-                  },
-                  {
-                    "cursor": "pointer"
-                  }
-                ]
-              },
-              "tap_action": {
-                "action": "call-service",
-                "service": "timer.cancel",
-                "service_data": {
-                  "entity_id": "timer.housevoice_kids_timer"
-                }
-              },
-              "type": "custom:button-card"
             }
           ],
           "columns": 1,
@@ -2243,6 +2136,7 @@
           "type": "grid"
         }
       ],
+      "index": 2,
       "path": "timer",
       "title": "Timer",
       "type": "panel"
