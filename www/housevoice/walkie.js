@@ -61,7 +61,7 @@ class HouseVoiceWalkie extends HTMLElement {
       : window.location.pathname.includes("graham")
         ? "graham"
         : "cora";
-    this._alwaysVisible = Boolean(config?.always_visible);
+    this._alwaysVisible = config?.always_visible !== false;
     this._render();
   }
 
@@ -321,4 +321,14 @@ class HouseVoiceWalkie extends HTMLElement {
 
 if (!customElements.get("housevoice-walkie")) {
   customElements.define("housevoice-walkie", HouseVoiceWalkie);
+}
+
+window.customCards = window.customCards || [];
+if (!window.customCards.some((card) => card.type === "housevoice-walkie")) {
+  window.customCards.push({
+    type: "housevoice-walkie",
+    name: "HouseVoice Walkie",
+    description: "Local HouseVoice room-to-room audio intercom",
+    preview: false,
+  });
 }
