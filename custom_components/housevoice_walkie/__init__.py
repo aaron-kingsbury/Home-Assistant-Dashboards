@@ -126,7 +126,11 @@ class WalkieCoordinator:
             return
 
         active = self.active.get(sender)
-        if not active or active["call_id"] != call_id or active.get("to") != target:
+        if (
+            not active
+            or active["call_id"] != call_id
+            or {active["from"], active["to"]} != {sender, target}
+        ):
             return
         if kind == "answer":
             self._emit_state(active, "connected")
