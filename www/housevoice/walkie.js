@@ -55,12 +55,18 @@ class HouseVoiceWalkie extends HTMLElement {
   }
 
   setConfig(config) {
-    if (!config || !HOUSEVOICE_WALKIE_ROOMS[config.room_id]) {
-      throw new Error("housevoice-walkie requires a valid room_id");
-    }
-    this._roomId = config.room_id;
-    this._alwaysVisible = Boolean(config.always_visible);
+    const configuredRoom = config?.room_id || config?.room;
+    this._roomId = HOUSEVOICE_WALKIE_ROOMS[configuredRoom]
+      ? configuredRoom
+      : window.location.pathname.includes("graham")
+        ? "graham"
+        : "cora";
+    this._alwaysVisible = Boolean(config?.always_visible);
     this._render();
+  }
+
+  getCardSize() {
+    return 0;
   }
 
   set hass(value) {

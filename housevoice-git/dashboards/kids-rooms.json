@@ -24,7 +24,7 @@
     },
     {
       "type": "module",
-      "url": "/local/housevoice/walkie.js"
+      "url": "/local/housevoice/walkie.js?v=2"
     }
   ],
   "views": [
