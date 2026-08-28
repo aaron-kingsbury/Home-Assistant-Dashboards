@@ -106,6 +106,7 @@ class HouseVoiceWalkie extends HTMLElement {
   _receive(message) {
     if (!message || message.to !== this._roomId || message.from === this._roomId) return;
     if (message.kind === "offer") this._receiveOffer(message);
+    if (message.kind === "start") this._startOutgoing(message.from, message.call_id);
     if (message.kind === "answer") this._receiveAnswer(message);
     if (message.kind === "candidate") this._receiveCandidate(message);
     if (message.kind === "decline" || message.kind === "end") {
@@ -190,10 +191,10 @@ class HouseVoiceWalkie extends HTMLElement {
     }
   }
 
-  async _callRoom(roomId) {
+  async _callRoom(roomId, callId = crypto.randomUUID()) {
     if (this._call) return;
     this._error = null;
-    this._call = { id: crypto.randomUUID(), from: this._roomId, to: roomId, state: "calling" };
+    this._call = { id: callId, from: this._roomId, to: roomId, state: "calling" };
     this._render();
     try {
       await this._makePeer(this._call, true);
@@ -201,6 +202,10 @@ class HouseVoiceWalkie extends HTMLElement {
       this._error = error.message;
       this._end();
     }
+  }
+
+  async _startOutgoing(roomId, callId) {
+    if (!this._call) await this._callRoom(roomId, callId);
   }
 
   async _answer() {

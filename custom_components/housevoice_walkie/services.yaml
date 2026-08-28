@@ -1,0 +1,16 @@
+call:
+  name: Call room
+  description: Start a one-to-one HouseVoice Walkie call.
+  fields:
+    from:
+      name: Calling room
+      description: Room initiating the call.
+      required: true
+      selector:
+        text:
+    to:
+      name: Target room
+      description: Room receiving the call.
+      required: true
+      selector:
+        text:

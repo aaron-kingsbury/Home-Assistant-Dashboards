@@ -5,7 +5,9 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
+import voluptuous as vol
 from homeassistant.core import Event, HomeAssistant, callback
+from homeassistant.helpers import config_validation as cv
 
 DOMAIN = "housevoice_walkie"
 REQUEST_EVENT = "housevoice_walkie_request"
@@ -30,11 +32,49 @@ class WalkieCoordinator:
 
     async def async_start(self) -> None:
         self.unsubscribe = self.hass.bus.async_listen(REQUEST_EVENT, self._handle_request)
+        self.hass.services.async_register(
+            DOMAIN,
+            "call",
+            self._call_service,
+            schema=vol.Schema(
+                {
+                    vol.Required("from"): cv.string,
+                    vol.Required("to"): cv.string,
+                }
+            ),
+        )
 
     async def async_stop(self) -> None:
         if self.unsubscribe:
             self.unsubscribe()
             self.unsubscribe = None
+        self.hass.services.async_remove(DOMAIN, "call")
+
+    async def _call_service(self, service_call: Any) -> None:
+        sender = service_call.data["from"]
+        target = service_call.data["to"]
+        if (
+            sender not in ROOMS
+            or target not in ROOMS
+            or sender == target
+            or not ROOMS[sender]["enabled"]
+            or not ROOMS[target]["enabled"]
+            or sender in self.active
+            or target in self.active
+        ):
+            return
+        call = {"call_id": f"{sender}-{target}", "from": sender, "to": target}
+        self.active[sender] = call
+        self.active[target] = call
+        self._emit_state(call, "ringing")
+        self._forward(
+            {
+                "kind": "start",
+                "call_id": call["call_id"],
+                "from": target,
+                "to": sender,
+            }
+        )
 
     @callback
     def _emit_state(self, call: dict[str, str] | None, state: str) -> None:
