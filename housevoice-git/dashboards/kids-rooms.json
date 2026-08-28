@@ -21,6 +21,10 @@
     {
       "type": "module",
       "url": "/local/community/slider-entity-row/slider-entity-row.js"
+    },
+    {
+      "type": "module",
+      "url": "/local/housevoice/walkie.js"
     }
   ],
   "views": [
@@ -592,248 +596,9 @@
                           "type": "markdown"
                         },
                         {
-                          "cards": [
-                            {
-                              "icon": "mdi:account-child",
-                              "label": "Graham's Room",
-                              "name": "GRAHAM",
-                              "show_label": true,
-                              "show_name": true,
-                              "show_state": false,
-                              "styles": {
-                                "card": [
-                                  {
-                                    "height": "180px"
-                                  },
-                                  {
-                                    "padding": "18px 8px"
-                                  },
-                                  {
-                                    "border-radius": "16px"
-                                  },
-                                  {
-                                    "display": "flex"
-                                  },
-                                  {
-                                    "flex-direction": "column"
-                                  },
-                                  {
-                                    "justify-content": "center"
-                                  }
-                                ],
-                                "grid": [
-                                  {
-                                    "grid-template-areas": "\\\"i\\\" \\\"n\\\" \\\"l\\\""
-                                  },
-                                  {
-                                    "grid-template-rows": "1fr min-content min-content"
-                                  },
-                                  {
-                                    "row-gap": "8px"
-                                  }
-                                ],
-                                "icon": [
-                                  {
-                                    "width": "72px"
-                                  },
-                                  {
-                                    "height": "72px"
-                                  }
-                                ],
-                                "label": [
-                                  {
-                                    "font-size": "17px"
-                                  },
-                                  {
-                                    "line-height": "1.2"
-                                  },
-                                  {
-                                    "color": "rgba(217,237,255,.78)"
-                                  }
-                                ],
-                                "name": [
-                                  {
-                                    "font-size": "27px"
-                                  },
-                                  {
-                                    "font-weight": "600"
-                                  },
-                                  {
-                                    "line-height": "1.1"
-                                  }
-                                ]
-                              },
-                              "tap_action": {
-                                "action": "call-service",
-                                "service": "script.turn_on",
-                                "service_data": {
-                                  "entity_id": "script.housevoice_walkie_graham"
-                                }
-                              },
-                              "type": "custom:button-card"
-                            },
-                            {
-                              "icon": "mdi:account-multiple",
-                              "label": "Parents' Room",
-                              "name": "MOM & DAD",
-                              "show_label": true,
-                              "show_name": true,
-                              "show_state": false,
-                              "styles": {
-                                "card": [
-                                  {
-                                    "height": "180px"
-                                  },
-                                  {
-                                    "padding": "18px 8px"
-                                  },
-                                  {
-                                    "border-radius": "16px"
-                                  },
-                                  {
-                                    "display": "flex"
-                                  },
-                                  {
-                                    "flex-direction": "column"
-                                  },
-                                  {
-                                    "justify-content": "center"
-                                  }
-                                ],
-                                "grid": [
-                                  {
-                                    "grid-template-areas": "\\\"i\\\" \\\"n\\\" \\\"l\\\""
-                                  },
-                                  {
-                                    "grid-template-rows": "1fr min-content min-content"
-                                  },
-                                  {
-                                    "row-gap": "8px"
-                                  }
-                                ],
-                                "icon": [
-                                  {
-                                    "width": "72px"
-                                  },
-                                  {
-                                    "height": "72px"
-                                  }
-                                ],
-                                "label": [
-                                  {
-                                    "font-size": "17px"
-                                  },
-                                  {
-                                    "line-height": "1.2"
-                                  },
-                                  {
-                                    "color": "rgba(217,237,255,.78)"
-                                  }
-                                ],
-                                "name": [
-                                  {
-                                    "font-size": "27px"
-                                  },
-                                  {
-                                    "font-weight": "600"
-                                  },
-                                  {
-                                    "line-height": "1.1"
-                                  }
-                                ]
-                              },
-                              "tap_action": {
-                                "action": "call-service",
-                                "service": "script.turn_on",
-                                "service_data": {
-                                  "entity_id": "script.housevoice_walkie_parents"
-                                }
-                              },
-                              "type": "custom:button-card"
-                            },
-                            {
-                              "icon": "mdi:silverware-fork-knife",
-                              "label": "Kitchen",
-                              "name": "KITCHEN",
-                              "show_label": true,
-                              "show_name": true,
-                              "show_state": false,
-                              "styles": {
-                                "card": [
-                                  {
-                                    "height": "180px"
-                                  },
-                                  {
-                                    "padding": "18px 8px"
-                                  },
-                                  {
-                                    "border-radius": "16px"
-                                  },
-                                  {
-                                    "display": "flex"
-                                  },
-                                  {
-                                    "flex-direction": "column"
-                                  },
-                                  {
-                                    "justify-content": "center"
-                                  }
-                                ],
-                                "grid": [
-                                  {
-                                    "grid-template-areas": "\\\"i\\\" \\\"n\\\" \\\"l\\\""
-                                  },
-                                  {
-                                    "grid-template-rows": "1fr min-content min-content"
-                                  },
-                                  {
-                                    "row-gap": "8px"
-                                  }
-                                ],
-                                "icon": [
-                                  {
-                                    "width": "72px"
-                                  },
-                                  {
-                                    "height": "72px"
-                                  }
-                                ],
-                                "label": [
-                                  {
-                                    "font-size": "17px"
-                                  },
-                                  {
-                                    "line-height": "1.2"
-                                  },
-                                  {
-                                    "color": "rgba(217,237,255,.78)"
-                                  }
-                                ],
-                                "name": [
-                                  {
-                                    "font-size": "27px"
-                                  },
-                                  {
-                                    "font-weight": "600"
-                                  },
-                                  {
-                                    "line-height": "1.1"
-                                  }
-                                ]
-                              },
-                              "tap_action": {
-                                "action": "call-service",
-                                "service": "script.turn_on",
-                                "service_data": {
-                                  "entity_id": "script.housevoice_walkie_kitchen"
-                                }
-                              },
-                              "type": "custom:button-card"
-                            }
-                          ],
-                          "columns": 3,
-                          "square": false,
-                          "type": "grid"
+                          "always_visible": true,
+                          "room_id": "cora",
+                          "type": "custom:housevoice-walkie"
                         }
                       ],
                       "type": "vertical-stack"
@@ -851,6 +616,11 @@
           "columns": 1,
           "square": false,
           "type": "grid"
+        },
+        {
+          "always_visible": false,
+          "room_id": "cora",
+          "type": "custom:housevoice-walkie"
         }
       ],
       "index": 0,
@@ -1365,6 +1135,11 @@
           "columns": 1,
           "square": false,
           "type": "grid"
+        },
+        {
+          "always_visible": false,
+          "room_id": "cora",
+          "type": "custom:housevoice-walkie"
         }
       ],
       "icon": "mdi:music",
@@ -2324,6 +2099,11 @@
           "columns": 1,
           "square": false,
           "type": "grid"
+        },
+        {
+          "always_visible": false,
+          "room_id": "cora",
+          "type": "custom:housevoice-walkie"
         }
       ],
       "index": 2,
@@ -2837,6 +2617,11 @@
           "columns": 1,
           "square": false,
           "type": "grid"
+        },
+        {
+          "always_visible": false,
+          "room_id": "cora",
+          "type": "custom:housevoice-walkie"
         }
       ],
       "index": 3,
@@ -3422,248 +3207,9 @@
                           "type": "markdown"
                         },
                         {
-                          "cards": [
-                            {
-                              "icon": "mdi:account-child",
-                              "label": "Cora's Room",
-                              "name": "CORA",
-                              "show_label": true,
-                              "show_name": true,
-                              "show_state": false,
-                              "styles": {
-                                "card": [
-                                  {
-                                    "height": "180px"
-                                  },
-                                  {
-                                    "padding": "18px 8px"
-                                  },
-                                  {
-                                    "border-radius": "16px"
-                                  },
-                                  {
-                                    "display": "flex"
-                                  },
-                                  {
-                                    "flex-direction": "column"
-                                  },
-                                  {
-                                    "justify-content": "center"
-                                  }
-                                ],
-                                "grid": [
-                                  {
-                                    "grid-template-areas": "\\\"i\\\" \\\"n\\\" \\\"l\\\""
-                                  },
-                                  {
-                                    "grid-template-rows": "1fr min-content min-content"
-                                  },
-                                  {
-                                    "row-gap": "8px"
-                                  }
-                                ],
-                                "icon": [
-                                  {
-                                    "width": "72px"
-                                  },
-                                  {
-                                    "height": "72px"
-                                  }
-                                ],
-                                "label": [
-                                  {
-                                    "font-size": "17px"
-                                  },
-                                  {
-                                    "line-height": "1.2"
-                                  },
-                                  {
-                                    "color": "rgba(217,237,255,.78)"
-                                  }
-                                ],
-                                "name": [
-                                  {
-                                    "font-size": "27px"
-                                  },
-                                  {
-                                    "font-weight": "600"
-                                  },
-                                  {
-                                    "line-height": "1.1"
-                                  }
-                                ]
-                              },
-                              "tap_action": {
-                                "action": "call-service",
-                                "service": "script.turn_on",
-                                "service_data": {
-                                  "entity_id": "script.housevoice_walkie_graham"
-                                }
-                              },
-                              "type": "custom:button-card"
-                            },
-                            {
-                              "icon": "mdi:account-multiple",
-                              "label": "Parents' Room",
-                              "name": "MOM & DAD",
-                              "show_label": true,
-                              "show_name": true,
-                              "show_state": false,
-                              "styles": {
-                                "card": [
-                                  {
-                                    "height": "180px"
-                                  },
-                                  {
-                                    "padding": "18px 8px"
-                                  },
-                                  {
-                                    "border-radius": "16px"
-                                  },
-                                  {
-                                    "display": "flex"
-                                  },
-                                  {
-                                    "flex-direction": "column"
-                                  },
-                                  {
-                                    "justify-content": "center"
-                                  }
-                                ],
-                                "grid": [
-                                  {
-                                    "grid-template-areas": "\\\"i\\\" \\\"n\\\" \\\"l\\\""
-                                  },
-                                  {
-                                    "grid-template-rows": "1fr min-content min-content"
-                                  },
-                                  {
-                                    "row-gap": "8px"
-                                  }
-                                ],
-                                "icon": [
-                                  {
-                                    "width": "72px"
-                                  },
-                                  {
-                                    "height": "72px"
-                                  }
-                                ],
-                                "label": [
-                                  {
-                                    "font-size": "17px"
-                                  },
-                                  {
-                                    "line-height": "1.2"
-                                  },
-                                  {
-                                    "color": "rgba(217,237,255,.78)"
-                                  }
-                                ],
-                                "name": [
-                                  {
-                                    "font-size": "27px"
-                                  },
-                                  {
-                                    "font-weight": "600"
-                                  },
-                                  {
-                                    "line-height": "1.1"
-                                  }
-                                ]
-                              },
-                              "tap_action": {
-                                "action": "call-service",
-                                "service": "script.turn_on",
-                                "service_data": {
-                                  "entity_id": "script.housevoice_walkie_parents"
-                                }
-                              },
-                              "type": "custom:button-card"
-                            },
-                            {
-                              "icon": "mdi:silverware-fork-knife",
-                              "label": "Kitchen",
-                              "name": "KITCHEN",
-                              "show_label": true,
-                              "show_name": true,
-                              "show_state": false,
-                              "styles": {
-                                "card": [
-                                  {
-                                    "height": "180px"
-                                  },
-                                  {
-                                    "padding": "18px 8px"
-                                  },
-                                  {
-                                    "border-radius": "16px"
-                                  },
-                                  {
-                                    "display": "flex"
-                                  },
-                                  {
-                                    "flex-direction": "column"
-                                  },
-                                  {
-                                    "justify-content": "center"
-                                  }
-                                ],
-                                "grid": [
-                                  {
-                                    "grid-template-areas": "\\\"i\\\" \\\"n\\\" \\\"l\\\""
-                                  },
-                                  {
-                                    "grid-template-rows": "1fr min-content min-content"
-                                  },
-                                  {
-                                    "row-gap": "8px"
-                                  }
-                                ],
-                                "icon": [
-                                  {
-                                    "width": "72px"
-                                  },
-                                  {
-                                    "height": "72px"
-                                  }
-                                ],
-                                "label": [
-                                  {
-                                    "font-size": "17px"
-                                  },
-                                  {
-                                    "line-height": "1.2"
-                                  },
-                                  {
-                                    "color": "rgba(217,237,255,.78)"
-                                  }
-                                ],
-                                "name": [
-                                  {
-                                    "font-size": "27px"
-                                  },
-                                  {
-                                    "font-weight": "600"
-                                  },
-                                  {
-                                    "line-height": "1.1"
-                                  }
-                                ]
-                              },
-                              "tap_action": {
-                                "action": "call-service",
-                                "service": "script.turn_on",
-                                "service_data": {
-                                  "entity_id": "script.housevoice_walkie_kitchen"
-                                }
-                              },
-                              "type": "custom:button-card"
-                            }
-                          ],
-                          "columns": 3,
-                          "square": false,
-                          "type": "grid"
+                          "always_visible": true,
+                          "room_id": "graham",
+                          "type": "custom:housevoice-walkie"
                         }
                       ],
                       "type": "vertical-stack"
@@ -3681,6 +3227,11 @@
           "columns": 1,
           "square": false,
           "type": "grid"
+        },
+        {
+          "always_visible": false,
+          "room_id": "graham",
+          "type": "custom:housevoice-walkie"
         }
       ],
       "icon": "mdi:home-account",
@@ -4195,6 +3746,11 @@
           "columns": 1,
           "square": false,
           "type": "grid"
+        },
+        {
+          "always_visible": false,
+          "room_id": "graham",
+          "type": "custom:housevoice-walkie"
         }
       ],
       "icon": "mdi:music",
@@ -5153,6 +4709,11 @@
           "columns": 1,
           "square": false,
           "type": "grid"
+        },
+        {
+          "always_visible": false,
+          "room_id": "graham",
+          "type": "custom:housevoice-walkie"
         }
       ],
       "icon": "mdi:timer-outline",
@@ -5666,6 +5227,11 @@
           "columns": 1,
           "square": false,
           "type": "grid"
+        },
+        {
+          "always_visible": false,
+          "room_id": "graham",
+          "type": "custom:housevoice-walkie"
         }
       ],
       "icon": "mdi:clock-outline",

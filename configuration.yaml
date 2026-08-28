@@ -13,6 +13,8 @@ http:
   trusted_proxies:
     - 127.0.0.1
 
+housevoice_walkie:
+
 template:
   - binary_sensor:
       - name: "HouseVoice Any Camera Motion"
