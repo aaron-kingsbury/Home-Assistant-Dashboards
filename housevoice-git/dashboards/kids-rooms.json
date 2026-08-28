@@ -3425,8 +3425,8 @@
                           "cards": [
                             {
                               "icon": "mdi:account-child",
-                              "label": "Graham's Room",
-                              "name": "GRAHAM",
+                              "label": "Cora's Room",
+                              "name": "CORA",
                               "show_label": true,
                               "show_name": true,
                               "show_state": false,
@@ -3670,7 +3670,7 @@
                     },
                     "dismissable": true,
                     "initial_style": "classic",
-                    "title": "Graham's Bedroom Light"
+                    "title": "Walkie"
                   },
                   "service": "browser_mod.popup"
                 }
