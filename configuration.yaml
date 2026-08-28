@@ -79,6 +79,13 @@ input_number:
     max: 100
     step: 1
     mode: slider
+  housevoice_right_bedroom_brightness:
+    name: "Right Bedroom Light Brightness"
+    initial: 20
+    min: 0
+    max: 100
+    step: 1
+    mode: slider
 
 timer:
   housevoice_panel_standby:

@@ -3209,12 +3209,15 @@
                           "entities": [
                             {
                               "entity": "input_boolean.right_bedroom_light",
-                              "icon": "mdi:ceiling-light",
-                              "name": "Room light"
+                              "icon": "mdi:ceiling-light"
+                            },
+                            {
+                              "entity": "input_number.housevoice_right_bedroom_brightness",
+                              "icon": "mdi:brightness-6",
+                              "name": "Brightness"
                             }
                           ],
                           "show_header_toggle": false,
-                          "title": "Graham's Bedroom Light",
                           "type": "entities"
                         }
                       ],
@@ -3222,7 +3225,7 @@
                     },
                     "dismissable": true,
                     "initial_style": "classic",
-                    "title": "Cora's Bedroom Light"
+                    "title": "Graham's Bedroom Light"
                   },
                   "service": "browser_mod.popup"
                 }
@@ -3405,6 +3408,17 @@
                       "cards": [
                         {
                           "content": "## Who do you want to call?",
+                          "entities": [
+                            {
+                              "entity": "input_boolean.right_bedroom_light",
+                              "icon": "mdi:ceiling-light"
+                            },
+                            {
+                              "entity": "input_number.housevoice_right_bedroom_brightness",
+                              "icon": "mdi:brightness-6",
+                              "name": "Brightness"
+                            }
+                          ],
                           "type": "markdown"
                         },
                         {
@@ -3656,7 +3670,7 @@
                     },
                     "dismissable": true,
                     "initial_style": "classic",
-                    "title": "Walkie"
+                    "title": "Graham's Bedroom Light"
                   },
                   "service": "browser_mod.popup"
                 }
