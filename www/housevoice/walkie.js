@@ -66,7 +66,7 @@ class HouseVoiceWalkie extends HTMLElement {
   }
 
   getCardSize() {
-    return 0;
+    return 1;
   }
 
   set hass(value) {
@@ -298,8 +298,8 @@ class HouseVoiceWalkie extends HTMLElement {
       }
     }
     this.shadowRoot.innerHTML = `<style>
-      :host { display: none; position: fixed; inset: 0; z-index: 9999; font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-      :host([visible]) { display: block; }
+      :host { display: block; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; position: fixed; inset: 0; z-index: 9999; font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      :host([visible]) { width: auto; height: auto; overflow: visible; opacity: 1; pointer-events: auto; }
       .idle { display: flex; gap: 8px; }
       section { min-width: 280px; padding: 26px; color: #f4f8ff; background: linear-gradient(145deg, rgba(6, 23, 48, .98), rgba(11, 5, 28, .98)); border: 1px solid #28658e; border-radius: 20px; box-shadow: 0 18px 70px rgba(0, 0, 0, .6); }
       :host([active]) section { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(430px, calc(100vw - 40px)); box-sizing: border-box; text-align: center; }
