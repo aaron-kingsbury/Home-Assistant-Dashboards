@@ -63,6 +63,7 @@ class HouseVoiceWalkie extends HTMLElement {
         : "cora";
     this._alwaysVisible = config?.always_visible !== false;
     this._render();
+    if (this._hass) this._diagnose("room_detected", `room_id=${this._roomId}`);
   }
 
   getCardSize() {
@@ -86,10 +87,21 @@ class HouseVoiceWalkie extends HTMLElement {
 
   async _subscribe() {
     if (this._unsubscribe || !this._hass?.connection) return;
+    this._diagnose("component_loaded", `room_id=${this._roomId}`);
     this._unsubscribe = await this._hass.connection.subscribeEvents(
       (event) => this._receive(event.data),
       "housevoice_walkie_signal",
     );
+  }
+
+  _diagnose(stage, detail = "") {
+    if (!this._roomId) return;
+    console.log(`[HouseVoice Walkie] ${this._roomId} ${stage}`, detail);
+    this._hass?.callService("housevoice_walkie", "client_log", {
+      room_id: this._roomId,
+      stage,
+      detail,
+    }).catch((error) => console.error("[HouseVoice Walkie] diagnostic failed", error));
   }
 
   _send(data) {
@@ -105,11 +117,18 @@ class HouseVoiceWalkie extends HTMLElement {
 
   _receive(message) {
     if (!message || message.to !== this._roomId || message.from === this._roomId) return;
-    if (message.kind === "offer") this._receiveOffer(message);
-    if (message.kind === "start") this._startOutgoing(message.from, message.call_id);
+    if (message.kind === "offer") {
+      this._diagnose("incoming_call_detected", `from=${message.from}`);
+      this._receiveOffer(message);
+    }
+    if (message.kind === "start") {
+      this._diagnose("outgoing_call_detected", `to=${message.from}`);
+      this._startOutgoing(message.from, message.call_id);
+    }
     if (message.kind === "answer") this._receiveAnswer(message);
     if (message.kind === "candidate") this._receiveCandidate(message);
     if (message.kind === "decline" || message.kind === "end") {
+      this._diagnose("end", `kind=${message.kind}`);
       if (this._call?.id === message.call_id) this._cleanup(false);
     }
   }
@@ -131,6 +150,7 @@ class HouseVoiceWalkie extends HTMLElement {
 
   async _receiveAnswer(message) {
     if (this._call?.id !== message.call_id || !this._peer) return;
+    this._diagnose("answer_received");
     await this._peer.setRemoteDescription(message.description);
     await this._flushCandidates();
   }
@@ -162,11 +182,13 @@ class HouseVoiceWalkie extends HTMLElement {
         });
       }
     };
+    this._peer.oniceconnectionstatechange = () => this._diagnose("ice_state", this._peer.iceConnectionState);
     this._peer.ontrack = ({ streams }) => {
       const audio = this.shadowRoot.querySelector("audio");
       if (audio && streams[0]) audio.srcObject = streams[0];
     };
     this._peer.onconnectionstatechange = () => {
+      this._diagnose("peer_connection_state", this._peer.connectionState);
       if (["failed", "disconnected", "closed"].includes(this._peer.connectionState)) {
         this._cleanup(false);
       } else if (this._peer.connectionState === "connected" && this._call) {
@@ -175,13 +197,16 @@ class HouseVoiceWalkie extends HTMLElement {
       }
     };
 
+    this._diagnose("microphone_request", `secure=${window.isSecureContext} mediaDevices=${Boolean(navigator.mediaDevices)} getUserMedia=${Boolean(navigator.mediaDevices?.getUserMedia)}`);
     this._localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    this._diagnose("microphone_granted");
     for (const track of this._localStream.getTracks()) {
       this._peer.addTrack(track, this._localStream);
     }
     if (initiator) {
       const offer = await this._peer.createOffer();
       await this._peer.setLocalDescription(offer);
+      this._diagnose("offer_created");
       this._send({
         kind: "offer",
         call_id: call.id,
@@ -200,7 +225,9 @@ class HouseVoiceWalkie extends HTMLElement {
       await this._makePeer(this._call, true);
     } catch (error) {
       this._error = error.message;
-      this._end();
+      this._diagnose("error", `${error.name}: ${error.message}`);
+      this._call.state = "error";
+      this._render();
     }
   }
 
@@ -214,6 +241,7 @@ class HouseVoiceWalkie extends HTMLElement {
     const offer = this._pendingOffer;
     this._pendingOffer = null;
     this._call.state = "answering";
+    this._diagnose("answer");
     this._render();
     try {
       await this._makePeer(this._call, false);
@@ -221,6 +249,7 @@ class HouseVoiceWalkie extends HTMLElement {
       await this._flushCandidates();
       const answer = await this._peer.createAnswer();
       await this._peer.setLocalDescription(answer);
+      this._diagnose("answer_created");
       this._send({
         kind: "answer",
         call_id: this._call.id,
@@ -229,7 +258,9 @@ class HouseVoiceWalkie extends HTMLElement {
       });
     } catch (error) {
       this._error = error.message;
-      this._end();
+      this._diagnose("error", `${error.name}: ${error.message}`);
+      this._call.state = "error";
+      this._render();
     }
   }
 
@@ -293,7 +324,7 @@ class HouseVoiceWalkie extends HTMLElement {
       if (call.state === "incoming") {
         panel = `<section><div class="eyebrow">INCOMING WALKIE</div><h2>${label}</h2><p>${label} is calling ${room.name}'s Room</p><div class="actions"><button data-answer>ANSWER</button><button class="secondary" data-decline>DECLINE</button></div></section>`;
       } else {
-        const state = call.state === "connected" ? "CONNECTED" : "CALLING";
+        const state = call.state === "connected" ? "CONNECTED" : call.state === "error" ? "ERROR" : "CALLING";
         panel = `<section><div class="eyebrow">${state}</div><h2>${label}</h2><p>${this._error || (call.state === "connected" ? "Two-way audio is live" : "Waiting for an answer")}</p><div class="actions">${call.state === "connected" ? `<button data-mute>${this._muted ? "UNMUTE" : "MUTE"}</button>` : ""}<button class="secondary" data-end>END CALL</button></div></section>`;
       }
     }

@@ -8,6 +8,7 @@ from typing import Any
 import voluptuous as vol
 from homeassistant.core import Event, HomeAssistant, callback
 from homeassistant.helpers import config_validation as cv
+from homeassistant.util import dt as dt_util
 
 DOMAIN = "housevoice_walkie"
 REQUEST_EVENT = "housevoice_walkie_request"
@@ -30,6 +31,20 @@ class WalkieCoordinator:
         self.active: dict[str, dict[str, str]] = {}
         self.unsubscribe: Callable[[], None] | None = None
 
+    @callback
+    def _set_diagnostics(
+        self,
+        *,
+        state: str,
+        sender: str | None = None,
+        target: str | None = None,
+    ) -> None:
+        timestamp = dt_util.now().isoformat()
+        self.hass.states.async_set("sensor.housevoice_walkie_last_request", timestamp)
+        self.hass.states.async_set("sensor.housevoice_walkie_last_caller", sender or "unknown")
+        self.hass.states.async_set("sensor.housevoice_walkie_last_recipient", target or "unknown")
+        self.hass.states.async_set("sensor.housevoice_walkie_call_state", state)
+
     async def async_start(self) -> None:
         self.unsubscribe = self.hass.bus.async_listen(REQUEST_EVENT, self._handle_request)
         self.hass.services.async_register(
@@ -43,16 +58,40 @@ class WalkieCoordinator:
                 }
             ),
         )
+        self.hass.services.async_register(
+            DOMAIN,
+            "client_log",
+            self._client_log_service,
+            schema=vol.Schema(
+                {
+                    vol.Required("room_id"): cv.string,
+                    vol.Required("stage"): cv.string,
+                    vol.Optional("detail", default=""): cv.string,
+                }
+            ),
+        )
+
+    async def _client_log_service(self, service_call: Any) -> None:
+        room_id = service_call.data["room_id"]
+        stage = service_call.data["stage"]
+        detail = service_call.data["detail"]
+        self.hass.states.async_set(
+            f"sensor.housevoice_walkie_{room_id}_client_stage",
+            stage,
+            {"detail": detail, "timestamp": dt_util.now().isoformat()},
+        )
 
     async def async_stop(self) -> None:
         if self.unsubscribe:
             self.unsubscribe()
             self.unsubscribe = None
         self.hass.services.async_remove(DOMAIN, "call")
+        self.hass.services.async_remove(DOMAIN, "client_log")
 
     async def _call_service(self, service_call: Any) -> None:
         sender = service_call.data["from"]
         target = service_call.data["to"]
+        self._set_diagnostics(state="requested", sender=sender, target=target)
         if (
             sender not in ROOMS
             or target not in ROOMS
@@ -62,10 +101,12 @@ class WalkieCoordinator:
             or sender in self.active
             or target in self.active
         ):
+            self._set_diagnostics(state="rejected", sender=sender, target=target)
             return
         call = {"call_id": f"{sender}-{target}", "from": sender, "to": target}
         self.active[sender] = call
         self.active[target] = call
+        self._set_diagnostics(state="ringing", sender=sender, target=target)
         self._emit_state(call, "ringing")
         self._forward(
             {
@@ -78,6 +119,11 @@ class WalkieCoordinator:
 
     @callback
     def _emit_state(self, call: dict[str, str] | None, state: str) -> None:
+        self._set_diagnostics(
+            state=state,
+            sender=call.get("from") if call else None,
+            target=call.get("to") if call else None,
+        )
         self.hass.bus.async_fire(
             STATE_EVENT,
             {

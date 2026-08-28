@@ -24,7 +24,7 @@
     },
     {
       "type": "module",
-      "url": "/local/housevoice/walkie.js?v=5"
+      "url": "/local/housevoice/walkie.js?v=7"
     }
   ],
   "views": [
@@ -693,11 +693,6 @@
                 }
               },
               "type": "custom:button-card"
-            },
-            {
-              "always_visible": false,
-              "room_id": "cora",
-              "type": "custom:housevoice-walkie"
             }
           ],
           "columns": 1,
@@ -3375,11 +3370,6 @@
                 }
               },
               "type": "custom:button-card"
-            },
-            {
-              "always_visible": false,
-              "room_id": "graham",
-              "type": "custom:housevoice-walkie"
             }
           ],
           "columns": 1,
