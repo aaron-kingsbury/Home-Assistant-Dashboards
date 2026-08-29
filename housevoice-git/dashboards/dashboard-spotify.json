@@ -1,0 +1,36 @@
+{
+  "views": [
+    {
+      "sections": [
+        {
+          "cards": [
+            {
+              "heading": "New section",
+              "type": "heading"
+            },
+            {
+              "entity": "media_player.spotify_aaron_kingsbury",
+              "type": "media-control"
+            },
+            {
+              "entity": "media_player.spotify_aaron_kingsbury",
+              "features": [
+                {
+                  "type": "media-player-source"
+                }
+              ],
+              "type": "tile"
+            },
+            {
+              "card_type": "media-player",
+              "entity": "media_player.spotify_aaron_kingsbury",
+              "type": "custom:bubble-card"
+            }
+          ],
+          "type": "grid"
+        }
+      ],
+      "type": "sections"
+    }
+  ]
+}
