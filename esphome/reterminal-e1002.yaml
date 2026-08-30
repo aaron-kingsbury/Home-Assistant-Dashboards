@@ -44,6 +44,12 @@ esphome:
       - component.update: battery_level
       # Read RTC time on boot / 启动时读取 RTC 时间
       - pcf8563.read_time:
+      - wait_until:
+          condition:
+            time.has_time:
+          timeout: 30s
+      - delay: 2s
+      - component.update: epaper_display
 
 esp32:
   board: esp32-s3-devkitc-1
@@ -62,15 +68,30 @@ logger:
 # =============================================================================
 
 font:
+  - file: "gfonts://Lora@400"
+    id: font_date
+    size: 16
+  - file: "gfonts://Lora@400"
+    id: font_event_title
+    size: 10
   - file: "gfonts://Inter@700"
-    id: font_small
-    size: 20
-  - file: "gfonts://Inter@700"
-    id: font_medium
-    size: 32
-  - file: "gfonts://Inter@700"
-    id: font_large
-    size: 48
+    id: font_event_time
+    size: 12
+  - file: "gfonts://Lora@400"
+    id: font_rail
+    size: 15
+  - file: "gfonts://Lora@400"
+    id: font_condition
+    size: 18
+  - file: "gfonts://Lora@700"
+    id: font_temperature
+    size: 34
+
+image:
+  - file: "../www/housevoice/assets/references/e-ink-background-8.png"
+    id: housevoice_background
+    type: RGB565
+    dither: FLOYDSTEINBERG
 
 # SPI — shared by ePaper display and SD card
 # SPI — 墨水屏和 SD 卡共用
@@ -132,6 +153,49 @@ sensor:
           min_value: 0
           max_value: 100
 
+text_sensor:
+  - platform: homeassistant
+    id: calendar_today_events
+    entity_id: input_text.calendar_today_events
+  - platform: homeassistant
+    id: calendar_sun_events
+    entity_id: input_text.calendar_sun_events
+  - platform: homeassistant
+    id: calendar_mon_events
+    entity_id: input_text.calendar_mon_events
+  - platform: homeassistant
+    id: calendar_tue_events
+    entity_id: input_text.calendar_tue_events
+  - platform: homeassistant
+    id: calendar_wed_events
+    entity_id: input_text.calendar_wed_events
+  - platform: homeassistant
+    id: calendar_thu_events
+    entity_id: input_text.calendar_thu_events
+  - platform: homeassistant
+    id: calendar_fri_events
+    entity_id: input_text.calendar_fri_events
+  - platform: homeassistant
+    id: calendar_sat_events
+    entity_id: input_text.calendar_sat_events
+  - platform: homeassistant
+    id: weather_condition
+    entity_id: input_text.e_ink_weather_condition
+  - platform: homeassistant
+    id: weather_high
+    entity_id: input_text.e_ink_weather_high
+  - platform: homeassistant
+    id: weather_low
+    entity_id: input_text.e_ink_weather_low
+  - platform: homeassistant
+    id: sunrise
+    entity_id: sun.sun
+    attribute: next_rising
+  - platform: homeassistant
+    id: sunset
+    entity_id: sun.sun
+    attribute: next_setting
+
 binary_sensor:
   # KEY0 (GPIO3)
   - platform: gpio
@@ -147,6 +211,7 @@ binary_sensor:
     on_press:
       then:
         - logger.log: "KEY0 (GPIO3) pressed"
+        - component.update: epaper_display
 
   # KEY1 (GPIO4)
   - platform: gpio
@@ -197,6 +262,15 @@ time:
       then:
         - pcf8563.write_time:
 
+button:
+  - platform: template
+    name: "Refresh HouseVoice E-Ink"
+    icon: "mdi:refresh"
+    entity_category: config
+    on_press:
+      then:
+        - component.update: epaper_display
+
 # Home Assistant native API / Home Assistant 原生 API
 api:
   encryption:
@@ -229,53 +303,97 @@ display:
     model: Seeed-reTerminal-E1002
     update_interval: never
     lambda: |-
-      // Define available colors / 定义可用颜色
-      const auto BLACK   = Color(0,   0,   0,   0);
-      const auto RED     = Color(255, 0,   0,   0);
-      const auto GREEN   = Color(0,   255, 0,   0);
-      const auto BLUE    = Color(0,   0,   255, 0);
-      const auto YELLOW  = Color(255, 255, 0,   0);
+      const auto BLACK = Color(0, 0, 0, 0);
+      const auto BLUE = Color(0, 0, 255, 0);
 
-      // ---- Log all sensor values / 打印所有传感器值到日志 ----
-      ESP_LOGD("display", "=== ePaper display refresh ===");
+      it.image(0, 0, id(housevoice_background));
 
-      // ---- Title (BLUE) / 标题（蓝色）----
-      it.printf(400, 15, id(font_medium), BLUE, TextAlign::TOP_CENTER,
-                "reTerminal E1002 Dashboard");
-      it.line(20, 55, 780, 55, BLACK);
+      auto draw_time = [&](const std::string &value, int y) {
+        if (value.size() < 16) {
+          it.printf(735, y, id(font_rail), BLACK, TextAlign::TOP_CENTER, "--:--");
+          return;
+        }
+        const int hour = (value[11] - '0') * 10 + (value[12] - '0');
+        const int minute = (value[14] - '0') * 10 + (value[15] - '0');
+        const bool pm = hour >= 12;
+        const int display_hour = hour % 12 == 0 ? 12 : hour % 12;
+        it.printf(735, y, id(font_rail), BLACK, TextAlign::TOP_CENTER,
+                  "%d:%02d %s", display_hour, minute, pm ? "PM" : "AM");
+      };
 
-      // ---- RTC Time (BLACK) / RTC 时间（黑色）----
+      auto draw_events = [&](const std::string &raw, int x, int max_title_chars) {
+        int row = 0;
+        size_t cursor = 0;
+        while (row < 4 && cursor < raw.size()) {
+          size_t line_end = raw.find('\n', cursor);
+          if (line_end == std::string::npos) line_end = raw.size();
+          std::string line = raw.substr(cursor, line_end - cursor);
+          cursor = line_end == raw.size() ? raw.size() : line_end + 1;
+          if (line.empty()) continue;
+
+          size_t separator = line.find("||");
+          std::string title = separator == std::string::npos ? line : line.substr(0, separator);
+          std::string when = separator == std::string::npos ? "All day" : line.substr(separator + 2);
+          if (title.empty()) title = "Untitled";
+          if (when.empty()) when = "All day";
+          if (title.size() > static_cast<size_t>(max_title_chars)) {
+            title = title.substr(0, max_title_chars - 3) + "...";
+          }
+
+          const int y = 223 + row * 28;
+          it.printf(x, y, id(font_event_time), BLUE, TextAlign::TOP_LEFT, "%s", when.c_str());
+          it.printf(x + 65, y, id(font_event_title), BLACK, TextAlign::TOP_LEFT, "%s", title.c_str());
+          row++;
+        }
+      };
+
       auto now = id(rtc_time).now();
       if (now.is_valid()) {
-        it.strftime(400, 65, id(font_medium), BLACK, TextAlign::TOP_CENTER,
-                    "%Y-%m-%d  %H:%M", now);
-        ESP_LOGD("display", "RTC time: %04d-%02d-%02d %02d:%02d",
-                 now.year, now.month, now.day_of_month, now.hour, now.minute);
+        char date_text[48];
+        now.strftime(date_text, sizeof(date_text), "%A, %B %d, %Y");
+        for (char *character = date_text; *character != '\0'; character++) {
+          if (*character >= 'a' && *character <= 'z') *character -= 'a' - 'A';
+        }
+        it.printf(407, 132, id(font_date), BLACK, TextAlign::TOP_CENTER, "%s", date_text);
       } else {
-        it.printf(400, 65, id(font_medium), BLACK, TextAlign::TOP_CENTER,
-                  "RTC: waiting for sync...");
-        ESP_LOGW("display", "RTC: not synced yet");
+        it.printf(407, 132, id(font_date), BLACK, TextAlign::TOP_CENTER, "WAITING FOR DATE");
       }
 
-      // ---- Battery (YELLOW) / 电池（黄色）----
-      if (id(battery_level).has_state()) {
-        ESP_LOGD("display", "Battery: %.0f%%  Voltage: %.2fV",
-                 id(battery_level).state, id(battery_voltage).state);
-        it.printf(30, 260, id(font_medium), YELLOW, "Battery: %.0f%%  (%.2fV)",
-                  id(battery_level).state, id(battery_voltage).state);
-      } else {
-        it.printf(30, 260, id(font_medium), YELLOW, "Battery: --");
+      draw_events(id(calendar_today_events).state, 237, 16);
+
+      int weekday = now.is_valid() ? now.day_of_week : 1;
+      weekday = weekday == 1 ? 0 : weekday - 1;
+      const int tomorrow = (weekday + 1) % 7;
+      if (tomorrow == 0) draw_events(id(calendar_sun_events).state, 435, 19);
+      if (tomorrow == 1) draw_events(id(calendar_mon_events).state, 435, 19);
+      if (tomorrow == 2) draw_events(id(calendar_tue_events).state, 435, 19);
+      if (tomorrow == 3) draw_events(id(calendar_wed_events).state, 435, 19);
+      if (tomorrow == 4) draw_events(id(calendar_thu_events).state, 435, 19);
+      if (tomorrow == 5) draw_events(id(calendar_fri_events).state, 435, 19);
+      if (tomorrow == 6) draw_events(id(calendar_sat_events).state, 435, 19);
+
+      std::string condition = id(weather_condition).state;
+      std::string normalized = condition;
+      for (char &character : normalized) {
+        if (character == '_') character = '-';
+        if (character >= 'A' && character <= 'Z') character += 'a' - 'A';
       }
+      const char *condition_label = normalized.c_str();
+      if (normalized == "sunny") condition_label = "Sunny";
+      else if (normalized == "clear" || normalized == "clear-night") condition_label = "Clear";
+      else if (normalized == "partlycloudy" || normalized == "partly-cloudy") condition_label = "Partly Cloudy";
+      else if (normalized == "cloudy") condition_label = "Cloudy";
+      else if (normalized == "rainy" || normalized == "pouring") condition_label = "Rainy";
+      else if (normalized == "snowy" || normalized == "snowy-rainy") condition_label = "Snow";
+      it.printf(710, 175, id(font_condition), BLACK, TextAlign::TOP_CENTER, "%s", condition_label);
 
-      // ---- Button hints (BLACK) / 按钮提示（黑色）----
-      it.line(20, 370, 780, 370, BLUE);
-      it.printf(30, 380, id(font_small), BLACK, "KEY0 GPIO3: Right green button");
-      it.printf(30, 405, id(font_small), BLACK, "KEY1 GPIO4: Middle button");
-      it.printf(30, 430, id(font_small), BLACK, "KEY2 GPIO5: Left button");
+      it.printf(672, 268, id(font_temperature), BLUE, TextAlign::TOP_CENTER,
+                "%s", id(weather_high).state.c_str());
+      it.printf(747, 268, id(font_temperature), BLACK, TextAlign::TOP_CENTER,
+                "%s", id(weather_low).state.c_str());
 
-      // ---- Footer (BLUE) / 页脚（蓝色）----
-      it.printf(400, 458, id(font_small), BLUE, TextAlign::TOP_CENTER,
-                "Selected reTerminal hardware features enabled");
+      draw_time(id(sunrise).state, 54);
+      draw_time(id(sunset).state, 132);
 
 # secrets.yaml (create this file alongside your config):
 # wifi_ssid: "Your WiFi SSID"
