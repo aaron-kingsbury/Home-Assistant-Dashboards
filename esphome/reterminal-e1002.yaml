@@ -44,12 +44,6 @@ esphome:
       - component.update: battery_level
       # Read RTC time on boot / 启动时读取 RTC 时间
       - pcf8563.read_time:
-      - wait_until:
-          condition:
-            time.has_time:
-          timeout: 30s
-      - delay: 2s
-      - component.update: epaper_display
 
 esp32:
   board: esp32-s3-devkitc-1
@@ -166,48 +160,145 @@ sensor:
           min_value: 0
           max_value: 100
 
+globals:
+  - id: housevoice_api_connected
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: housevoice_time_synced
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: housevoice_initial_refresh_done
+    type: bool
+    restore_value: false
+    initial_value: "false"
+  - id: housevoice_initial_refresh_timeout
+    type: bool
+    restore_value: false
+    initial_value: "false"
+
+script:
+  - id: housevoice_check_initial_data
+    mode: single
+    then:
+      - if:
+          condition:
+            lambda: |-
+              if (id(housevoice_initial_refresh_done) || !id(housevoice_api_connected) || !id(housevoice_time_synced)) {
+                return false;
+              }
+              if (!id(calendar_today_events).has_state() ||
+                  !id(calendar_sun_events).has_state() ||
+                  !id(calendar_mon_events).has_state() ||
+                  !id(calendar_tue_events).has_state() ||
+                  !id(calendar_wed_events).has_state() ||
+                  !id(calendar_thu_events).has_state() ||
+                  !id(calendar_fri_events).has_state() ||
+                  !id(calendar_sat_events).has_state() ||
+                  id(weather_condition).state.empty() ||
+                  id(weather_high).state.empty() ||
+                  id(weather_low).state.empty() ||
+                  id(sunrise).state.empty() ||
+                  id(sunset).state.empty()) {
+                return id(housevoice_initial_refresh_timeout);
+              }
+              return true;
+          then:
+            - globals.set:
+                id: housevoice_initial_refresh_done
+                value: "true"
+            - lambda: |-
+                const auto now = id(ha_time).now();
+                ESP_LOGI("housevoice", "HouseVoice data ready: date=%04d-%02d-%02d today_len=%u weather=%s high=%s low=%s sunrise=%s sunset=%s",
+                         now.year, now.month, now.day_of_month,
+                         static_cast<unsigned>(id(calendar_today_events).state.size()),
+                         id(weather_condition).state.c_str(), id(weather_high).state.c_str(),
+                         id(weather_low).state.c_str(), id(sunrise).state.c_str(),
+                         id(sunset).state.c_str());
+            - component.update: epaper_display
+
 text_sensor:
   - platform: homeassistant
     id: calendar_today_events
     entity_id: input_text.calendar_today_events
+    on_value:
+      then:
+        - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: calendar_sun_events
     entity_id: input_text.calendar_sun_events
+    on_value:
+      then:
+        - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: calendar_mon_events
     entity_id: input_text.calendar_mon_events
+    on_value:
+      then:
+        - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: calendar_tue_events
     entity_id: input_text.calendar_tue_events
+    on_value:
+      then:
+        - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: calendar_wed_events
     entity_id: input_text.calendar_wed_events
+    on_value:
+      then:
+        - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: calendar_thu_events
     entity_id: input_text.calendar_thu_events
+    on_value:
+      then:
+        - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: calendar_fri_events
     entity_id: input_text.calendar_fri_events
+    on_value:
+      then:
+        - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: calendar_sat_events
     entity_id: input_text.calendar_sat_events
+    on_value:
+      then:
+        - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: weather_condition
     entity_id: input_text.e_ink_weather_condition
+    on_value:
+      then:
+        - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: weather_high
     entity_id: input_text.e_ink_weather_high
+    on_value:
+      then:
+        - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: weather_low
     entity_id: input_text.e_ink_weather_low
+    on_value:
+      then:
+        - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: sunrise
     entity_id: sun.sun
     attribute: next_rising
+    on_value:
+      then:
+        - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: sunset
     entity_id: sun.sun
     attribute: next_setting
+    on_value:
+      then:
+        - script.execute: housevoice_check_initial_data
 
 binary_sensor:
   # KEY0 (GPIO3)
@@ -269,11 +360,21 @@ time:
     update_interval: never
 
   - platform: homeassistant
+    id: ha_time
     # When HA pushes a time sync, write it to the hardware RTC
     # 当 HA 推送时间同步时，写入硬件 RTC
     on_time_sync:
       then:
+        - globals.set:
+            id: housevoice_time_synced
+            value: "true"
+        - lambda: |-
+            const auto now = id(ha_time).now();
+            ESP_LOGI("housevoice", "Home Assistant time synchronized: %04d-%02d-%02d %02d:%02d:%02d",
+                     now.year, now.month, now.day_of_month, now.hour, now.minute, now.second);
         - pcf8563.write_time:
+        - logger.log: "Home Assistant time written to PCF8563 RTC"
+        - script.execute: housevoice_check_initial_data
 
 button:
   - platform: template
@@ -288,6 +389,21 @@ button:
 api:
   encryption:
     key: !secret api_encryption_key
+  on_client_connected:
+    - globals.set:
+        id: housevoice_api_connected
+        value: "true"
+    - logger.log: "Home Assistant API connected; waiting for HouseVoice data"
+    - script.execute: housevoice_check_initial_data
+    - delay: 60s
+    - globals.set:
+        id: housevoice_initial_refresh_timeout
+        value: "true"
+    - script.execute: housevoice_check_initial_data
+  on_client_disconnected:
+    - globals.set:
+        id: housevoice_api_connected
+        value: "false"
 
 # OTA (Over-The-Air) firmware update / 空中固件更新
 ota:
