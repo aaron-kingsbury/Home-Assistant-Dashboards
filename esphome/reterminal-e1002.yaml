@@ -67,7 +67,7 @@ font:
     size: 16
   - file: "gfonts://Lora@400"
     id: font_event_title
-    size: 10
+    size: 11
   - file: "gfonts://Inter@700"
     id: font_event_time
     size: 12
@@ -664,16 +664,29 @@ display:
       it.image(0, 0, id(housevoice_background_yellow), YELLOW, WHITE);
 
       auto draw_time = [&](const std::string &value, int y) {
-        if (value.size() < 16) {
+        if (value.empty()) {
           it.printf(735, y, id(font_rail), BLACK, TextAlign::TOP_CENTER, "--:--");
           return;
         }
-        const int hour = (value[11] - '0') * 10 + (value[12] - '0');
-        const int minute = (value[14] - '0') * 10 + (value[15] - '0');
-        const bool pm = hour >= 12;
-        const int display_hour = hour % 12 == 0 ? 12 : hour % 12;
-        it.printf(735, y, id(font_rail), BLACK, TextAlign::TOP_CENTER,
-                  "%d:%02d %s", display_hour, minute, pm ? "PM" : "AM");
+        it.printf(735, y, id(font_rail), BLACK, TextAlign::TOP_CENTER, "%s", value.c_str());
+      };
+
+      auto local_sun_time = [](const std::string &value) {
+        if (value.size() < 19) return std::string("--:--");
+        char timestamp[20];
+        memcpy(timestamp, value.c_str(), 19);
+        timestamp[10] = ' ';
+        timestamp[19] = '\0';
+        esphome::ESPTime utc;
+        if (!esphome::ESPTime::strptime(timestamp, utc)) return std::string("--:--");
+        utc.recalc_timestamp_utc(false);
+        if (utc.timestamp == -1) return std::string("--:--");
+        const auto local = esphome::ESPTime::from_epoch_local(utc.timestamp);
+        const int display_hour = local.hour % 12 == 0 ? 12 : local.hour % 12;
+        const char *period = local.hour >= 12 ? "PM" : "AM";
+        char formatted[12];
+        snprintf(formatted, sizeof(formatted), "%d:%02d %s", display_hour, local.minute, period);
+        return std::string(formatted);
       };
 
       auto draw_events = [&](const std::string &raw, int x, int max_title_chars) {
@@ -691,13 +704,29 @@ display:
           std::string when = separator == std::string::npos ? "All day" : line.substr(separator + 2);
           if (title.empty()) title = "Untitled";
           if (when.empty()) when = "All day";
+          std::string first_line = title;
+          std::string second_line;
           if (title.size() > static_cast<size_t>(max_title_chars)) {
-            title = title.substr(0, max_title_chars - 3) + "...";
+            size_t split = title.rfind(' ', max_title_chars);
+            if (split == std::string::npos || split == 0) split = max_title_chars;
+            first_line = title.substr(0, split);
+            size_t remainder_start = split;
+            while (remainder_start < title.size() && title[remainder_start] == ' ') {
+              remainder_start++;
+            }
+            second_line = title.substr(remainder_start);
+            if (second_line.size() > static_cast<size_t>(max_title_chars)) {
+              second_line = second_line.substr(0, max_title_chars - 3) + "...";
+            }
           }
 
           const int y = 223 + row * 28;
           it.printf(x, y, id(font_event_time), BLUE, TextAlign::TOP_LEFT, "%s", when.c_str());
-          it.printf(x + 65, y, id(font_event_title), BLACK, TextAlign::TOP_LEFT, "%s", title.c_str());
+          it.printf(x + 65, y, id(font_event_title), BLACK, TextAlign::TOP_LEFT, "%s", first_line.c_str());
+          if (!second_line.empty()) {
+            it.printf(x + 65, y + 11, id(font_event_title), BLACK, TextAlign::TOP_LEFT,
+                      "%s", second_line.c_str());
+          }
           row++;
         }
       };
@@ -768,8 +797,10 @@ display:
       it.printf(747, 268, id(font_temperature), BLACK, TextAlign::TOP_CENTER,
                 "%s", id(weather_low).state.c_str());
 
-      draw_time(id(sunrise).state, 54);
-      draw_time(id(sunset).state, 132);
+      const std::string sunrise_local = local_sun_time(id(sunrise).state);
+      const std::string sunset_local = local_sun_time(id(sunset).state);
+      draw_time(sunrise_local, 54);
+      draw_time(sunset_local, 132);
 
 # secrets.yaml (create this file alongside your config):
 # wifi_ssid: "Your WiFi SSID"
