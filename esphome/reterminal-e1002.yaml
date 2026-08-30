@@ -191,6 +191,46 @@ script:
     mode: single
     then:
       - lambda: |-
+          auto calendar_summary = [](const std::string &value) {
+            std::string preview = value.substr(0, 48);
+            for (char &character : preview) {
+              if (character == '\n') character = '|';
+            }
+            std::string result = "len=";
+            result += std::to_string(value.size());
+            result += " | empty=";
+            result += value.empty() ? "true" : "false";
+            result += " | preview=";
+            result += preview;
+            return result;
+          };
+          id(debug_calendar_today).publish_state(calendar_summary(id(calendar_today_events).state));
+          id(debug_calendar_sun).publish_state(calendar_summary(id(calendar_sun_events).state));
+          id(debug_calendar_mon).publish_state(calendar_summary(id(calendar_mon_events).state));
+          id(debug_calendar_tue).publish_state(calendar_summary(id(calendar_tue_events).state));
+          id(debug_calendar_wed).publish_state(calendar_summary(id(calendar_wed_events).state));
+          id(debug_calendar_thu).publish_state(calendar_summary(id(calendar_thu_events).state));
+          id(debug_calendar_fri).publish_state(calendar_summary(id(calendar_fri_events).state));
+          id(debug_calendar_sat).publish_state(calendar_summary(id(calendar_sat_events).state));
+          id(debug_weather_condition).publish_state(id(weather_condition).state);
+          id(debug_weather_high).publish_state(id(weather_high).state);
+          id(debug_weather_low).publish_state(id(weather_low).state);
+          id(debug_sunrise).publish_state(id(sunrise).state);
+          id(debug_sunset).publish_state(id(sunset).state);
+          const bool data_ready = id(calendar_today_events).has_state() &&
+              id(calendar_sun_events).has_state() && id(calendar_mon_events).has_state() &&
+              id(calendar_tue_events).has_state() && id(calendar_wed_events).has_state() &&
+              id(calendar_thu_events).has_state() && id(calendar_fri_events).has_state() &&
+              id(calendar_sat_events).has_state() && !id(weather_condition).state.empty() &&
+              !id(weather_high).state.empty() && !id(weather_low).state.empty() &&
+              !id(sunrise).state.empty() && !id(sunset).state.empty();
+          char readiness[96];
+          snprintf(readiness, sizeof(readiness), "api=%s | time=%s | data=%s | mask=%u",
+                   id(housevoice_api_connected) ? "true" : "false",
+                   id(housevoice_time_synced) ? "true" : "false",
+                   data_ready ? "true" : "false", id(housevoice_last_readiness));
+          id(debug_readiness).publish_state(readiness);
+      - lambda: |-
           const bool time_ready = id(housevoice_time_synced);
           const bool today_ready = id(calendar_today_events).has_state();
           const bool tomorrow_ready = id(calendar_sun_events).has_state() ||
@@ -214,10 +254,24 @@ script:
                      sunrise_ready ? "true" : "false", sunset_ready ? "true" : "false");
             id(housevoice_last_readiness) = readiness;
           }
-          if (readiness == 255 && !id(housevoice_all_data_ready_logged)) {
-            ESP_LOGI("housevoice", "ALL DATA READY; automatic display refresh suppressed for diagnostic build");
-            id(housevoice_all_data_ready_logged) = true;
-          }
+           if (readiness == 255 && !id(housevoice_all_data_ready_logged)) {
+             ESP_LOGI("housevoice", "ALL DATA READY; automatic display refresh suppressed for diagnostic build");
+             id(housevoice_all_data_ready_logged) = true;
+           }
+      - lambda: |-
+          const bool data_ready = id(calendar_today_events).has_state() &&
+              id(calendar_sun_events).has_state() && id(calendar_mon_events).has_state() &&
+              id(calendar_tue_events).has_state() && id(calendar_wed_events).has_state() &&
+              id(calendar_thu_events).has_state() && id(calendar_fri_events).has_state() &&
+              id(calendar_sat_events).has_state() && !id(weather_condition).state.empty() &&
+              !id(weather_high).state.empty() && !id(weather_low).state.empty() &&
+              !id(sunrise).state.empty() && !id(sunset).state.empty();
+          char readiness[96];
+          snprintf(readiness, sizeof(readiness), "api=%s | time=%s | data=%s | mask=%u",
+                   id(housevoice_api_connected) ? "true" : "false",
+                   id(housevoice_time_synced) ? "true" : "false",
+                   data_ready ? "true" : "false", id(housevoice_last_readiness));
+          id(debug_readiness).publish_state(readiness);
       - if:
           condition:
             lambda: |-
@@ -393,6 +447,64 @@ text_sensor:
         - lambda: |-
             ESP_LOGI("housevoice", "sunset received: \"%s\"", id(sunset).state.c_str());
         - script.execute: housevoice_check_initial_data
+
+  # Temporary diagnostic mirrors for direct Home Assistant inspection.
+  - platform: template
+    name: "HV Debug Calendar Today"
+    id: debug_calendar_today
+    update_interval: never
+  - platform: template
+    name: "HV Debug Calendar Sunday"
+    id: debug_calendar_sun
+    update_interval: never
+  - platform: template
+    name: "HV Debug Calendar Monday"
+    id: debug_calendar_mon
+    update_interval: never
+  - platform: template
+    name: "HV Debug Calendar Tuesday"
+    id: debug_calendar_tue
+    update_interval: never
+  - platform: template
+    name: "HV Debug Calendar Wednesday"
+    id: debug_calendar_wed
+    update_interval: never
+  - platform: template
+    name: "HV Debug Calendar Thursday"
+    id: debug_calendar_thu
+    update_interval: never
+  - platform: template
+    name: "HV Debug Calendar Friday"
+    id: debug_calendar_fri
+    update_interval: never
+  - platform: template
+    name: "HV Debug Calendar Saturday"
+    id: debug_calendar_sat
+    update_interval: never
+  - platform: template
+    name: "HV Debug Weather Condition"
+    id: debug_weather_condition
+    update_interval: never
+  - platform: template
+    name: "HV Debug Weather High"
+    id: debug_weather_high
+    update_interval: never
+  - platform: template
+    name: "HV Debug Weather Low"
+    id: debug_weather_low
+    update_interval: never
+  - platform: template
+    name: "HV Debug Sunrise"
+    id: debug_sunrise
+    update_interval: never
+  - platform: template
+    name: "HV Debug Sunset"
+    id: debug_sunset
+    update_interval: never
+  - platform: template
+    name: "HV Debug Readiness"
+    id: debug_readiness
+    update_interval: never
 
 binary_sensor:
   # KEY0 (GPIO3)
