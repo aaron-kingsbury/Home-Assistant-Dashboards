@@ -177,11 +177,47 @@ globals:
     type: bool
     restore_value: false
     initial_value: "false"
+  - id: housevoice_last_readiness
+    type: uint16_t
+    restore_value: false
+    initial_value: "65535"
+  - id: housevoice_all_data_ready_logged
+    type: bool
+    restore_value: false
+    initial_value: "false"
 
 script:
   - id: housevoice_check_initial_data
     mode: single
     then:
+      - lambda: |-
+          const bool time_ready = id(housevoice_time_synced);
+          const bool today_ready = id(calendar_today_events).has_state();
+          const bool tomorrow_ready = id(calendar_sun_events).has_state() ||
+              id(calendar_mon_events).has_state() || id(calendar_tue_events).has_state() ||
+              id(calendar_wed_events).has_state() || id(calendar_thu_events).has_state() ||
+              id(calendar_fri_events).has_state() || id(calendar_sat_events).has_state();
+          const bool condition_ready = !id(weather_condition).state.empty();
+          const bool high_ready = !id(weather_high).state.empty();
+          const bool low_ready = !id(weather_low).state.empty();
+          const bool sunrise_ready = !id(sunrise).state.empty();
+          const bool sunset_ready = !id(sunset).state.empty();
+          const uint16_t readiness =
+              (time_ready ? 1 : 0) | (today_ready ? 2 : 0) | (tomorrow_ready ? 4 : 0) |
+              (condition_ready ? 8 : 0) | (high_ready ? 16 : 0) | (low_ready ? 32 : 0) |
+              (sunrise_ready ? 64 : 0) | (sunset_ready ? 128 : 0);
+          if (readiness != id(housevoice_last_readiness)) {
+            ESP_LOGI("housevoice", "HouseVoice readiness: time=%s today=%s tomorrow=%s condition=%s high=%s low=%s sunrise=%s sunset=%s",
+                     time_ready ? "true" : "false", today_ready ? "true" : "false",
+                     tomorrow_ready ? "true" : "false", condition_ready ? "true" : "false",
+                     high_ready ? "true" : "false", low_ready ? "true" : "false",
+                     sunrise_ready ? "true" : "false", sunset_ready ? "true" : "false");
+            id(housevoice_last_readiness) = readiness;
+          }
+          if (readiness == 255 && !id(housevoice_all_data_ready_logged)) {
+            ESP_LOGI("housevoice", "ALL DATA READY; automatic display refresh suppressed for diagnostic build");
+            id(housevoice_all_data_ready_logged) = true;
+          }
       - if:
           condition:
             lambda: |-
@@ -216,7 +252,7 @@ script:
                          id(weather_condition).state.c_str(), id(weather_high).state.c_str(),
                          id(weather_low).state.c_str(), id(sunrise).state.c_str(),
                          id(sunset).state.c_str());
-            - component.update: epaper_display
+            - logger.log: "HouseVoice readiness action completed; automatic display refresh suppressed"
 
 text_sensor:
   - platform: homeassistant
@@ -224,66 +260,120 @@ text_sensor:
     entity_id: input_text.calendar_today_events
     on_value:
       then:
+        - lambda: |-
+            const auto &value = id(calendar_today_events).state;
+            std::string preview = value.substr(0, 48);
+            for (char &character : preview) if (character == '\n') character = '|';
+            ESP_LOGI("housevoice", "calendar_today_events received: length=%u empty=%s preview=\"%s\"",
+                     static_cast<unsigned>(value.size()), value.empty() ? "true" : "false", preview.c_str());
         - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: calendar_sun_events
     entity_id: input_text.calendar_sun_events
     on_value:
       then:
+        - lambda: |-
+            const auto &value = id(calendar_sun_events).state;
+            std::string preview = value.substr(0, 48);
+            for (char &character : preview) if (character == '\n') character = '|';
+            ESP_LOGI("housevoice", "calendar_sun_events received: length=%u empty=%s preview=\"%s\"",
+                     static_cast<unsigned>(value.size()), value.empty() ? "true" : "false", preview.c_str());
         - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: calendar_mon_events
     entity_id: input_text.calendar_mon_events
     on_value:
       then:
+        - lambda: |-
+            const auto &value = id(calendar_mon_events).state;
+            std::string preview = value.substr(0, 48);
+            for (char &character : preview) if (character == '\n') character = '|';
+            ESP_LOGI("housevoice", "calendar_mon_events received: length=%u empty=%s preview=\"%s\"",
+                     static_cast<unsigned>(value.size()), value.empty() ? "true" : "false", preview.c_str());
         - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: calendar_tue_events
     entity_id: input_text.calendar_tue_events
     on_value:
       then:
+        - lambda: |-
+            const auto &value = id(calendar_tue_events).state;
+            std::string preview = value.substr(0, 48);
+            for (char &character : preview) if (character == '\n') character = '|';
+            ESP_LOGI("housevoice", "calendar_tue_events received: length=%u empty=%s preview=\"%s\"",
+                     static_cast<unsigned>(value.size()), value.empty() ? "true" : "false", preview.c_str());
         - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: calendar_wed_events
     entity_id: input_text.calendar_wed_events
     on_value:
       then:
+        - lambda: |-
+            const auto &value = id(calendar_wed_events).state;
+            std::string preview = value.substr(0, 48);
+            for (char &character : preview) if (character == '\n') character = '|';
+            ESP_LOGI("housevoice", "calendar_wed_events received: length=%u empty=%s preview=\"%s\"",
+                     static_cast<unsigned>(value.size()), value.empty() ? "true" : "false", preview.c_str());
         - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: calendar_thu_events
     entity_id: input_text.calendar_thu_events
     on_value:
       then:
+        - lambda: |-
+            const auto &value = id(calendar_thu_events).state;
+            std::string preview = value.substr(0, 48);
+            for (char &character : preview) if (character == '\n') character = '|';
+            ESP_LOGI("housevoice", "calendar_thu_events received: length=%u empty=%s preview=\"%s\"",
+                     static_cast<unsigned>(value.size()), value.empty() ? "true" : "false", preview.c_str());
         - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: calendar_fri_events
     entity_id: input_text.calendar_fri_events
     on_value:
       then:
+        - lambda: |-
+            const auto &value = id(calendar_fri_events).state;
+            std::string preview = value.substr(0, 48);
+            for (char &character : preview) if (character == '\n') character = '|';
+            ESP_LOGI("housevoice", "calendar_fri_events received: length=%u empty=%s preview=\"%s\"",
+                     static_cast<unsigned>(value.size()), value.empty() ? "true" : "false", preview.c_str());
         - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: calendar_sat_events
     entity_id: input_text.calendar_sat_events
     on_value:
       then:
+        - lambda: |-
+            const auto &value = id(calendar_sat_events).state;
+            std::string preview = value.substr(0, 48);
+            for (char &character : preview) if (character == '\n') character = '|';
+            ESP_LOGI("housevoice", "calendar_sat_events received: length=%u empty=%s preview=\"%s\"",
+                     static_cast<unsigned>(value.size()), value.empty() ? "true" : "false", preview.c_str());
         - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: weather_condition
     entity_id: input_text.e_ink_weather_condition
     on_value:
       then:
+        - lambda: |-
+            ESP_LOGI("housevoice", "weather_condition received: \"%s\"", id(weather_condition).state.c_str());
         - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: weather_high
     entity_id: input_text.e_ink_weather_high
     on_value:
       then:
+        - lambda: |-
+            ESP_LOGI("housevoice", "weather_high received: \"%s\"", id(weather_high).state.c_str());
         - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: weather_low
     entity_id: input_text.e_ink_weather_low
     on_value:
       then:
+        - lambda: |-
+            ESP_LOGI("housevoice", "weather_low received: \"%s\"", id(weather_low).state.c_str());
         - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: sunrise
@@ -291,6 +381,8 @@ text_sensor:
     attribute: next_rising
     on_value:
       then:
+        - lambda: |-
+            ESP_LOGI("housevoice", "sunrise received: \"%s\"", id(sunrise).state.c_str());
         - script.execute: housevoice_check_initial_data
   - platform: homeassistant
     id: sunset
@@ -298,6 +390,8 @@ text_sensor:
     attribute: next_setting
     on_value:
       then:
+        - lambda: |-
+            ESP_LOGI("housevoice", "sunset received: \"%s\"", id(sunset).state.c_str());
         - script.execute: housevoice_check_initial_data
 
 binary_sensor:
@@ -396,10 +490,15 @@ api:
     - logger.log: "Home Assistant API connected; waiting for HouseVoice data"
     - script.execute: housevoice_check_initial_data
     - delay: 60s
-    - globals.set:
-        id: housevoice_initial_refresh_timeout
-        value: "true"
-    - script.execute: housevoice_check_initial_data
+    - if:
+        condition:
+          lambda: "return !id(housevoice_initial_refresh_done);"
+        then:
+          - logger.log: "HouseVoice 60-SECOND FALLBACK REACHED"
+          - globals.set:
+              id: housevoice_initial_refresh_timeout
+              value: "true"
+          - script.execute: housevoice_check_initial_data
   on_client_disconnected:
     - globals.set:
         id: housevoice_api_connected
