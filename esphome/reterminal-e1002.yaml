@@ -485,8 +485,8 @@ display:
         }
       };
 
-      auto now = id(rtc_time).now();
-      if (now.is_valid()) {
+       auto now = id(ha_time).now();
+       if (now.is_valid() && now.year >= 2025 && now.year <= 2100) {
         char date_text[48];
         now.strftime(date_text, sizeof(date_text), "%A, %B %d, %Y");
         for (char *character = date_text; *character != '\0'; character++) {
