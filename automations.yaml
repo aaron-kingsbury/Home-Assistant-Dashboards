@@ -727,7 +727,7 @@
     - conditions:
       - condition: state
         entity_id: input_select.fan_mode
-        state: true
+        state: 'On'
       sequence:
       - action: climate.set_fan_mode
         target:
@@ -770,7 +770,7 @@
         target:
           entity_id: input_select.fan_mode
         data:
-          option: true
+          option: 'On'
     - conditions:
       - condition: template
         value_template: '{{ trigger.to_state.attributes.fan_mode == ''Circulation''
@@ -847,3 +847,37 @@
       - action: input_boolean.turn_off
         target:
           entity_id: input_boolean.eco_mode
+- id: e_ink_daily_weather_refresh
+  alias: E-Ink Daily Weather Refresh
+  description: Store the daily forecast used by the overnight e-ink board.
+  triggers:
+  - at: 00:10:00
+    trigger: time
+  - event: start
+    trigger: homeassistant
+  actions:
+  - action: weather.get_forecasts
+    data:
+      type: daily
+    response_variable: daily_forecast
+    target:
+      entity_id: weather.forecast_housevoice_weather
+  - variables:
+      today: '{{ daily_forecast[''weather.forecast_housevoice_weather''][''forecast''][0]
+        }}'
+  - action: input_text.set_value
+    data:
+      value: '{{ today.condition | replace(''-'', '' '') | title }}'
+    target:
+      entity_id: input_text.e_ink_weather_condition
+  - action: input_text.set_value
+    data:
+      value: '{{ today.temperature | string }}°'
+    target:
+      entity_id: input_text.e_ink_weather_high
+  - action: input_text.set_value
+    data:
+      value: '{{ today.templow | string }}°'
+    target:
+      entity_id: input_text.e_ink_weather_low
+  mode: restart
