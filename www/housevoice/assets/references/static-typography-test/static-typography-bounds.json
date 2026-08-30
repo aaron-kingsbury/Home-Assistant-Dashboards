@@ -1,0 +1,132 @@
+{
+  "regions": [
+    {
+      "id": "family",
+      "label": "Our Family Today",
+      "x": 292,
+      "y": 77,
+      "w": 238,
+      "h": 42,
+      "source": [
+        "black",
+        "red",
+        "yellow"
+      ],
+      "color": "red",
+      "bg": "light"
+    },
+    {
+      "id": "today",
+      "label": "TODAY",
+      "x": 280,
+      "y": 177,
+      "w": 65,
+      "h": 13,
+      "source": [
+        "black",
+        "blue"
+      ],
+      "color": "blue",
+      "bg": "light"
+    },
+    {
+      "id": "tomorrow",
+      "label": "TOMORROW",
+      "x": 457,
+      "y": 177,
+      "w": 99,
+      "h": 13,
+      "source": [
+        "black",
+        "blue"
+      ],
+      "color": "blue",
+      "bg": "light"
+    },
+    {
+      "id": "sunrise",
+      "label": "SUNRISE",
+      "x": 706,
+      "y": 40,
+      "w": 50,
+      "h": 9,
+      "source": [
+        "black",
+        "blue"
+      ],
+      "color": "blue",
+      "bg": "light"
+    },
+    {
+      "id": "sunset",
+      "label": "SUNSET",
+      "x": 706,
+      "y": 118,
+      "w": 45,
+      "h": 9,
+      "source": [
+        "black",
+        "blue"
+      ],
+      "color": "blue",
+      "bg": "light"
+    },
+    {
+      "id": "high",
+      "label": "HIGH",
+      "x": 656,
+      "y": 251,
+      "w": 34,
+      "h": 9,
+      "source": [
+        "black",
+        "blue"
+      ],
+      "color": "blue",
+      "bg": "light"
+    },
+    {
+      "id": "low",
+      "label": "LOW",
+      "x": 729,
+      "y": 251,
+      "w": 29,
+      "h": 9,
+      "source": [
+        "black",
+        "blue"
+      ],
+      "color": "blue",
+      "bg": "light"
+    },
+    {
+      "id": "quote",
+      "label": "Give thanks to the Lord, for he is good.",
+      "x": 222,
+      "y": 395,
+      "w": 378,
+      "h": 24,
+      "source": [
+        "white",
+        "blue"
+      ],
+      "color": "white",
+      "bg": "footer"
+    },
+    {
+      "id": "psalm",
+      "label": "PSALM 107:1",
+      "x": 352,
+      "y": 427,
+      "w": 100,
+      "h": 11,
+      "source": [
+        "red",
+        "yellow"
+      ],
+      "color": "yellow",
+      "bg": "footer"
+    }
+  ],
+  "preview": "/homeassistant/www/housevoice/assets/references/static-typography-test/static-typography-full-preview.png"
+}

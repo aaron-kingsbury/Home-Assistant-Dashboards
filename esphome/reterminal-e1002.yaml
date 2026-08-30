@@ -103,6 +103,42 @@ image:
         file: "../www/housevoice/assets/references/housevoice-title-test/housevoice-title-cleanup.png"
       - id: housevoice_title_overlay
         file: "../www/housevoice/assets/references/housevoice-title-test/housevoice-title-overlay.png"
+      - id: housevoice_static_family_cleanup
+        file: "../www/housevoice/assets/references/static-typography-test/static-family-cleanup.png"
+      - id: housevoice_static_family_overlay
+        file: "../www/housevoice/assets/references/static-typography-test/static-family-overlay.png"
+      - id: housevoice_static_today_cleanup
+        file: "../www/housevoice/assets/references/static-typography-test/static-today-cleanup.png"
+      - id: housevoice_static_today_overlay
+        file: "../www/housevoice/assets/references/static-typography-test/static-today-overlay.png"
+      - id: housevoice_static_tomorrow_cleanup
+        file: "../www/housevoice/assets/references/static-typography-test/static-tomorrow-cleanup.png"
+      - id: housevoice_static_tomorrow_overlay
+        file: "../www/housevoice/assets/references/static-typography-test/static-tomorrow-overlay.png"
+      - id: housevoice_static_sunrise_cleanup
+        file: "../www/housevoice/assets/references/static-typography-test/static-sunrise-cleanup.png"
+      - id: housevoice_static_sunrise_overlay
+        file: "../www/housevoice/assets/references/static-typography-test/static-sunrise-overlay.png"
+      - id: housevoice_static_sunset_cleanup
+        file: "../www/housevoice/assets/references/static-typography-test/static-sunset-cleanup.png"
+      - id: housevoice_static_sunset_overlay
+        file: "../www/housevoice/assets/references/static-typography-test/static-sunset-overlay.png"
+      - id: housevoice_static_high_cleanup
+        file: "../www/housevoice/assets/references/static-typography-test/static-high-cleanup.png"
+      - id: housevoice_static_high_overlay
+        file: "../www/housevoice/assets/references/static-typography-test/static-high-overlay.png"
+      - id: housevoice_static_low_cleanup
+        file: "../www/housevoice/assets/references/static-typography-test/static-low-cleanup.png"
+      - id: housevoice_static_low_overlay
+        file: "../www/housevoice/assets/references/static-typography-test/static-low-overlay.png"
+      - id: housevoice_static_quote_cleanup
+        file: "../www/housevoice/assets/references/static-typography-test/static-quote-cleanup.png"
+      - id: housevoice_static_quote_overlay
+        file: "../www/housevoice/assets/references/static-typography-test/static-quote-overlay.png"
+      - id: housevoice_static_psalm_cleanup
+        file: "../www/housevoice/assets/references/static-typography-test/static-psalm-cleanup.png"
+      - id: housevoice_static_psalm_overlay
+        file: "../www/housevoice/assets/references/static-typography-test/static-psalm-overlay.png"
 
 # SPI — shared by ePaper display and SD card
 # SPI — 墨水屏和 SD 卡共用
@@ -668,6 +704,24 @@ display:
       it.image(0, 0, id(housevoice_background_yellow), YELLOW, WHITE);
       it.image(215, 18, id(housevoice_title_cleanup), WHITE, BLACK);
       it.image(215, 18, id(housevoice_title_overlay), BLUE, WHITE);
+      it.image(292, 77, id(housevoice_static_family_cleanup), WHITE, BLACK);
+      it.image(292, 77, id(housevoice_static_family_overlay), RED, WHITE);
+      it.image(280, 177, id(housevoice_static_today_cleanup), WHITE, BLACK);
+      it.image(280, 177, id(housevoice_static_today_overlay), BLUE, WHITE);
+      it.image(457, 177, id(housevoice_static_tomorrow_cleanup), WHITE, BLACK);
+      it.image(457, 177, id(housevoice_static_tomorrow_overlay), BLUE, WHITE);
+      it.image(706, 40, id(housevoice_static_sunrise_cleanup), WHITE, BLACK);
+      it.image(706, 40, id(housevoice_static_sunrise_overlay), BLUE, WHITE);
+      it.image(706, 118, id(housevoice_static_sunset_cleanup), WHITE, BLACK);
+      it.image(706, 118, id(housevoice_static_sunset_overlay), BLUE, WHITE);
+      it.image(656, 251, id(housevoice_static_high_cleanup), WHITE, BLACK);
+      it.image(656, 251, id(housevoice_static_high_overlay), BLUE, WHITE);
+      it.image(729, 251, id(housevoice_static_low_cleanup), WHITE, BLACK);
+      it.image(729, 251, id(housevoice_static_low_overlay), BLUE, WHITE);
+      it.image(222, 395, id(housevoice_static_quote_cleanup), BLACK, WHITE);
+      it.image(222, 395, id(housevoice_static_quote_overlay), WHITE, BLACK);
+      it.image(352, 427, id(housevoice_static_psalm_cleanup), BLACK, WHITE);
+      it.image(352, 427, id(housevoice_static_psalm_overlay), YELLOW, BLACK);
 
       auto draw_time = [&](const std::string &value, int y) {
         if (value.empty()) {
