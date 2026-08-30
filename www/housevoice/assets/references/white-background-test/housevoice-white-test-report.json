@@ -1,0 +1,42 @@
+{
+  "dimensions": {
+    "width": 800,
+    "height": 480
+  },
+  "changedCreamToWhitePixels": 219858,
+  "whiteMaskPixelsInMainField": 233862,
+  "source": "/homeassistant/www/housevoice/assets/references/e-ink-background-8-800x480.png",
+  "currentPreview": "/homeassistant/www/housevoice/assets/references/white-background-test/housevoice-current-cream-800x480.png",
+  "whitePreview": "/homeassistant/www/housevoice/assets/references/white-background-test/housevoice-test-white-800x480.png",
+  "comparison": "/homeassistant/www/housevoice/assets/references/white-background-test/housevoice-cream-vs-white-comparison.png",
+  "crops": {
+    "titleCurrent": "/homeassistant/www/housevoice/assets/references/white-background-test/housevoice-cream-title.png",
+    "titleWhite": "/homeassistant/www/housevoice/assets/references/white-background-test/housevoice-white-title.png",
+    "calendarCurrent": "/homeassistant/www/housevoice/assets/references/white-background-test/housevoice-cream-calendar.png",
+    "calendarWhite": "/homeassistant/www/housevoice/assets/references/white-background-test/housevoice-white-calendar.png",
+    "mountain_boundaryCurrent": "/homeassistant/www/housevoice/assets/references/white-background-test/housevoice-cream-mountain_boundary.png",
+    "mountain_boundaryWhite": "/homeassistant/www/housevoice/assets/references/white-background-test/housevoice-white-mountain_boundary.png",
+    "weather_railCurrent": "/homeassistant/www/housevoice/assets/references/white-background-test/housevoice-cream-weather_rail.png",
+    "weather_railWhite": "/homeassistant/www/housevoice/assets/references/white-background-test/housevoice-white-weather_rail.png"
+  },
+  "method": "Only pixels assigned to the existing white mask above the footer were changed; title cleanup and blue overlay are identical in both previews.",
+  "verification": {
+    "currentDimensions": [
+      800,
+      480
+    ],
+    "whiteDimensions": [
+      800,
+      480
+    ],
+    "changedPixels": 219858,
+    "changedNonWhiteArtworkPixels": 0,
+    "changedFooterPixels": 0,
+    "changedHousevoiceRegionPixels": 0,
+    "whiteChangedPixelsArePureWhite": true,
+    "noYellowFlood": true,
+    "artworkMaskOverlap": true,
+    "footerUnchanged": true,
+    "titleIdenticalBetweenPreviews": true
+  }
+}
