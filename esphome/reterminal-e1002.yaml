@@ -89,10 +89,22 @@ font:
 
 image:
   - platform: file
-    file: "../www/housevoice/assets/references/e-ink-background-8-800x480.png"
-    id: housevoice_background
-    type: RGB565
-    dither: FLOYDSTEINBERG
+    defaults:
+      type: BINARY
+      transparency: chroma_key
+    files:
+      - id: housevoice_background_white
+        file: "../www/housevoice/assets/references/e-ink-background-8-800x480/mask-white.png"
+      - id: housevoice_background_black
+        file: "../www/housevoice/assets/references/e-ink-background-8-800x480/mask-black.png"
+      - id: housevoice_background_red
+        file: "../www/housevoice/assets/references/e-ink-background-8-800x480/mask-red.png"
+      - id: housevoice_background_green
+        file: "../www/housevoice/assets/references/e-ink-background-8-800x480/mask-green.png"
+      - id: housevoice_background_blue
+        file: "../www/housevoice/assets/references/e-ink-background-8-800x480/mask-blue.png"
+      - id: housevoice_background_yellow
+        file: "../www/housevoice/assets/references/e-ink-background-8-800x480/mask-yellow.png"
 
 # SPI — shared by ePaper display and SD card
 # SPI — 墨水屏和 SD 卡共用
@@ -304,10 +316,19 @@ display:
     model: Seeed-reTerminal-E1002
     update_interval: never
     lambda: |-
+      const auto WHITE = Color(255, 255, 255, 0);
       const auto BLACK = Color(0, 0, 0, 0);
+      const auto RED = Color(255, 0, 0, 0);
+      const auto GREEN = Color(0, 255, 0, 0);
       const auto BLUE = Color(0, 0, 255, 0);
+      const auto YELLOW = Color(255, 255, 0, 0);
 
-      it.image(0, 0, id(housevoice_background));
+      it.image(0, 0, id(housevoice_background_white), WHITE, BLACK);
+      it.image(0, 0, id(housevoice_background_black), BLACK, WHITE);
+      it.image(0, 0, id(housevoice_background_red), RED, WHITE);
+      it.image(0, 0, id(housevoice_background_green), GREEN, WHITE);
+      it.image(0, 0, id(housevoice_background_blue), BLUE, WHITE);
+      it.image(0, 0, id(housevoice_background_yellow), YELLOW, WHITE);
 
       auto draw_time = [&](const std::string &value, int y) {
         if (value.size() < 16) {
