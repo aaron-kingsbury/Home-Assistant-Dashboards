@@ -89,7 +89,7 @@ font:
 
 image:
   - platform: file
-    file: "../www/housevoice/assets/references/e-ink-background-8.png"
+    file: "../www/housevoice/assets/references/e-ink-background-8-800x480.png"
     id: housevoice_background
     type: RGB565
     dither: FLOYDSTEINBERG
