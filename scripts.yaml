@@ -249,21 +249,24 @@ housevoice_panel_cancel_standby_countdown:
         entity_id: timer.housevoice_panel_standby
 housevoice_panel_screen_on:
   alias: HouseVoice Panel Screen On
-  description: "Future use: - Fully Kiosk screen_on - panel backlight switch - Android display command - MQTT display brightness Placeholder only. Do not call until the real panel hardware is known.
+  description:
+    "Future use: - Fully Kiosk screen_on - panel backlight switch - Android display command - MQTT display brightness Placeholder only. Do not call until the real panel hardware is known.
 
     "
   mode: restart
   sequence: []
 housevoice_panel_screen_dim:
   alias: HouseVoice Panel Screen Dim
-  description: "Future use: - Fully Kiosk screen_dim / brightness - panel backlight dim - Android display command - MQTT display brightness Placeholder only. Do not call until the real panel hardware is known.
+  description:
+    "Future use: - Fully Kiosk screen_dim / brightness - panel backlight dim - Android display command - MQTT display brightness Placeholder only. Do not call until the real panel hardware is known.
 
     "
   mode: restart
   sequence: []
 housevoice_panel_screen_off:
   alias: HouseVoice Panel Screen Off
-  description: "Future use: - Fully Kiosk screen_off - panel backlight power control - Android display command - MQTT display brightness Placeholder only. Do not call until the real panel hardware is known.
+  description:
+    "Future use: - Fully Kiosk screen_off - panel backlight power control - Android display command - MQTT display brightness Placeholder only. Do not call until the real panel hardware is known.
 
     "
   mode: restart
@@ -397,3 +400,79 @@ housevoice_walkie_kitchen:
   alias: "HouseVoice Walkie: Kitchen"
   description: Placeholder for future Drop-In routing to the kitchen
   sequence: []
+housevoice_quick_add_calendar_event:
+  alias: "HouseVoice Quick Add Calendar Event"
+  description: Add a validated appointment to the HouseVoice Google Calendar
+  mode: restart
+  sequence:
+    - condition: template
+      value_template: >-
+        {{ states('input_text.housevoice_quick_event_title') | trim not in
+        ['', 'unknown', 'unavailable'] and
+        states('input_datetime.housevoice_quick_event_date') not in
+        ['', 'unknown', 'unavailable'] and
+        states('input_datetime.housevoice_quick_event_start') not in
+        ['', 'unknown', 'unavailable'] and
+        states('input_datetime.housevoice_quick_event_end') not in
+        ['', 'unknown', 'unavailable'] }}
+    - variables:
+        event_date: "{{ states('input_datetime.housevoice_quick_event_date') }}"
+        start_time: "{{ states('input_datetime.housevoice_quick_event_start') }}"
+        end_time: "{{ states('input_datetime.housevoice_quick_event_end') }}"
+        start_datetime: >-
+          {{ strptime(
+          states('input_datetime.housevoice_quick_event_date') ~ ' ' ~
+          states('input_datetime.housevoice_quick_event_start'),
+          '%Y-%m-%d %H:%M:%S') }}
+        end_datetime: >-
+          {{ strptime(
+          states('input_datetime.housevoice_quick_event_date') ~ ' ' ~
+          states('input_datetime.housevoice_quick_event_end'),
+          '%Y-%m-%d %H:%M:%S') }}
+    - variables:
+        adjusted_end_datetime: >-
+          {% if end_datetime <= start_datetime %}
+            {{ end_datetime + timedelta(days=1) }}
+          {% else %}
+            {{ end_datetime }}
+          {% endif %}
+    - action: calendar.create_event
+      target:
+        entity_id: calendar.kingsbury_mindy_gmail_com
+      data:
+        summary: "{{ states('input_text.housevoice_quick_event_title') | trim }}"
+        start_date_time: "{{ start_datetime.strftime('%Y-%m-%d %H:%M:%S') }}"
+        end_date_time: "{{ adjusted_end_datetime.strftime('%Y-%m-%d %H:%M:%S') }}"
+    - delay:
+        seconds: 5
+    - action: automation.trigger
+      target:
+        entity_id: automation.housevoice_calendar_refresh
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.housevoice_quick_event_title
+      data:
+        value: ""
+    - action: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.housevoice_quick_event_date
+      data:
+        date: "{{ now().strftime('%Y-%m-%d') }}"
+    - variables:
+        next_slot: >-
+          {{ now().replace(second=0, microsecond=0) +
+          timedelta(minutes=30 - (now().minute % 30)) }}
+    - action: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.housevoice_quick_event_start
+      data:
+        time: "{{ next_slot.strftime('%H:%M:%S') }}"
+    - action: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.housevoice_quick_event_end
+      data:
+        time: "{{ (next_slot + timedelta(hours=1)).strftime('%H:%M:%S') }}"
+    - action: browser_mod.close_popup
+      data:
+        browser_id:
+          - housevoice-hall-panel

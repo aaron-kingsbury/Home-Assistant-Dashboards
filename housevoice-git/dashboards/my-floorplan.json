@@ -611,7 +611,7 @@
                 },
                 {
                   "icon": "mdi:image-frame",
-                  "name": "Sleep Screen",
+                  "name": "Calendar",
                   "styles": {
                     "card": [
                       {
@@ -666,7 +666,7 @@
                   },
                   "tap_action": {
                     "action": "navigate",
-                    "navigation_path": "/my-floorplan/sleep-screen"
+                    "navigation_path": "/my-floorplan/calendar-control"
                   },
                   "type": "custom:button-card"
                 }
@@ -15524,6 +15524,266 @@
                     },
                     "cards": [
                       {
+                        "icon": "mdi:calendar-plus",
+                        "name": "+ EVENT",
+                        "show_icon": true,
+                        "show_name": true,
+                        "show_state": false,
+                        "styles": {
+                          "card": [
+                            {
+                              "height": "37px"
+                            },
+                            {
+                              "width": "82px"
+                            },
+                            {
+                              "border-radius": "10px"
+                            },
+                            {
+                              "background": "#ffffff"
+                            },
+                            {
+                              "border": "2px solid #c4d9ee"
+                            },
+                            {
+                              "box-shadow": "none"
+                            },
+                            {
+                              "transform": "translateX(-14px)"
+                            }
+                          ],
+                          "grid": [
+                            {
+                              "grid-template-areas": "\"i n\""
+                            },
+                            {
+                              "grid-template-columns": "22px 1fr"
+                            },
+                            {
+                              "grid-template-rows": "1fr"
+                            }
+                          ],
+                          "icon": [
+                            {
+                              "color": "#1468ff"
+                            },
+                            {
+                              "width": "17px"
+                            }
+                          ],
+                          "name": [
+                            {
+                              "color": "#1468ff"
+                            },
+                            {
+                              "justify-self": "center"
+                            },
+                            {
+                              "font-size": "10px"
+                            },
+                            {
+                              "font-weight": "700"
+                            },
+                            {
+                              "letter-spacing": "0.2px"
+                            }
+                          ]
+                        },
+                        "tap_action": {
+                          "action": "call-service",
+                          "data": {
+                            "browser_id": [
+                              "housevoice-hall-panel"
+                            ],
+                            "sequence": [
+                              {
+                                "data": {
+                                  "value": ""
+                                },
+                                "service": "input_text.set_value",
+                                "target": {
+                                  "entity_id": "input_text.housevoice_quick_event_title"
+                                }
+                              },
+                              {
+                                "data": {
+                                  "date": "{{ now().strftime('%Y-%m-%d') }}"
+                                },
+                                "service": "input_datetime.set_datetime",
+                                "target": {
+                                  "entity_id": "input_datetime.housevoice_quick_event_date"
+                                }
+                              },
+                              {
+                                "data": {
+                                  "time": "{% set next_slot = now().replace(second=0, microsecond=0) + timedelta(minutes=30 - (now().minute % 30)) %}{{ next_slot.strftime('%H:%M:%S') }}"
+                                },
+                                "service": "input_datetime.set_datetime",
+                                "target": {
+                                  "entity_id": "input_datetime.housevoice_quick_event_start"
+                                }
+                              },
+                              {
+                                "data": {
+                                  "time": "{% set next_slot = now().replace(second=0, microsecond=0) + timedelta(minutes=30 - (now().minute % 30)) %}{{ (next_slot + timedelta(hours=1)).strftime('%H:%M:%S') }}"
+                                },
+                                "service": "input_datetime.set_datetime",
+                                "target": {
+                                  "entity_id": "input_datetime.housevoice_quick_event_end"
+                                }
+                              },
+                              {
+                                "data": {
+                                  "browser_id": [
+                                    "housevoice-hall-panel"
+                                  ],
+                                  "content": {
+                                    "card_mod": {
+                                      "style": "ha-card { width: min(420px, 88vw); padding: 8px; background: #ffffff; border: 1px solid #dfe6ef; border-radius: 16px; box-shadow: none; }"
+                                    },
+                                    "cards": [
+                                      {
+                                        "card_mod": {
+                                          "style": "ha-card { background: transparent; box-shadow: none; border: 0; } hui-text-entity-row, hui-input-datetime-entity-row { min-height: 58px; }"
+                                        },
+                                        "entities": [
+                                          {
+                                            "entity": "input_text.housevoice_quick_event_title",
+                                            "name": "Event title"
+                                          },
+                                          {
+                                            "entity": "input_datetime.housevoice_quick_event_date",
+                                            "name": "Date"
+                                          },
+                                          {
+                                            "entity": "input_datetime.housevoice_quick_event_start",
+                                            "name": "Start time"
+                                          },
+                                          {
+                                            "entity": "input_datetime.housevoice_quick_event_end",
+                                            "name": "End time"
+                                          }
+                                        ],
+                                        "show_header_toggle": false,
+                                        "type": "entities"
+                                      },
+                                      {
+                                        "cards": [
+                                          {
+                                            "icon": "mdi:close",
+                                            "name": "CANCEL",
+                                            "styles": {
+                                              "card": {
+                                                "background": "#f4f7fb",
+                                                "border": "1px solid #dfe6ef",
+                                                "border-radius": "12px",
+                                                "box-shadow": "none",
+                                                "height": "52px"
+                                              },
+                                              "icon": {
+                                                "color": "#59687b"
+                                              },
+                                              "name": {
+                                                "color": "#59687b",
+                                                "font-weight": "700"
+                                              }
+                                            },
+                                            "tap_action": {
+                                              "action": "call-service",
+                                              "data": {
+                                                "browser_id": [
+                                                  "housevoice-hall-panel"
+                                                ]
+                                              },
+                                              "service": "browser_mod.close_popup"
+                                            },
+                                            "type": "button"
+                                          },
+                                          {
+                                            "icon": "mdi:calendar-check",
+                                            "name": "ADD EVENT",
+                                            "styles": {
+                                              "card": {
+                                                "background": "#1468ff",
+                                                "border": "1px solid #1468ff",
+                                                "border-radius": "12px",
+                                                "box-shadow": "none",
+                                                "height": "52px"
+                                              },
+                                              "icon": {
+                                                "color": "#ffffff"
+                                              },
+                                              "name": {
+                                                "color": "#ffffff",
+                                                "font-weight": "700"
+                                              }
+                                            },
+                                            "tap_action": {
+                                              "action": "call-service",
+                                              "service": "script.housevoice_quick_add_calendar_event"
+                                            },
+                                            "type": "button"
+                                          }
+                                        ],
+                                        "type": "horizontal-stack"
+                                      }
+                                    ],
+                                    "type": "vertical-stack"
+                                  },
+                                  "title": "Add to Calendar"
+                                },
+                                "service": "browser_mod.popup"
+                              }
+                            ]
+                          },
+                          "service": "browser_mod.sequence"
+                        },
+                        "type": "custom:button-card"
+                      },
+                      {
+                        "icon": "mdi:chevron-left",
+                        "show_icon": true,
+                        "styles": {
+                          "card": [
+                            {
+                              "height": "37px"
+                            },
+                            {
+                              "width": "37px"
+                            },
+                            {
+                              "border-radius": "10px"
+                            },
+                            {
+                              "background": "#ffffff"
+                            },
+                            {
+                              "border": "2px solid #c4d9ee"
+                            },
+                            {
+                              "box-shadow": "0 2px 8px rgba(50,80,120,0.05)"
+                            },
+                            {
+                              "transform": "translateX(-14px)"
+                            }
+                          ],
+                          "icon": [
+                            {
+                              "color": "#1468ff"
+                            },
+                            {
+                              "width": "15px"
+                            }
+                          ]
+                        },
+                        "tap_action": {
+                          "action": "call-service",
+                          "service": "script.calendar_week_previous"
+                        },
+                        "type": "custom:button-card"
+                      },
+                      {
                         "name": "TODAY",
                         "show_icon": false,
                         "show_name": true,
@@ -15542,10 +15802,13 @@
                               "background": "#ffffff"
                             },
                             {
-                              "border": "1px solid #c4d9ee"
+                              "border": "2px solid #8fb8e6"
                             },
                             {
-                              "box-shadow": "0 2px 8px rgba(50,80,120,0.05)"
+                              "box-shadow": "none"
+                            },
+                            {
+                              "transform": "translateX(-14px)"
                             }
                           ],
                           "grid": [
@@ -15581,45 +15844,6 @@
                         "type": "custom:button-card"
                       },
                       {
-                        "icon": "mdi:chevron-left",
-                        "show_icon": true,
-                        "styles": {
-                          "card": [
-                            {
-                              "height": "37px"
-                            },
-                            {
-                              "width": "37px"
-                            },
-                            {
-                              "border-radius": "10px"
-                            },
-                            {
-                              "background": "#ffffff"
-                            },
-                            {
-                              "border": "1px solid #c4d9ee"
-                            },
-                            {
-                              "box-shadow": "0 2px 8px rgba(50,80,120,0.05)"
-                            }
-                          ],
-                          "icon": [
-                            {
-                              "color": "#1468ff"
-                            },
-                            {
-                              "width": "15px"
-                            }
-                          ]
-                        },
-                        "tap_action": {
-                          "action": "call-service",
-                          "service": "script.calendar_week_previous"
-                        },
-                        "type": "custom:button-card"
-                      },
-                      {
                         "icon": "mdi:chevron-right",
                         "show_icon": true,
                         "styles": {
@@ -15637,10 +15861,13 @@
                               "background": "#ffffff"
                             },
                             {
-                              "border": "1px solid #c4d9ee"
+                              "border": "2px solid #c4d9ee"
                             },
                             {
                               "box-shadow": "0 2px 8px rgba(50,80,120,0.05)"
+                            },
+                            {
+                              "transform": "translateX(-14px)"
                             }
                           ],
                           "icon": [
