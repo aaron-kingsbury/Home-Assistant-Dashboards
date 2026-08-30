@@ -99,6 +99,10 @@ image:
         file: "../www/housevoice/assets/references/e-ink-background-8-800x480/mask-blue.png"
       - id: housevoice_background_yellow
         file: "../www/housevoice/assets/references/e-ink-background-8-800x480/mask-yellow.png"
+      - id: housevoice_title_cleanup
+        file: "../www/housevoice/assets/references/housevoice-title-test/housevoice-title-cleanup.png"
+      - id: housevoice_title_overlay
+        file: "../www/housevoice/assets/references/housevoice-title-test/housevoice-title-overlay.png"
 
 # SPI — shared by ePaper display and SD card
 # SPI — 墨水屏和 SD 卡共用
@@ -662,6 +666,8 @@ display:
       it.image(0, 0, id(housevoice_background_green), GREEN, WHITE);
       it.image(0, 0, id(housevoice_background_blue), BLUE, WHITE);
       it.image(0, 0, id(housevoice_background_yellow), YELLOW, WHITE);
+      it.image(215, 18, id(housevoice_title_cleanup), WHITE, BLACK);
+      it.image(215, 18, id(housevoice_title_overlay), BLUE, WHITE);
 
       auto draw_time = [&](const std::string &value, int y) {
         if (value.empty()) {
