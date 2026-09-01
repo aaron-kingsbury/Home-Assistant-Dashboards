@@ -400,6 +400,35 @@ housevoice_walkie_kitchen:
   alias: "HouseVoice Walkie: Kitchen"
   description: Placeholder for future Drop-In routing to the kitchen
   sequence: []
+housevoice_prepare_quick_calendar_event:
+  alias: "HouseVoice Prepare Quick Calendar Event"
+  mode: restart
+  sequence:
+    - action: input_text.set_value
+      target:
+        entity_id: input_text.housevoice_quick_event_title
+      data:
+        value: ""
+    - action: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.housevoice_quick_event_date
+      data:
+        date: "{{ now().strftime('%Y-%m-%d') }}"
+    - action: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.housevoice_quick_event_start
+      data:
+        time: >-
+          {{ (now().replace(second=0, microsecond=0) +
+          timedelta(minutes=30 - (now().minute % 30))).strftime('%H:%M:%S') }}
+    - action: input_datetime.set_datetime
+      target:
+        entity_id: input_datetime.housevoice_quick_event_end
+      data:
+        time: >-
+          {{ (now().replace(second=0, microsecond=0) +
+          timedelta(minutes=30 - (now().minute % 30) + 60)).strftime('%H:%M:%S') }}
+
 housevoice_quick_add_calendar_event:
   alias: "HouseVoice Quick Add Calendar Event"
   description: Add a validated appointment to the HouseVoice Google Calendar
@@ -419,30 +448,22 @@ housevoice_quick_add_calendar_event:
         event_date: "{{ states('input_datetime.housevoice_quick_event_date') }}"
         start_time: "{{ states('input_datetime.housevoice_quick_event_start') }}"
         end_time: "{{ states('input_datetime.housevoice_quick_event_end') }}"
-        start_datetime: >-
-          {{ strptime(
-          states('input_datetime.housevoice_quick_event_date') ~ ' ' ~
-          states('input_datetime.housevoice_quick_event_start'),
-          '%Y-%m-%d %H:%M:%S') }}
-        end_datetime: >-
-          {{ strptime(
-          states('input_datetime.housevoice_quick_event_date') ~ ' ' ~
-          states('input_datetime.housevoice_quick_event_end'),
-          '%Y-%m-%d %H:%M:%S') }}
-    - variables:
-        adjusted_end_datetime: >-
-          {% if end_datetime <= start_datetime %}
-            {{ end_datetime + timedelta(days=1) }}
+        end_date: >-
+          {% if end_time <= start_time %}
+            {{ (as_datetime(event_date ~ ' ' ~ end_time) + timedelta(days=1)).strftime('%Y-%m-%d') }}
           {% else %}
-            {{ end_datetime }}
+            {{ event_date }}
           {% endif %}
     - action: calendar.create_event
       target:
         entity_id: calendar.kingsbury_mindy_gmail_com
       data:
         summary: "{{ states('input_text.housevoice_quick_event_title') | trim }}"
-        start_date_time: "{{ start_datetime.strftime('%Y-%m-%d %H:%M:%S') }}"
-        end_date_time: "{{ adjusted_end_datetime.strftime('%Y-%m-%d %H:%M:%S') }}"
+        start_date_time: "{{ event_date }} {{ start_time }}"
+        end_date_time: "{{ end_date }} {{ end_time }}"
+    - action: homeassistant.update_entity
+      target:
+        entity_id: calendar.kingsbury_mindy_gmail_com
     - delay:
         seconds: 5
     - action: automation.trigger
@@ -458,20 +479,20 @@ housevoice_quick_add_calendar_event:
         entity_id: input_datetime.housevoice_quick_event_date
       data:
         date: "{{ now().strftime('%Y-%m-%d') }}"
-    - variables:
-        next_slot: >-
-          {{ now().replace(second=0, microsecond=0) +
-          timedelta(minutes=30 - (now().minute % 30)) }}
     - action: input_datetime.set_datetime
       target:
         entity_id: input_datetime.housevoice_quick_event_start
       data:
-        time: "{{ next_slot.strftime('%H:%M:%S') }}"
+        time: >-
+          {{ (now().replace(second=0, microsecond=0) +
+          timedelta(minutes=30 - (now().minute % 30))).strftime('%H:%M:%S') }}
     - action: input_datetime.set_datetime
       target:
         entity_id: input_datetime.housevoice_quick_event_end
       data:
-        time: "{{ (next_slot + timedelta(hours=1)).strftime('%H:%M:%S') }}"
+        time: >-
+          {{ (now().replace(second=0, microsecond=0) +
+          timedelta(minutes=30 - (now().minute % 30) + 60)).strftime('%H:%M:%S') }}
     - action: browser_mod.close_popup
       data:
         browser_id:

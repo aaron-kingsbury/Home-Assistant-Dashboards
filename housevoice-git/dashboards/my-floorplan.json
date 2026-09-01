@@ -15520,22 +15520,34 @@
                   },
                   {
                     "card_mod": {
-                      "style": "ha-card { position: relative; left: -100px !important; }"
+                      "style": ""
                     },
                     "cards": [
                       {
                         "icon": "mdi:calendar-plus",
-                        "name": "+ EVENT",
-                        "show_icon": true,
+                        "name": "+ Event",
+                        "show_icon": false,
                         "show_name": true,
                         "show_state": false,
                         "styles": {
                           "card": [
                             {
+                              "width": "76px"
+                            },
+                            {
                               "height": "37px"
                             },
                             {
-                              "width": "82px"
+                              "min-width": "76px"
+                            },
+                            {
+                              "padding": "0 10px"
+                            },
+                            {
+                              "margin": "0 0 0 -20px"
+                            },
+                            {
+                              "box-sizing": "border-box"
                             },
                             {
                               "border-radius": "10px"
@@ -15544,213 +15556,208 @@
                               "background": "#ffffff"
                             },
                             {
-                              "border": "2px solid #c4d9ee"
+                              "border": "1px solid #c4d9ee"
                             },
                             {
-                              "box-shadow": "none"
-                            },
-                            {
-                              "transform": "translateX(-14px)"
+                              "box-shadow": "0 2px 8px rgba(50,80,120,0.05)"
                             }
                           ],
                           "grid": [
                             {
-                              "grid-template-areas": "\"i n\""
+                              "grid-template-areas": "\"n\""
                             },
                             {
-                              "grid-template-columns": "22px 1fr"
+                              "grid-template-columns": "1fr"
                             },
                             {
                               "grid-template-rows": "1fr"
+                            },
+                            {
+                              "align-items": "center"
+                            },
+                            {
+                              "justify-items": "center"
                             }
                           ],
                           "icon": [
                             {
-                              "color": "#1468ff"
+                              "width": "15px"
                             },
                             {
-                              "width": "17px"
+                              "color": "#1468ff"
                             }
                           ],
                           "name": [
                             {
-                              "color": "#1468ff"
-                            },
-                            {
                               "justify-self": "center"
                             },
                             {
-                              "font-size": "10px"
+                              "color": "#1468ff"
                             },
                             {
-                              "font-weight": "700"
+                              "font-size": "12px"
+                            },
+                            {
+                              "font-weight": "400"
                             },
                             {
                               "letter-spacing": "0.2px"
+                            },
+                            {
+                              "white-space": "nowrap"
+                            },
+                            {
+                              "width": "100%"
+                            },
+                            {
+                              "text-align": "center"
                             }
                           ]
                         },
                         "tap_action": {
-                          "action": "call-service",
-                          "data": {
-                            "browser_id": [
-                              "housevoice-hall-panel"
-                            ],
-                            "sequence": [
-                              {
-                                "data": {
-                                  "value": ""
+                          "action": "fire-dom-event",
+                          "browser_mod": {
+                            "data": {
+                              "sequence": [
+                                {
+                                  "service": "script.housevoice_prepare_quick_calendar_event"
                                 },
-                                "service": "input_text.set_value",
-                                "target": {
-                                  "entity_id": "input_text.housevoice_quick_event_title"
-                                }
-                              },
-                              {
-                                "data": {
-                                  "date": "{{ now().strftime('%Y-%m-%d') }}"
-                                },
-                                "service": "input_datetime.set_datetime",
-                                "target": {
-                                  "entity_id": "input_datetime.housevoice_quick_event_date"
-                                }
-                              },
-                              {
-                                "data": {
-                                  "time": "{% set next_slot = now().replace(second=0, microsecond=0) + timedelta(minutes=30 - (now().minute % 30)) %}{{ next_slot.strftime('%H:%M:%S') }}"
-                                },
-                                "service": "input_datetime.set_datetime",
-                                "target": {
-                                  "entity_id": "input_datetime.housevoice_quick_event_start"
-                                }
-                              },
-                              {
-                                "data": {
-                                  "time": "{% set next_slot = now().replace(second=0, microsecond=0) + timedelta(minutes=30 - (now().minute % 30)) %}{{ (next_slot + timedelta(hours=1)).strftime('%H:%M:%S') }}"
-                                },
-                                "service": "input_datetime.set_datetime",
-                                "target": {
-                                  "entity_id": "input_datetime.housevoice_quick_event_end"
-                                }
-                              },
-                              {
-                                "data": {
-                                  "browser_id": [
-                                    "housevoice-hall-panel"
-                                  ],
-                                  "content": {
-                                    "card_mod": {
-                                      "style": "ha-card { width: min(420px, 88vw); padding: 8px; background: #ffffff; border: 1px solid #dfe6ef; border-radius: 16px; box-shadow: none; }"
-                                    },
-                                    "cards": [
-                                      {
-                                        "card_mod": {
-                                          "style": "ha-card { background: transparent; box-shadow: none; border: 0; } hui-text-entity-row, hui-input-datetime-entity-row { min-height: 58px; }"
-                                        },
-                                        "entities": [
-                                          {
-                                            "entity": "input_text.housevoice_quick_event_title",
-                                            "name": "Event title"
-                                          },
-                                          {
-                                            "entity": "input_datetime.housevoice_quick_event_date",
-                                            "name": "Date"
-                                          },
-                                          {
-                                            "entity": "input_datetime.housevoice_quick_event_start",
-                                            "name": "Start time"
-                                          },
-                                          {
-                                            "entity": "input_datetime.housevoice_quick_event_end",
-                                            "name": "End time"
-                                          }
-                                        ],
-                                        "show_header_toggle": false,
-                                        "type": "entities"
+                                {
+                                  "data": {
+                                    "content": {
+                                      "card_mod": {
+                                        "style": "ha-card { width: min(420px, 88vw); padding: 8px; background: #ffffff; border: 1px solid #dfe6ef; border-radius: 16px; box-shadow: none; }"
                                       },
-                                      {
-                                        "cards": [
-                                          {
-                                            "icon": "mdi:close",
-                                            "name": "CANCEL",
-                                            "styles": {
-                                              "card": {
-                                                "background": "#f4f7fb",
-                                                "border": "1px solid #dfe6ef",
-                                                "border-radius": "12px",
-                                                "box-shadow": "none",
-                                                "height": "52px"
-                                              },
-                                              "icon": {
-                                                "color": "#59687b"
-                                              },
-                                              "name": {
-                                                "color": "#59687b",
-                                                "font-weight": "700"
-                                              }
-                                            },
-                                            "tap_action": {
-                                              "action": "call-service",
-                                              "data": {
-                                                "browser_id": [
-                                                  "housevoice-hall-panel"
-                                                ]
-                                              },
-                                              "service": "browser_mod.close_popup"
-                                            },
-                                            "type": "button"
+                                      "cards": [
+                                        {
+                                          "card_mod": {
+                                            "style": "ha-card { background: transparent; box-shadow: none; border: 0; } hui-text-entity-row, hui-input-datetime-entity-row { min-height: 58px; }"
                                           },
-                                          {
-                                            "icon": "mdi:calendar-check",
-                                            "name": "ADD EVENT",
-                                            "styles": {
-                                              "card": {
-                                                "background": "#1468ff",
-                                                "border": "1px solid #1468ff",
-                                                "border-radius": "12px",
-                                                "box-shadow": "none",
-                                                "height": "52px"
-                                              },
-                                              "icon": {
-                                                "color": "#ffffff"
-                                              },
-                                              "name": {
-                                                "color": "#ffffff",
-                                                "font-weight": "700"
-                                              }
+                                          "entities": [
+                                            {
+                                              "entity": "input_text.housevoice_quick_event_title",
+                                              "name": "Event title"
                                             },
-                                            "tap_action": {
-                                              "action": "call-service",
-                                              "service": "script.housevoice_quick_add_calendar_event"
+                                            {
+                                              "entity": "input_datetime.housevoice_quick_event_date",
+                                              "name": "Date"
                                             },
-                                            "type": "button"
-                                          }
-                                        ],
-                                        "type": "horizontal-stack"
-                                      }
-                                    ],
-                                    "type": "vertical-stack"
+                                            {
+                                              "entity": "input_datetime.housevoice_quick_event_start",
+                                              "name": "Start time"
+                                            },
+                                            {
+                                              "entity": "input_datetime.housevoice_quick_event_end",
+                                              "name": "End time"
+                                            }
+                                          ],
+                                          "show_header_toggle": false,
+                                          "type": "entities"
+                                        },
+                                        {
+                                          "cards": [
+                                            {
+                                              "icon": "mdi:close",
+                                              "name": "CANCEL",
+                                              "styles": {
+                                                "card": {
+                                                  "background": "#f4f7fb",
+                                                  "border": "1px solid #dfe6ef",
+                                                  "border-radius": "12px",
+                                                  "box-shadow": "none",
+                                                  "height": "52px"
+                                                },
+                                                "icon": {
+                                                  "color": "#59687b"
+                                                },
+                                                "name": {
+                                                  "color": "#59687b",
+                                                  "font-weight": "700"
+                                                }
+                                              },
+                                              "tap_action": {
+                                                "action": "fire-dom-event",
+                                                "browser_mod": {
+                                                  "service": "browser_mod.close_popup"
+                                                }
+                                              },
+                                              "type": "button"
+                                            },
+                                            {
+                                              "icon": "mdi:calendar-check",
+                                              "name": "ADD EVENT",
+                                              "styles": {
+                                                "card": {
+                                                  "background": "#1468ff",
+                                                  "border": "1px solid #1468ff",
+                                                  "border-radius": "12px",
+                                                  "box-shadow": "none",
+                                                  "height": "52px"
+                                                },
+                                                "icon": {
+                                                  "color": "#ffffff"
+                                                },
+                                                "name": {
+                                                  "color": "#ffffff",
+                                                  "font-weight": "700"
+                                                }
+                                              },
+                                              "tap_action": {
+                                                "action": "fire-dom-event",
+                                                "browser_mod": {
+                                                  "data": {
+                                                    "sequence": [
+                                                      {
+                                                        "service": "browser_mod.close_popup"
+                                                      },
+                                                      {
+                                                        "service": "script.housevoice_quick_add_calendar_event"
+                                                      }
+                                                    ]
+                                                  },
+                                                  "service": "browser_mod.sequence"
+                                                }
+                                              },
+                                              "type": "button"
+                                            }
+                                          ],
+                                          "type": "horizontal-stack"
+                                        }
+                                      ],
+                                      "type": "vertical-stack"
+                                    },
+                                    "title": "Add to Calendar"
                                   },
-                                  "title": "Add to Calendar"
-                                },
-                                "service": "browser_mod.popup"
-                              }
-                            ]
-                          },
-                          "service": "browser_mod.sequence"
+                                  "service": "browser_mod.popup"
+                                }
+                              ]
+                            },
+                            "service": "browser_mod.sequence"
+                          }
                         },
                         "type": "custom:button-card"
                       },
                       {
                         "icon": "mdi:chevron-left",
                         "show_icon": true,
+                        "show_name": false,
+                        "show_state": false,
                         "styles": {
                           "card": [
+                            {
+                              "width": "37px"
+                            },
                             {
                               "height": "37px"
                             },
                             {
-                              "width": "37px"
+                              "min-width": "37px"
+                            },
+                            {
+                              "padding": "0"
+                            },
+                            {
+                              "margin": "0"
                             },
                             {
                               "border-radius": "10px"
@@ -15759,21 +15766,18 @@
                               "background": "#ffffff"
                             },
                             {
-                              "border": "2px solid #c4d9ee"
+                              "border": "1px solid #c4d9ee"
                             },
                             {
                               "box-shadow": "0 2px 8px rgba(50,80,120,0.05)"
-                            },
-                            {
-                              "transform": "translateX(-14px)"
                             }
                           ],
                           "icon": [
                             {
-                              "color": "#1468ff"
+                              "width": "15px"
                             },
                             {
-                              "width": "15px"
+                              "color": "#1468ff"
                             }
                           ]
                         },
@@ -15784,16 +15788,26 @@
                         "type": "custom:button-card"
                       },
                       {
-                        "name": "TODAY",
+                        "name": "Today",
                         "show_icon": false,
                         "show_name": true,
+                        "show_state": false,
                         "styles": {
                           "card": [
+                            {
+                              "width": "76px"
+                            },
                             {
                               "height": "37px"
                             },
                             {
-                              "width": "76px"
+                              "min-width": "76px"
+                            },
+                            {
+                              "padding": "0"
+                            },
+                            {
+                              "margin": "0"
                             },
                             {
                               "border-radius": "10px"
@@ -15802,13 +15816,10 @@
                               "background": "#ffffff"
                             },
                             {
-                              "border": "2px solid #8fb8e6"
+                              "border": "1px solid #c4d9ee"
                             },
                             {
-                              "box-shadow": "none"
-                            },
-                            {
-                              "transform": "translateX(-14px)"
+                              "box-shadow": "0 2px 8px rgba(50,80,120,0.05)"
                             }
                           ],
                           "grid": [
@@ -15817,23 +15828,32 @@
                             },
                             {
                               "grid-template-columns": "1fr"
+                            },
+                            {
+                              "grid-template-rows": "1fr"
                             }
                           ],
                           "name": [
                             {
-                              "color": "#1468ff"
-                            },
-                            {
                               "justify-self": "center"
                             },
                             {
-                              "font-size": "10px"
+                              "align-self": "center"
                             },
                             {
-                              "font-weight": "700"
+                              "color": "#1468ff"
+                            },
+                            {
+                              "font-size": "12px"
+                            },
+                            {
+                              "font-weight": "400"
                             },
                             {
                               "letter-spacing": "0.4px"
+                            },
+                            {
+                              "white-space": "nowrap"
                             }
                           ]
                         },
@@ -15846,13 +15866,24 @@
                       {
                         "icon": "mdi:chevron-right",
                         "show_icon": true,
+                        "show_name": false,
+                        "show_state": false,
                         "styles": {
                           "card": [
+                            {
+                              "width": "37px"
+                            },
                             {
                               "height": "37px"
                             },
                             {
-                              "width": "37px"
+                              "min-width": "37px"
+                            },
+                            {
+                              "padding": "0"
+                            },
+                            {
+                              "margin": "0"
                             },
                             {
                               "border-radius": "10px"
@@ -15861,21 +15892,18 @@
                               "background": "#ffffff"
                             },
                             {
-                              "border": "2px solid #c4d9ee"
+                              "border": "1px solid #c4d9ee"
                             },
                             {
                               "box-shadow": "0 2px 8px rgba(50,80,120,0.05)"
-                            },
-                            {
-                              "transform": "translateX(-14px)"
                             }
                           ],
                           "icon": [
                             {
-                              "color": "#1468ff"
+                              "width": "15px"
                             },
                             {
-                              "width": "15px"
+                              "color": "#1468ff"
                             }
                           ]
                         },
@@ -15888,16 +15916,19 @@
                     ],
                     "type": "horizontal-stack",
                     "view_layout": {
-                      "grid-area": "actions"
+                      "grid-area": "actions",
+                      "justify-self": "end",
+                      "margin-right": "20px",
+                      "width": "fit-content"
                     }
                   },
                   {
                     "cards": [
                       {
                         "custom_fields": {
-                          "calendar": "[[[\nconst days = [\n  ['SUN', 'input_text.calendar_sun_events'],\n  ['MON', 'input_text.calendar_mon_events'],\n  ['TUE', 'input_text.calendar_tue_events'],\n  ['WED', 'input_text.calendar_wed_events'],\n  ['THU', 'input_text.calendar_thu_events'],\n  ['FRI', 'input_text.calendar_fri_events'],\n  ['SAT', 'input_text.calendar_sat_events']\n];\n\nconst palette = ['blue', 'purple', 'green', 'yellow', 'red'];\nconst rawDate = states['sensor.date_time']?.state || '';\nconst dateParts = (rawDate.split(',')[0] || '').split('-').map(Number);\nconst now = dateParts.length === 3 && dateParts.every(Number.isFinite)\n  ? new Date(dateParts[0], dateParts[1] - 1, dateParts[2])\n  : new Date();\nconst weekOffset = Number(states['input_number.calendar_week_offset']?.state || 0);\nconst weekStart = new Date(now);\nweekStart.setDate(now.getDate() - now.getDay() + weekOffset * 7);\n\nconst readEvents = entityId => {\n  const value = states[entityId]?.state || '';\n  if (!value || value === 'unknown' || value === 'unavailable') return [];\n  return value.split('\\n').filter(Boolean).map(line => {\n    const [name, time] = line.split('||');\n    return { name: name || 'Untitled', time: time || 'All day' };\n  });\n};\n\nconst eventCard = (event, color) => `\n  <div class=\"hv-live-event hv-live-${color}\">\n    <div class=\"hv-live-event-name\">${event.name}</div>\n    <div class=\"hv-live-event-time\">${event.time}</div>\n  </div>\n`;\n\nconst dayColumn = (day, entityId, offset) => {\n  const events = readEvents(entityId);\n  const dayPalette = [...palette].sort((a, b) => { const score = value => [...(day + value)].reduce((hash, char) => (hash * 33 + char.charCodeAt(0)) >>> 0, 5381); return score(a) - score(b); });\n  const date = new Date(weekStart);\n  date.setDate(weekStart.getDate() + offset);\n  const isToday = date.getFullYear() === now.getFullYear()\n    && date.getMonth() === now.getMonth()\n    && date.getDate() === now.getDate();\n  const totalEvents = isToday ? readEvents('input_text.calendar_today_events').length : events.length;\n  return `\n    <div class=\"hv-live-column${isToday ? ' hv-live-today' : ''}\">\n      <div class=\"hv-live-day-header${isToday ? ' hv-live-today-header' : ''}\">\n        <div class=\"hv-live-day-name\" style=\"position:relative;text-align:center;\">\n          <span class=\"${isToday ? 'hv-live-today-day-label' : ''}\">${day}</span>\n          <span class=\"hv-live-date-pill\">${date.getMonth() + 1}/${date.getDate()}</span>\n        </div>\n        <div class=\"hv-live-day-count${isToday ? ' hv-live-today-count' : ''}\"><span>${totalEvents} event${totalEvents === 1 ? '' : 's'}</span> ${isToday ? '<span class=\"hv-live-today-pill\">TODAY</span>' : ''}</div>\n      </div>\n      <div class=\"hv-live-event-list${isToday ? ' hv-live-today-event-list' : ' hv-live-day-event-list'}\">\n        ${events.length ? events.map((event, index) => eventCard(event, dayPalette[index % dayPalette.length])).join('') : '<div class=\"hv-live-empty\">No events</div>'}\n      </div>\n    </div>\n  `;\n};\n\nconst nextWeekValue = [\n  states['input_text.calendar_next_week_events']?.state || '',\n  states['input_text.calendar_next_week_events_2']?.state || '',\n  states['input_text.calendar_next_week_events_3']?.state || ''\n].filter(value => value && value !== 'unknown' && value !== 'unavailable').join('\\n');\nconst nextWeekEvents = nextWeekValue && nextWeekValue !== 'unknown' && nextWeekValue !== 'unavailable'\n  ? nextWeekValue.split('\\n').filter(Boolean).map(line => {\n      const [date, name, time] = line.split('||');\n      return { date: date || '', name: name || 'Untitled', time: time || 'All day' };\n    })\n  : [];\nconst nextWeekCards = nextWeekEvents.length\n  ? nextWeekEvents.map(event => `\n      <div style=\"display:flex;align-items:baseline;gap:7px;padding:8px 0;border-bottom:1px solid #e5eaf0;color:#273449;\">\n        <span style=\"flex:0 0 auto;font-size:10px;font-weight:700;white-space:nowrap;\">${event.date.split(' ')[0]}</span>\n        <span style=\"min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:600;\">${event.name}</span>\n        <span style=\"flex:0 0 auto;margin-left:auto;color:#7a8798;font-size:10px;white-space:nowrap;\">${event.time}</span>\n      </div>\n    `).join('')\n  : '<div class=\"hv-live-empty\">No appointments</div>';\nconst nextWeekColumn = `\n  <div class=\"hv-live-column\">\n    <div class=\"hv-live-day-header\">\n      <div class=\"hv-live-day-name hv-live-overflow-title\">NEXT WEEK</div>\n      <div class=\"hv-live-day-count\">${nextWeekEvents.length} appointment${nextWeekEvents.length === 1 ? '' : 's'}</div>\n    </div>\n    <div class=\"hv-live-event-list hv-live-next-week-list\">${nextWeekCards}</div>\n  </div>\n`;\n\nreturn `\n  <div class=\"hv-live-week\">\n    ${days.slice(0, 4).map(([day, entityId], index) => dayColumn(day, entityId, index)).join('')}\n    ${days.slice(4).map(([day, entityId], index) => dayColumn(day, entityId, index + 4)).join('')}\n    ${nextWeekColumn}\n  </div>\n`;\n\n]]]"
+                          "calendar": "[[[\nconst days = [\n  ['SUN', ['input_text.calendar_sun_events', 'input_text.calendar_sun_events_2', 'input_text.calendar_sun_events_3']],\n  ['MON', ['input_text.calendar_mon_events', 'input_text.calendar_mon_events_2', 'input_text.calendar_mon_events_3']],\n  ['TUE', ['input_text.calendar_tue_events', 'input_text.calendar_tue_events_2', 'input_text.calendar_tue_events_3']],\n  ['WED', ['input_text.calendar_wed_events', 'input_text.calendar_wed_events_2', 'input_text.calendar_wed_events_3']],\n  ['THU', ['input_text.calendar_thu_events', 'input_text.calendar_thu_events_2', 'input_text.calendar_thu_events_3']],\n  ['FRI', ['input_text.calendar_fri_events', 'input_text.calendar_fri_events_2', 'input_text.calendar_fri_events_3']],\n  ['SAT', ['input_text.calendar_sat_events', 'input_text.calendar_sat_events_2', 'input_text.calendar_sat_events_3']]\n];\n\nconst palette = ['blue', 'purple', 'green', 'yellow', 'red'];\nconst rawDate = states['sensor.date_time']?.state || '';\nconst dateParts = (rawDate.split(',')[0] || '').split('-').map(Number);\nconst now = dateParts.length === 3 && dateParts.every(Number.isFinite)\n  ? new Date(dateParts[0], dateParts[1] - 1, dateParts[2])\n  : new Date();\nconst weekOffset = Number(states['input_number.calendar_week_offset']?.state || 0);\nconst weekStart = new Date(now);\nweekStart.setDate(now.getDate() - now.getDay() + weekOffset * 7);\n\nconst readEvents = helperIds => {\n  const value = helperIds.map(helperId => states[helperId]?.state || '').filter(Boolean).join('\\n');\n  if (!value || value === 'unknown' || value === 'unavailable') return [];\n  return value.split('\\n').filter(Boolean).map(line => {\n    const [name, time] = line.split('||');\n    return { name: name || 'Untitled', time: time || 'All day' };\n  });\n};\n\nconst eventCard = (event, color) => `\n  <div class=\"hv-live-event hv-live-${color}\">\n    <div class=\"hv-live-event-name\">${event.name}</div>\n    <div class=\"hv-live-event-time\">${event.time}</div>\n  </div>\n`;\n\nconst dayColumn = (day, helperIds, offset) => {\n  const events = readEvents(helperIds);\n  const dayPalette = [...palette].sort((a, b) => { const score = value => [...(day + value)].reduce((hash, char) => (hash * 33 + char.charCodeAt(0)) >>> 0, 5381); return score(a) - score(b); });\n  const date = new Date(weekStart);\n  date.setDate(weekStart.getDate() + offset);\n  const isToday = date.getFullYear() === now.getFullYear()\n    && date.getMonth() === now.getMonth()\n    && date.getDate() === now.getDate();\n  const totalEvents = events.length;\n  return `\n    <div class=\"hv-live-column${isToday ? ' hv-live-today' : ''}\">\n      <div class=\"hv-live-day-header${isToday ? ' hv-live-today-header' : ''}\">\n        <div class=\"hv-live-day-name\" style=\"position:relative;text-align:center;\">\n          <span class=\"${isToday ? 'hv-live-today-day-label' : ''}\">${day}</span>\n          <span class=\"hv-live-date-pill\">${date.getMonth() + 1}/${date.getDate()}</span>\n        </div>\n        <div class=\"hv-live-day-count${isToday ? ' hv-live-today-count' : ''}\"><span>${totalEvents} event${totalEvents === 1 ? '' : 's'}</span> ${isToday ? '<span class=\"hv-live-today-pill\">TODAY</span>' : ''}</div>\n      </div>\n      <div class=\"hv-live-event-list${isToday ? ' hv-live-today-event-list' : ' hv-live-day-event-list'}\">\n        ${events.length ? events.map((event, index) => eventCard(event, dayPalette[index % dayPalette.length])).join('') : '<div class=\"hv-live-empty\">No events</div>'}\n      </div>\n    </div>\n  `;\n};\n\nconst nextWeekValue = [\n  states['input_text.calendar_next_week_events']?.state || '',\n  states['input_text.calendar_next_week_events_2']?.state || '',\n  states['input_text.calendar_next_week_events_3']?.state || ''\n].filter(value => value && value !== 'unknown' && value !== 'unavailable').join('\\n');\nconst nextWeekEvents = nextWeekValue && nextWeekValue !== 'unknown' && nextWeekValue !== 'unavailable'\n  ? nextWeekValue.split('\\n').filter(Boolean).map(line => {\n      const [date, name, time] = line.split('||');\n      return { date: date || '', name: name || 'Untitled', time: time || 'All day' };\n    })\n  : [];\nconst nextWeekCards = nextWeekEvents.length\n  ? nextWeekEvents.map(event => `\n      <div style=\"display:flex;align-items:baseline;gap:7px;padding:8px 0;border-bottom:1px solid #e5eaf0;color:#273449;\">\n        <span style=\"flex:0 0 auto;font-size:10px;font-weight:700;white-space:nowrap;\">${event.date.split(' ')[0]}</span>\n        <span style=\"min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;font-weight:600;\">${event.name}</span>\n        <span style=\"flex:0 0 auto;margin-left:auto;color:#7a8798;font-size:10px;white-space:nowrap;\">${event.time}</span>\n      </div>\n    `).join('')\n  : '<div class=\"hv-live-empty\">No appointments</div>';\nconst nextWeekColumn = `\n  <div class=\"hv-live-column\">\n    <div class=\"hv-live-day-header\">\n      <div class=\"hv-live-day-name hv-live-overflow-title\">NEXT WEEK</div>\n      <div class=\"hv-live-day-count\">${nextWeekEvents.length} appointment${nextWeekEvents.length === 1 ? '' : 's'}</div>\n    </div>\n    <div class=\"hv-live-event-list hv-live-next-week-list\">${nextWeekCards}</div>\n  </div>\n`;\n\nreturn `\n  <div class=\"hv-live-week\">\n    ${days.slice(0, 4).map(([day, helperIds], index) => dayColumn(day, helperIds, index)).join('')}\n    ${days.slice(4).map(([day, helperIds], index) => dayColumn(day, helperIds, index + 4)).join('')}\n    ${nextWeekColumn}\n  </div>\n`;\n\n]]]"
                         },
-                        "extra_styles": ".hv-live-week { width: 100%; height: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); column-gap: 10px; row-gap: 4px; color: #172033; font-family: Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; } .hv-live-week, .hv-live-week * { scrollbar-width: none; -ms-overflow-style: none; } .hv-live-week::-webkit-scrollbar, .hv-live-week *::-webkit-scrollbar { display: none; } .hv-live-column { min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; } .hv-live-today { border: none; border-radius: 0; } .hv-live-day-header { height: 58px; flex: 0 0 58px; padding: 4px 8px; box-sizing: border-box; } .hv-live-day-name { color: #111827; font-size: 16px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .hv-live-overflow-title { font-size: 12px; line-height: 1.05; white-space: normal; } .hv-live-day-count { color: #3d4a5d; font-size: 11px; line-height: 1.3; display: flex; align-items: center; justify-content: center; gap: 7px; } .hv-live-today-header { display: grid; grid-template-columns: auto auto; grid-template-rows: 1fr 1fr; align-items: center; justify-content: center; column-gap: 10px; } .hv-live-today-header .hv-live-day-name { display: contents; } .hv-live-today-header .hv-live-day-count { display: contents; } .hv-live-today-header .hv-live-today-day-label { grid-column: 1; grid-row: 1; text-align: center; } .hv-live-today-header .hv-live-date-pill { position: static; grid-column: 2; grid-row: 1; text-align: center; } .hv-live-today-header .hv-live-day-count > span:first-child { grid-column: 1; grid-row: 2; text-align: center; } .hv-live-today-header .hv-live-today-pill { grid-column: 2; grid-row: 2; } .hv-live-today-pill { display: inline-flex; align-items: center; justify-content: center; height: 17px; min-width: 42px; padding: 0 8px; box-sizing: border-box; border-radius: 999px; background: #3478f6; color: #ffffff; font-size: 9px; line-height: 1; font-weight: 700; letter-spacing: 0.35px; white-space: nowrap; box-shadow: 0 1px 3px rgba(52,120,246,0.16); } .hv-live-event-list { min-height: 0; overflow: hidden; } .hv-live-next-week-list { max-height: 220px; overflow-y: auto; } .hv-live-today-event-list, .hv-live-day-event-list { max-height: 240px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; } .hv-live-today-event-list::-webkit-scrollbar { display: none; } .hv-live-overflow-list { overflow-y: auto; padding-right: 2px; } .hv-live-event { height: 40px; margin: 0 0 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 4px 6px; box-sizing: border-box; border-radius: 11px; color: #172033; overflow: hidden; } .hv-live-event-name { font-size: 11px; font-weight: 600; line-height: 1.1; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .hv-live-event-time { margin-top: 1px; font-size: 10px; text-align: center; width: 100%; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .hv-live-blue { background: #dff5ff; } .hv-live-purple { background: #eee1ff; } .hv-live-green { background: #e4f7d7; } .hv-live-yellow { background: #fff0c9; } .hv-live-red { background: #ffdede; } .hv-live-empty { height: 40px; padding: 18px 8px; box-sizing: border-box; color: #718096; font-size: 11px; text-align: center; background: #f5f8fc; border-radius: 11px; } .hv-live-date-pill { position: absolute; right: 8px; top: 1px; color: #64748b; font-size: 13px; font-weight: 600; }",
+                        "extra_styles": ".hv-live-week { width: 100%; height: 100%; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); column-gap: 10px; row-gap: 4px; color: #172033; font-family: Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; } .hv-live-week, .hv-live-week * { scrollbar-width: none; -ms-overflow-style: none; } .hv-live-week::-webkit-scrollbar, .hv-live-week *::-webkit-scrollbar { display: none; } .hv-live-column { min-width: 0; min-height: 0; display: flex; flex-direction: column; overflow: hidden; } .hv-live-today { border: none; border-radius: 0; } .hv-live-day-header { height: 58px; flex: 0 0 58px; padding: 4px 8px; box-sizing: border-box; } .hv-live-day-name { color: #111827; font-size: 16px; font-weight: 700; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .hv-live-overflow-title { font-size: 12px; line-height: 1.05; white-space: normal; } .hv-live-day-count { color: #3d4a5d; font-size: 11px; line-height: 1.3; display: flex; align-items: center; justify-content: center; gap: 7px; } .hv-live-today-header { display: grid; grid-template-columns: auto auto; grid-template-rows: 1fr 1fr; align-items: center; justify-content: center; column-gap: 10px; } .hv-live-today-header .hv-live-day-name { display: contents; } .hv-live-today-header .hv-live-day-count { display: contents; } .hv-live-today-header .hv-live-today-day-label { grid-column: 1; grid-row: 1; text-align: center; } .hv-live-today-header .hv-live-date-pill { position: static; grid-column: 2; grid-row: 1; text-align: center; } .hv-live-today-header .hv-live-day-count > span:first-child { grid-column: 1; grid-row: 2; text-align: center; } .hv-live-today-header .hv-live-today-pill { grid-column: 2; grid-row: 2; } .hv-live-today-pill { display: inline-flex; align-items: center; justify-content: center; height: 17px; min-width: 42px; padding: 0 8px; box-sizing: border-box; border-radius: 999px; background: #3478f6; color: #ffffff; font-size: 9px; line-height: 1; font-weight: 700; letter-spacing: 0.35px; white-space: nowrap; box-shadow: 0 1px 3px rgba(52,120,246,0.16); } .hv-live-event-list { min-height: 0; overflow: hidden; } .hv-live-next-week-list { max-height: 220px; overflow-y: auto; } .hv-live-today-event-list, .hv-live-day-event-list { max-height: 240px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; } .hv-live-week .hv-live-today-event-list::-webkit-scrollbar { display: none; } .hv-live-overflow-list { overflow-y: auto; padding-right: 2px; } .hv-live-event { height: 40px; margin: 0 0 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 4px 6px; box-sizing: border-box; border-radius: 11px; color: #172033; overflow: hidden; } .hv-live-event-name { font-size: 11px; font-weight: 600; line-height: 1.1; text-align: center; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .hv-live-event-time { margin-top: 1px; font-size: 10px; text-align: center; width: 100%; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .hv-live-blue { background: #dff5ff; } .hv-live-purple { background: #eee1ff; } .hv-live-green { background: #e4f7d7; } .hv-live-yellow { background: #fff0c9; } .hv-live-red { background: #ffdede; } .hv-live-empty { height: 40px; padding: 18px 8px; box-sizing: border-box; color: #718096; font-size: 11px; text-align: center; background: #f5f8fc; border-radius: 11px; } .hv-live-date-pill { position: absolute; right: 8px; top: 1px; color: #64748b; font-size: 13px; font-weight: 600; } .hv-live-day-event-list, .hv-live-today-event-list { flex: 0 0 240px; height: 240px; min-height: 0; max-height: 240px; overflow-y: scroll !important; touch-action: pan-y; pointer-events: auto; cursor: ns-resize; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none; -ms-overflow-style: none; } .hv-live-week .hv-live-day-event-list::-webkit-scrollbar, .hv-live-week .hv-live-today-event-list::-webkit-scrollbar { display: none; } .hv-live-week .hv-live-day-event-list::-webkit-scrollbar-thumb, .hv-live-week .hv-live-today-event-list::-webkit-scrollbar-thumb { background: #9aa8ba; border-radius: 999px; } .hv-live-next-week-list, .hv-today-list { flex: 0 0 220px; height: 220px; max-height: 220px; min-height: 0; overflow-y: auto !important; touch-action: pan-y; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; scrollbar-width: none; -ms-overflow-style: none; } .hv-live-week .hv-live-next-week-list::-webkit-scrollbar, .hv-today-list::-webkit-scrollbar { display: none; } .hv-live-week .hv-live-next-week-list { display: block !important; flex: 0 0 220px !important; height: 220px !important; min-height: 0 !important; max-height: 220px !important; overflow-y: scroll !important; overflow-x: hidden !important; pointer-events: auto; touch-action: pan-y; }",
                         "show_icon": false,
                         "show_name": false,
                         "show_state": false,
@@ -15951,7 +15982,21 @@
                           "input_text.calendar_sat_events",
                           "input_text.calendar_today_overflow",
                           "input_text.calendar_next_week_events",
-                          "input_number.calendar_week_offset"
+                          "input_number.calendar_week_offset",
+                          "input_text.calendar_sun_events_2",
+                          "input_text.calendar_sun_events_3",
+                          "input_text.calendar_mon_events_2",
+                          "input_text.calendar_mon_events_3",
+                          "input_text.calendar_tue_events_2",
+                          "input_text.calendar_tue_events_3",
+                          "input_text.calendar_wed_events_2",
+                          "input_text.calendar_wed_events_3",
+                          "input_text.calendar_thu_events_2",
+                          "input_text.calendar_thu_events_3",
+                          "input_text.calendar_fri_events_2",
+                          "input_text.calendar_fri_events_3",
+                          "input_text.calendar_sat_events_2",
+                          "input_text.calendar_sat_events_3"
                         ],
                         "type": "custom:button-card",
                         "view_layout": {
@@ -16078,7 +16123,7 @@
                           },
                           {
                             "custom_fields": {
-                              "today": "[[[\n  const value = states['input_text.calendar_today_events']?.state || '';\n  const events = value && value !== 'unknown' && value !== 'unavailable'\n    ? value.split('\\n').filter(Boolean).map(line => {\n        const [name, time] = line.split('||');\n        return { name: name || 'Untitled', time: time || 'All day' };\n      })\n    : [];\n  const rows = events.length\n    ? events.map(event => `<div class=\"hv-today-event\"><span class=\"hv-today-name\">${event.name}</span><span class=\"hv-today-time\">${event.time}</span></div>`).join('')\n    : '<div class=\"hv-today-empty\">No events today</div>';\n  return `<div class=\"hv-today-list\"><div class=\"hv-today-title\">TODAY'S EVENTS</div>${rows}</div>`;\n]]]"
+                              "today": "[[[\n  const value = [states[\"input_text.calendar_today_events\"]?.state || \"\", states[\"input_text.calendar_today_overflow\"]?.state || \"\"].filter(value => value && value !== \"unknown\" && value !== \"unavailable\").join(\"\\n\");\n  const events = value && value !== 'unknown' && value !== 'unavailable'\n    ? value.split('\\n').filter(Boolean).map(line => {\n        const [name, time] = line.split('||');\n        return { name: name || 'Untitled', time: time || 'All day' };\n      })\n    : [];\n  const rows = events.length\n    ? events.map(event => `<div class=\"hv-today-event\"><span class=\"hv-today-name\">${event.name}</span><span class=\"hv-today-time\">${event.time}</span></div>`).join('')\n    : '<div class=\"hv-today-empty\">No events today</div>';\n  return `<div class=\"hv-today-list\"><div class=\"hv-today-title\">TODAY'S EVENTS</div>${rows}</div>`;\n]]]"
                             },
                             "extra_styles": ".hv-today-list { width: 100%; height: 100%; display: flex; flex-direction: column; overflow-y: auto; color: #172033; font-family: Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; } .hv-today-title { flex: 0 0 auto; margin-bottom: 4px; color: #111827; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; } .hv-today-event { flex: 0 0 auto; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px solid #e5eaf0; } .hv-today-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #273449; font-size: 11px; font-weight: 600; } .hv-today-time { flex: 0 0 auto; color: #7a8798; font-size: 10px; white-space: nowrap; } .hv-today-empty { padding: 8px 0; color: #7a8798; font-size: 11px; }",
                             "show_icon": false,

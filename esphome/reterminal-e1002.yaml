@@ -62,19 +62,19 @@ logger:
 # =============================================================================
 
 font:
-  - file: "gfonts://Lora@400"
+  - file: "gfonts://Lora@500"
     id: font_date
     size: 16
-  - file: "gfonts://Lora@400"
+  - file: "gfonts://Inter@500"
     id: font_event_title
-    size: 11
+    size: 12
   - file: "gfonts://Inter@700"
     id: font_event_time
     size: 12
-  - file: "gfonts://Lora@400"
+  - file: "gfonts://Lora@500"
     id: font_rail
     size: 15
-  - file: "gfonts://Lora@400"
+  - file: "gfonts://Lora@500"
     id: font_condition
     size: 18
   - file: "gfonts://Lora@700"
@@ -749,7 +749,46 @@ display:
         return std::string(formatted);
       };
 
-      auto draw_events = [&](const std::string &raw, int x, int max_title_chars) {
+      auto draw_events = [&](const std::string &raw, int x, int max_title_width) {
+        auto text_width = [&](const std::string &value) {
+          int x1, y1, width, height;
+          it.get_text_bounds(0, 0, value.c_str(), id(font_event_title), TextAlign::TOP_LEFT,
+                             &x1, &y1, &width, &height);
+          return width;
+        };
+        auto trim_left = [](std::string value) {
+          size_t first = value.find_first_not_of(' ');
+          return first == std::string::npos ? std::string() : value.substr(first);
+        };
+        auto take_line = [&](const std::string &value) {
+          if (text_width(value) <= max_title_width) return value;
+          size_t cursor = 0;
+          size_t best_end = 0;
+          while (cursor < value.size()) {
+            while (cursor < value.size() && value[cursor] == ' ') cursor++;
+            size_t next_space = value.find(' ', cursor);
+            if (next_space == std::string::npos) next_space = value.size();
+            const std::string candidate = value.substr(0, next_space);
+            if (text_width(candidate) > max_title_width) break;
+            best_end = next_space;
+            cursor = next_space;
+          }
+          if (best_end == 0) {
+            for (size_t length = 1; length <= value.size(); length++) {
+              if (text_width(value.substr(0, length)) > max_title_width) break;
+              best_end = length;
+            }
+          }
+          if (best_end == 0) best_end = 1;
+          return value.substr(0, best_end);
+        };
+        auto add_ellipsis = [&](std::string value) {
+          const std::string suffix = "...";
+          while (!value.empty() && text_width(value + suffix) > max_title_width) {
+            value.erase(value.size() - 1);
+          }
+          return value + suffix;
+        };
         int row = 0;
         size_t cursor = 0;
         while (row < 4 && cursor < raw.size()) {
@@ -764,21 +803,13 @@ display:
           std::string when = separator == std::string::npos ? "All day" : line.substr(separator + 2);
           if (title.empty()) title = "Untitled";
           if (when.empty()) when = "All day";
-          std::string first_line = title;
-          std::string second_line;
-          if (title.size() > static_cast<size_t>(max_title_chars)) {
-            size_t split = title.rfind(' ', max_title_chars);
-            if (split == std::string::npos || split == 0) split = max_title_chars;
-            first_line = title.substr(0, split);
-            size_t remainder_start = split;
-            while (remainder_start < title.size() && title[remainder_start] == ' ') {
-              remainder_start++;
-            }
-            second_line = title.substr(remainder_start);
-            if (second_line.size() > static_cast<size_t>(max_title_chars)) {
-              second_line = second_line.substr(0, max_title_chars - 3) + "...";
-            }
-          }
+           std::string first_line = take_line(title);
+           std::string remainder = trim_left(title.substr(first_line.size()));
+           std::string second_line;
+           if (!remainder.empty()) {
+             second_line = take_line(remainder);
+             if (second_line.size() < remainder.size()) second_line = add_ellipsis(second_line);
+           }
 
           const int y = 223 + row * 28;
           it.printf(x, y, id(font_event_time), BLUE, TextAlign::TOP_LEFT, "%s", when.c_str());
@@ -803,7 +834,7 @@ display:
         it.printf(407, 132, id(font_date), BLACK, TextAlign::TOP_CENTER, "WAITING FOR DATE");
       }
 
-       draw_events(id(calendar_today_events).state, 237, 16);
+        draw_events(id(calendar_today_events).state, 237, 105);
 
        int weekday = now.is_valid() ? now.day_of_week : 1;
        weekday = weekday == 1 ? 0 : weekday - 1;
@@ -835,7 +866,7 @@ display:
                 static_cast<unsigned>(tomorrow_events->size()), id(weather_condition).state.c_str(),
                 id(weather_high).state.c_str(), id(weather_low).state.c_str(),
                 id(sunrise).state.c_str(), id(sunset).state.c_str());
-       draw_events(*tomorrow_events, 435, 19);
+        draw_events(*tomorrow_events, 435, 130);
 
       std::string condition = id(weather_condition).state;
       std::string normalized = condition;
