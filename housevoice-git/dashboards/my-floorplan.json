@@ -15595,7 +15595,7 @@
                               "color": "#1468ff"
                             },
                             {
-                              "font-size": "12px"
+                              "font-size": "14px"
                             },
                             {
                               "font-weight": "400"
@@ -15774,7 +15774,7 @@
                           ],
                           "icon": [
                             {
-                              "width": "15px"
+                              "width": "19px"
                             },
                             {
                               "color": "#1468ff"
@@ -15844,7 +15844,7 @@
                               "color": "#1468ff"
                             },
                             {
-                              "font-size": "12px"
+                              "font-size": "14px"
                             },
                             {
                               "font-weight": "400"
@@ -15900,7 +15900,7 @@
                           ],
                           "icon": [
                             {
-                              "width": "15px"
+                              "width": "19px"
                             },
                             {
                               "color": "#1468ff"
@@ -16125,7 +16125,7 @@
                             "custom_fields": {
                               "today": "[[[\n  const value = [states[\"input_text.calendar_today_events\"]?.state || \"\", states[\"input_text.calendar_today_overflow\"]?.state || \"\"].filter(value => value && value !== \"unknown\" && value !== \"unavailable\").join(\"\\n\");\n  const events = value && value !== 'unknown' && value !== 'unavailable'\n    ? value.split('\\n').filter(Boolean).map(line => {\n        const [name, time] = line.split('||');\n        return { name: name || 'Untitled', time: time || 'All day' };\n      })\n    : [];\n  const rows = events.length\n    ? events.map(event => `<div class=\"hv-today-event\"><span class=\"hv-today-name\">${event.name}</span><span class=\"hv-today-time\">${event.time}</span></div>`).join('')\n    : '<div class=\"hv-today-empty\">No events today</div>';\n  return `<div class=\"hv-today-list\"><div class=\"hv-today-title\">TODAY'S EVENTS</div>${rows}</div>`;\n]]]"
                             },
-                            "extra_styles": ".hv-today-list { width: 100%; height: 100%; display: flex; flex-direction: column; overflow-y: auto; color: #172033; font-family: Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; } .hv-today-title { flex: 0 0 auto; margin-bottom: 4px; color: #111827; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; } .hv-today-event { flex: 0 0 auto; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px solid #e5eaf0; } .hv-today-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #273449; font-size: 11px; font-weight: 600; } .hv-today-time { flex: 0 0 auto; color: #7a8798; font-size: 10px; white-space: nowrap; } .hv-today-empty { padding: 8px 0; color: #7a8798; font-size: 11px; }",
+                            "extra_styles": ".hv-today-list { width: 100%; height: 100%; display: flex; flex-direction: column; overflow-y: auto; color: #172033; font-family: Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif; } .hv-today-title { flex: 0 0 auto; margin-bottom: 4px; color: #111827; font-size: 12px; font-weight: 700; letter-spacing: 0.5px; } .hv-today-event { flex: 0 0 auto; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px solid #e5eaf0; } .hv-today-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #273449; font-size: 11px; font-weight: 600; } .hv-today-time { flex: 0 0 auto; color: #7a8798; font-size: 10px; white-space: nowrap; } .hv-today-empty { padding: 8px 0; color: #7a8798; font-size: 11px; } .hv-today-event { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 3px; } .hv-today-name { white-space: normal !important; overflow: visible !important; text-overflow: clip !important; line-height: 1.25; word-break: break-word; } .hv-today-time { align-self: flex-start; }",
                             "show_icon": false,
                             "show_name": false,
                             "show_state": false,
