@@ -999,3 +999,30 @@
     target:
       entity_id: switch.vaca_c958413a0_alarm
   mode: single
+- id: graham_wakeup_alarm_trigger
+  alias: Graham Wake-Up Alarm Trigger
+  description: Activate Graham display alarm every day at the selected time
+  triggers:
+  - at: input_datetime.graham_wake_up_alarm_time
+    trigger: time
+  conditions:
+  - condition: state
+    entity_id: input_boolean.graham_wake_up_alarm_enabled
+    state: 'on'
+  actions:
+  - action: switch.turn_on
+    target:
+      entity_id: switch.vaca_96ed4d2c4_alarm
+  mode: single
+- id: graham_wake_up_alarm_disarm
+  alias: Graham Wake-Up Alarm Disarm
+  description: Silence Graham display alarm when the wake-up alarm is disabled
+  triggers:
+  - entity_id: input_boolean.graham_wake_up_alarm_enabled
+    to: 'off'
+    trigger: state
+  actions:
+  - action: switch.turn_off
+    target:
+      entity_id: switch.vaca_96ed4d2c4_alarm
+  mode: single

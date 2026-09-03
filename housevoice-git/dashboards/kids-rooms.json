@@ -2698,6 +2698,7 @@
             {
               "custom_fields": {
                 "alarm_label": "Alarm",
+                "alarm_status": "[[[ return states['input_boolean.cora_wake_up_alarm_enabled']?.state === 'on' ? 'ON' : 'OFF'; ]]]",
                 "unicorn": "<img src=\"/local/housevoice/assets/references/unicorn.png?v=1\" alt=\"\" style=\"height:115px;width:115px;object-fit:contain;display:block;pointer-events:none;filter:drop-shadow(0 0 8px rgba(147,92,255,.65));\">"
               },
               "name": "Alarm",
@@ -2719,7 +2720,7 @@
                     "width": "130px"
                   },
                   {
-                    "height": "150px"
+                    "height": "165px"
                   },
                   {
                     "padding": "0"
@@ -2764,6 +2765,29 @@
                       "opacity": "[[[ const level = states[\"input_select.housevoice_clock_brightness\"]?.state || \"Medium\"; return level === \"Low\" ? 0.45 : level === \"High\" ? 1 : 0.75; ]]]"
                     }
                   ],
+                  "alarm_status": [
+                    {
+                      "color": "#78d6ff"
+                    },
+                    {
+                      "font-size": "11px"
+                    },
+                    {
+                      "font-weight": "600"
+                    },
+                    {
+                      "letter-spacing": "1px"
+                    },
+                    {
+                      "justify-self": "center"
+                    },
+                    {
+                      "align-self": "start"
+                    },
+                    {
+                      "color": "[[[ return states['input_boolean.cora_wake_up_alarm_enabled']?.state === 'on' ? '#78e08f' : '#8b9aaa'; ]]]"
+                    }
+                  ],
                   "unicorn": [
                     {
                       "justify-self": "center"
@@ -2778,13 +2802,13 @@
                 },
                 "grid": [
                   {
-                    "grid-template-areas": "\"unicorn\" \"alarm_label\""
+                    "grid-template-areas": "\"unicorn\" \"alarm_label\" \"alarm_status\""
                   },
                   {
                     "grid-template-columns": "1fr"
                   },
                   {
-                    "grid-template-rows": "115px 24px"
+                    "grid-template-rows": "115px 24px 18px"
                   }
                 ],
                 "icon": [
@@ -5525,6 +5549,157 @@
                   "option": "High"
                 }
               },
+              "type": "custom:button-card"
+            },
+            {
+              "custom_fields": {
+                "alarm_label": "Alarm",
+                "alarm_status": "[[[ return states['input_boolean.graham_wake_up_alarm_enabled']?.state === 'on' ? 'ON' : 'OFF'; ]]]",
+                "basketball": "<img src=\"/local/housevoice/assets/references/basketball.png?v=1\" alt=\"\" style=\"height:115px;width:115px;object-fit:contain;display:block;pointer-events:none;filter:drop-shadow(0 0 8px rgba(45,125,255,.65));\">"
+              },
+              "name": "Alarm",
+              "show_icon": false,
+              "show_name": false,
+              "show_state": false,
+              "styles": {
+                "card": [
+                  {
+                    "position": "fixed"
+                  },
+                  {
+                    "left": "2.3vw"
+                  },
+                  {
+                    "top": "23vh"
+                  },
+                  {
+                    "width": "130px"
+                  },
+                  {
+                    "height": "165px"
+                  },
+                  {
+                    "padding": "0"
+                  },
+                  {
+                    "margin": "0"
+                  },
+                  {
+                    "background": "transparent"
+                  },
+                  {
+                    "border": "0"
+                  },
+                  {
+                    "box-shadow": "none"
+                  },
+                  {
+                    "z-index": "120"
+                  },
+                  {
+                    "pointer-events": "auto"
+                  }
+                ],
+                "custom_fields": {
+                  "alarm_label": [
+                    {
+                      "color": "#d8f5ff"
+                    },
+                    {
+                      "font-size": "18px"
+                    },
+                    {
+                      "font-weight": "500"
+                    },
+                    {
+                      "justify-self": "center"
+                    },
+                    {
+                      "align-self": "start"
+                    },
+                    {
+                      "opacity": "[[[ const level = states[\"input_select.housevoice_clock_brightness\"]?.state || \"Medium\"; return level === \"Low\" ? 0.45 : level === \"High\" ? 1 : 0.75; ]]]"
+                    }
+                  ],
+                  "alarm_status": [
+                    {
+                      "color": "#78d6ff"
+                    },
+                    {
+                      "font-size": "11px"
+                    },
+                    {
+                      "font-weight": "600"
+                    },
+                    {
+                      "letter-spacing": "1px"
+                    },
+                    {
+                      "justify-self": "center"
+                    },
+                    {
+                      "align-self": "start"
+                    },
+                    {
+                      "color": "[[[ return states['input_boolean.graham_wake_up_alarm_enabled']?.state === 'on' ? '#78e08f' : '#8b9aaa'; ]]]"
+                    }
+                  ],
+                  "basketball": [
+                    {
+                      "justify-self": "center"
+                    },
+                    {
+                      "align-self": "center"
+                    },
+                    {
+                      "opacity": "[[[ const level = states[\"input_select.housevoice_clock_brightness\"]?.state || \"Medium\"; return level === \"Low\" ? 0.45 : level === \"High\" ? 1 : 0.75; ]]]"
+                    }
+                  ]
+                },
+                "grid": [
+                  {
+                    "grid-template-areas": "\"basketball\" \"alarm_label\" \"alarm_status\""
+                  },
+                  {
+                    "grid-template-columns": "1fr"
+                  },
+                  {
+                    "grid-template-rows": "115px 24px 18px"
+                  }
+                ]
+              },
+              "tap_action": {
+                "action": "fire-dom-event",
+                "browser_mod": {
+                  "data": {
+                    "content": {
+                      "card_mod": {
+                        "style": "ha-card { width: min(420px, 88vw); padding: 8px; background: #ffffff; color: #172033; border: 1px solid #c4d9ee; border-radius: 16px; box-shadow: 0 12px 30px rgba(20,50,90,.18); }"
+                      },
+                      "entities": [
+                        {
+                          "entity": "input_boolean.graham_wake_up_alarm_enabled",
+                          "name": "Alarm"
+                        },
+                        {
+                          "entity": "input_datetime.graham_wake_up_alarm_time",
+                          "name": "Wake-up time"
+                        }
+                      ],
+                      "show_header_toggle": false,
+                      "type": "entities"
+                    },
+                    "title": "Wake-Up Alarm"
+                  },
+                  "service": "browser_mod.popup"
+                }
+              },
+              "triggers_update": [
+                "input_boolean.graham_wake_up_alarm_enabled",
+                "input_datetime.graham_wake_up_alarm_time",
+                "input_select.housevoice_clock_brightness",
+                "switch.vaca_96ed4d2c4_alarm"
+              ],
               "type": "custom:button-card"
             },
             {
