@@ -62,19 +62,19 @@ logger:
 # =============================================================================
 
 font:
-  - file: "gfonts://Lora@500"
+  - file: "gfonts://Lora@700"
     id: font_date
     size: 16
-  - file: "gfonts://Inter@500"
+  - file: "gfonts://Inter@700"
     id: font_event_title
     size: 12
   - file: "gfonts://Inter@700"
     id: font_event_time
     size: 12
-  - file: "gfonts://Lora@500"
+  - file: "gfonts://Lora@700"
     id: font_rail
     size: 15
-  - file: "gfonts://Lora@500"
+  - file: "gfonts://Lora@700"
     id: font_condition
     size: 18
   - file: "gfonts://Lora@700"
