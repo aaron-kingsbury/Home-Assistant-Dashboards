@@ -88,17 +88,17 @@ image:
       transparency: chroma_key
     files:
       - id: housevoice_background_white
-        file: "../www/housevoice/assets/references/e-ink-background-8-800x480/mask-white.png"
+        file: "../www/housevoice/assets/references/e-ink-background-9-800x480/mask-white.png"
       - id: housevoice_background_black
-        file: "../www/housevoice/assets/references/e-ink-background-8-800x480/mask-black.png"
+        file: "../www/housevoice/assets/references/e-ink-background-9-800x480/mask-black.png"
       - id: housevoice_background_red
-        file: "../www/housevoice/assets/references/e-ink-background-8-800x480/mask-red.png"
+        file: "../www/housevoice/assets/references/e-ink-background-9-800x480/mask-red.png"
       - id: housevoice_background_green
-        file: "../www/housevoice/assets/references/e-ink-background-8-800x480/mask-green.png"
+        file: "../www/housevoice/assets/references/e-ink-background-9-800x480/mask-green.png"
       - id: housevoice_background_blue
-        file: "../www/housevoice/assets/references/e-ink-background-8-800x480/mask-blue.png"
+        file: "../www/housevoice/assets/references/e-ink-background-9-800x480/mask-blue.png"
       - id: housevoice_background_yellow
-        file: "../www/housevoice/assets/references/e-ink-background-8-800x480/mask-yellow.png"
+        file: "../www/housevoice/assets/references/e-ink-background-9-800x480/mask-yellow.png"
       - id: housevoice_title_cleanup
         file: "../www/housevoice/assets/references/housevoice-title-test/housevoice-title-cleanup.png"
       - id: housevoice_title_overlay
@@ -702,26 +702,6 @@ display:
       it.image(0, 0, id(housevoice_background_green), GREEN, WHITE);
       it.image(0, 0, id(housevoice_background_blue), BLUE, WHITE);
       it.image(0, 0, id(housevoice_background_yellow), YELLOW, WHITE);
-      it.image(215, 18, id(housevoice_title_cleanup), WHITE, BLACK);
-      it.image(215, 18, id(housevoice_title_overlay), BLUE, WHITE);
-      it.image(292, 77, id(housevoice_static_family_cleanup), WHITE, BLACK);
-      it.image(292, 77, id(housevoice_static_family_overlay), RED, WHITE);
-      it.image(280, 177, id(housevoice_static_today_cleanup), WHITE, BLACK);
-      it.image(280, 177, id(housevoice_static_today_overlay), BLUE, WHITE);
-      it.image(457, 177, id(housevoice_static_tomorrow_cleanup), WHITE, BLACK);
-      it.image(457, 177, id(housevoice_static_tomorrow_overlay), BLUE, WHITE);
-      it.image(706, 40, id(housevoice_static_sunrise_cleanup), WHITE, BLACK);
-      it.image(706, 40, id(housevoice_static_sunrise_overlay), BLUE, WHITE);
-      it.image(706, 118, id(housevoice_static_sunset_cleanup), WHITE, BLACK);
-      it.image(706, 118, id(housevoice_static_sunset_overlay), BLUE, WHITE);
-      it.image(656, 251, id(housevoice_static_high_cleanup), WHITE, BLACK);
-      it.image(656, 251, id(housevoice_static_high_overlay), BLUE, WHITE);
-      it.image(729, 251, id(housevoice_static_low_cleanup), WHITE, BLACK);
-      it.image(729, 251, id(housevoice_static_low_overlay), BLUE, WHITE);
-      it.image(222, 395, id(housevoice_static_quote_cleanup), BLACK, WHITE);
-      it.image(222, 395, id(housevoice_static_quote_overlay), WHITE, BLACK);
-      it.image(352, 427, id(housevoice_static_psalm_cleanup), BLACK, WHITE);
-      it.image(352, 427, id(housevoice_static_psalm_overlay), YELLOW, BLACK);
 
       auto draw_time = [&](const std::string &value, int y) {
         if (value.empty()) {
@@ -829,12 +809,12 @@ display:
         for (char *character = date_text; *character != '\0'; character++) {
           if (*character >= 'a' && *character <= 'z') *character -= 'a' - 'A';
         }
-        it.printf(407, 132, id(font_date), BLACK, TextAlign::TOP_CENTER, "%s", date_text);
+         it.printf(407, 150, id(font_date), BLACK, TextAlign::TOP_CENTER, "%s", date_text);
       } else {
-        it.printf(407, 132, id(font_date), BLACK, TextAlign::TOP_CENTER, "WAITING FOR DATE");
+        it.printf(407, 150, id(font_date), BLACK, TextAlign::TOP_CENTER, "WAITING FOR DATE");
       }
 
-        draw_events(id(calendar_today_events).state, 237, 105);
+        draw_events(id(calendar_today_events).state, 237, 70);
 
        int weekday = now.is_valid() ? now.day_of_week : 1;
        weekday = weekday == 1 ? 0 : weekday - 1;
@@ -866,7 +846,7 @@ display:
                 static_cast<unsigned>(tomorrow_events->size()), id(weather_condition).state.c_str(),
                 id(weather_high).state.c_str(), id(weather_low).state.c_str(),
                 id(sunrise).state.c_str(), id(sunset).state.c_str());
-        draw_events(*tomorrow_events, 435, 130);
+         draw_events(*tomorrow_events, 435, 70);
 
       std::string condition = id(weather_condition).state;
       std::string normalized = condition;
@@ -881,17 +861,17 @@ display:
       else if (normalized == "cloudy") condition_label = "Cloudy";
       else if (normalized == "rainy" || normalized == "pouring") condition_label = "Rainy";
       else if (normalized == "snowy" || normalized == "snowy-rainy") condition_label = "Snow";
-      it.printf(710, 175, id(font_condition), BLACK, TextAlign::TOP_CENTER, "%s", condition_label);
+      it.printf(710, 209, id(font_condition), BLACK, TextAlign::TOP_CENTER, "%s", condition_label);
 
-      it.printf(672, 268, id(font_temperature), BLUE, TextAlign::TOP_CENTER,
+      it.printf(672, 310, id(font_temperature), BLUE, TextAlign::TOP_CENTER,
                 "%s", id(weather_high).state.c_str());
-      it.printf(747, 268, id(font_temperature), BLACK, TextAlign::TOP_CENTER,
+      it.printf(747, 310, id(font_temperature), BLACK, TextAlign::TOP_CENTER,
                 "%s", id(weather_low).state.c_str());
 
       const std::string sunrise_local = local_sun_time(id(sunrise).state);
       const std::string sunset_local = local_sun_time(id(sunset).state);
-      draw_time(sunrise_local, 54);
-      draw_time(sunset_local, 132);
+      draw_time(sunrise_local, 70);
+      draw_time(sunset_local, 150);
 
 # secrets.yaml (create this file alongside your config):
 # wifi_ssid: "Your WiFi SSID"
