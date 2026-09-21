@@ -76,7 +76,7 @@ font:
     size: 17
   - file: "gfonts://Lora@700"
     id: font_condition
-    size: 36
+    size: 34
   - file: "gfonts://Lora@700"
     id: font_temperature
     size: 34
@@ -861,7 +861,7 @@ display:
       else if (normalized == "cloudy") condition_label = "Cloudy";
       else if (normalized == "rainy" || normalized == "pouring") condition_label = "Rainy";
       else if (normalized == "snowy" || normalized == "snowy-rainy") condition_label = "Snow";
-      it.printf(702, 209, id(font_condition), BLACK, TextAlign::TOP_CENTER, "%s", condition_label);
+      it.printf(702, 207, id(font_condition), BLACK, TextAlign::TOP_CENTER, "%s", condition_label);
 
       it.printf(672, 310, id(font_temperature), BLUE, TextAlign::TOP_CENTER,
                 "%s", id(weather_high).state.c_str());
