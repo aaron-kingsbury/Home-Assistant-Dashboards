@@ -83,6 +83,12 @@ font:
   - file: "gfonts://Inter@700"
     id: font_battery
     size: 12
+  - file: "gfonts://Lora@700"
+    id: font_scripture_verse
+    size: 20
+  - file: "gfonts://Lora@700"
+    id: font_scripture_reference
+    size: 12
 
 image:
   - platform: file
@@ -868,10 +874,49 @@ display:
 
       it.printf(647, 310, id(font_temperature), BLUE, TextAlign::TOP_CENTER,
                 "%s", id(weather_high).state.c_str());
-      it.printf(747, 310, id(font_temperature), BLACK, TextAlign::TOP_CENTER,
-                "%s", id(weather_low).state.c_str());
+       it.printf(747, 310, id(font_temperature), BLACK, TextAlign::TOP_CENTER,
+                 "%s", id(weather_low).state.c_str());
 
-      const float battery_percent = id(battery_level).state;
+       if (now.is_valid()) {
+         const char *verse = "";
+         const char *reference = "";
+         switch (weekday) {
+           case 0:
+             verse = "Give thanks to the Lord, for he is good";
+             reference = "PSALM 107:1";
+             break;
+           case 1:
+             verse = "This is the day that the Lord has made";
+             reference = "PSALM 118:24";
+             break;
+           case 2:
+             verse = "Trust in the Lord with all your heart";
+             reference = "PROVERBS 3:5";
+             break;
+           case 3:
+             verse = "Oh, taste and see that the Lord is good";
+             reference = "PSALM 34:8";
+             break;
+           case 4:
+             verse = "Come into his presence with singing";
+             reference = "PSALM 100:2";
+             break;
+           case 5:
+             verse = "He knows those who take refuge in him";
+             reference = "NAHUM 1:7";
+             break;
+           case 6:
+             verse = "for his steadfast love endures forever";
+             reference = "PSALM 136:1";
+             break;
+         }
+         it.printf(400, 393, id(font_scripture_verse), BLACK, TextAlign::TOP_CENTER,
+                   "%s", verse);
+         it.printf(400, 422, id(font_scripture_reference), BLACK, TextAlign::TOP_CENTER,
+                   "%s", reference);
+       }
+
+       const float battery_percent = id(battery_level).state;
       if (isnan(battery_percent)) {
         it.printf(770, 4, id(font_battery), BLACK, TextAlign::TOP_CENTER, "BATT --");
       } else {
