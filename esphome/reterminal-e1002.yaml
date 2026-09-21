@@ -809,9 +809,9 @@ display:
         for (char *character = date_text; *character != '\0'; character++) {
           if (*character >= 'a' && *character <= 'z') *character -= 'a' - 'A';
         }
-         it.printf(346, 150, id(font_date), BLACK, TextAlign::TOP_CENTER, "%s", date_text);
+         it.printf(381, 150, id(font_date), BLACK, TextAlign::TOP_CENTER, "%s", date_text);
       } else {
-        it.printf(346, 150, id(font_date), BLACK, TextAlign::TOP_CENTER, "WAITING FOR DATE");
+        it.printf(381, 150, id(font_date), BLACK, TextAlign::TOP_CENTER, "WAITING FOR DATE");
       }
 
         draw_events(id(calendar_today_events).state, 237, 70);
