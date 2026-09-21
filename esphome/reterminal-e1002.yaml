@@ -791,7 +791,7 @@ display:
              if (second_line.size() < remainder.size()) second_line = add_ellipsis(second_line);
            }
 
-          const int y = 223 + row * 28;
+          const int y = 245 + row * 28;
           it.printf(x, y, id(font_event_time), BLUE, TextAlign::TOP_LEFT, "%s", when.c_str());
           it.printf(x + 65, y, id(font_event_title), BLACK, TextAlign::TOP_LEFT, "%s", first_line.c_str());
           if (!second_line.empty()) {
