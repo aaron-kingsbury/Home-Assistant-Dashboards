@@ -73,7 +73,7 @@ font:
     size: 12
   - file: "gfonts://Lora@700"
     id: font_rail
-    size: 15
+    size: 17
   - file: "gfonts://Lora@700"
     id: font_condition
     size: 18
