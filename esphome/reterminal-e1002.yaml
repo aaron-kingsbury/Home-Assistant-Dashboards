@@ -85,10 +85,10 @@ font:
     size: 12
   - file: "gfonts://Lora@700"
     id: font_scripture_verse
-    size: 20
+    size: 40
   - file: "gfonts://Lora@700"
     id: font_scripture_reference
-    size: 12
+    size: 20
 
 image:
   - platform: file
