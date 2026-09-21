@@ -80,6 +80,9 @@ font:
   - file: "gfonts://Lora@700"
     id: font_temperature
     size: 34
+  - file: "gfonts://Inter@700"
+    id: font_battery
+    size: 12
 
 image:
   - platform: file
@@ -870,12 +873,12 @@ display:
 
       const float battery_percent = id(battery_level).state;
       if (isnan(battery_percent)) {
-        it.printf(744, 232, id(font_rail), BLACK, TextAlign::TOP_CENTER, "BATT --");
+        it.printf(770, 4, id(font_battery), BLACK, TextAlign::TOP_CENTER, "BATT --");
       } else {
         const auto battery_color = battery_percent < 15.0f
             ? RED
             : (battery_percent < 30.0f ? YELLOW : GREEN);
-        it.printf(744, 232, id(font_rail), battery_color, TextAlign::TOP_CENTER,
+        it.printf(770, 4, id(font_battery), battery_color, TextAlign::TOP_CENTER,
                   "BATT %.0f%%", battery_percent);
       }
 
