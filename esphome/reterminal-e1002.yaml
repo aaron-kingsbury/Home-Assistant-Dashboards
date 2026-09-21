@@ -863,7 +863,7 @@ display:
       else if (normalized == "snowy" || normalized == "snowy-rainy") condition_label = "Snow";
       it.printf(702, 207, id(font_condition), BLACK, TextAlign::TOP_CENTER, "%s", condition_label);
 
-      it.printf(652, 310, id(font_temperature), BLUE, TextAlign::TOP_CENTER,
+      it.printf(647, 310, id(font_temperature), BLUE, TextAlign::TOP_CENTER,
                 "%s", id(weather_high).state.c_str());
       it.printf(747, 310, id(font_temperature), BLACK, TextAlign::TOP_CENTER,
                 "%s", id(weather_low).state.c_str());
