@@ -83,7 +83,7 @@ font:
   - file: "gfonts://Inter@700"
     id: font_battery
     size: 12
-  - file: "gfonts://Lora@700"
+  - file: "gfonts://Libre+Baskerville@400"
     id: font_scripture_verse
     size: 30
   - file: "gfonts://Lora@700"
@@ -913,7 +913,7 @@ display:
          }
          ESP_LOGI("housevoice", "Scripture render: weekday=%d verse=\"%s\" reference=\"%s\"",
                   weekday, verse, reference);
-         it.printf(400, 389, id(font_scripture_verse), WHITE, TextAlign::TOP_CENTER,
+         it.printf(400, 384, id(font_scripture_verse), WHITE, TextAlign::TOP_CENTER,
                    "%s", verse);
          it.printf(400, 424, id(font_scripture_reference), WHITE, TextAlign::TOP_CENTER,
                    "%s", reference);
