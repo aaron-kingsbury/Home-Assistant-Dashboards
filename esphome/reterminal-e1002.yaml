@@ -811,7 +811,8 @@ display:
         }
       };
 
-       auto now = id(ha_time).now();
+        auto now = id(ha_time).now();
+        if (!now.is_valid()) now = id(rtc_time).now();
        if (now.is_valid() && now.year >= 2025 && now.year <= 2100) {
         char date_text[48];
         now.strftime(date_text, sizeof(date_text), "%A, %B %d, %Y");
@@ -910,6 +911,8 @@ display:
              reference = "PSALM 136:1";
              break;
          }
+         ESP_LOGI("housevoice", "Scripture render: weekday=%d verse=\"%s\" reference=\"%s\"",
+                  weekday, verse, reference);
          it.printf(400, 393, id(font_scripture_verse), BLACK, TextAlign::TOP_CENTER,
                    "%s", verse);
          it.printf(400, 422, id(font_scripture_reference), BLACK, TextAlign::TOP_CENTER,
