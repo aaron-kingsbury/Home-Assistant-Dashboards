@@ -871,7 +871,7 @@ display:
       const std::string sunrise_local = local_sun_time(id(sunrise).state);
       const std::string sunset_local = local_sun_time(id(sunset).state);
       draw_time(sunrise_local, 70);
-      draw_time(sunset_local, 150);
+      draw_time(sunset_local, 155);
 
 # secrets.yaml (create this file alongside your config):
 # wifi_ssid: "Your WiFi SSID"
