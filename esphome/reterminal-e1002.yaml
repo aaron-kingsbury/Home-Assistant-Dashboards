@@ -868,6 +868,17 @@ display:
       it.printf(747, 310, id(font_temperature), BLACK, TextAlign::TOP_CENTER,
                 "%s", id(weather_low).state.c_str());
 
+      const float battery_percent = id(battery_level).state;
+      if (isnan(battery_percent)) {
+        it.printf(744, 232, id(font_rail), BLACK, TextAlign::TOP_CENTER, "BATT --");
+      } else {
+        const auto battery_color = battery_percent < 15.0f
+            ? RED
+            : (battery_percent < 30.0f ? YELLOW : GREEN);
+        it.printf(744, 232, id(font_rail), battery_color, TextAlign::TOP_CENTER,
+                  "BATT %.0f%%", battery_percent);
+      }
+
       const std::string sunrise_local = local_sun_time(id(sunrise).state);
       const std::string sunset_local = local_sun_time(id(sunset).state);
       draw_time(sunrise_local, 70);
