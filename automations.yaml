@@ -890,6 +890,31 @@
     target:
       entity_id: input_text.e_ink_weather_low
   mode: restart
+- id: housevoice_eink_refresh
+  alias: HouseVoice E-Ink Refresh
+  description: Refresh the HouseVoice E-Ink display each morning and when its displayed data changes
+  triggers:
+  - at: 05:00:00
+    trigger: time
+  - entity_id:
+    - input_text.calendar_today_events
+    - input_text.calendar_sun_events
+    - input_text.calendar_mon_events
+    - input_text.calendar_tue_events
+    - input_text.calendar_wed_events
+    - input_text.calendar_thu_events
+    - input_text.calendar_fri_events
+    - input_text.calendar_sat_events
+    - input_text.e_ink_weather_condition
+    - input_text.e_ink_weather_high
+    - input_text.e_ink_weather_low
+    trigger: state
+  actions:
+  - delay: 00:00:10
+  - action: button.press
+    target:
+      entity_id: button.reterminal_e1002_refresh_housevoice_e_ink
+  mode: restart
 - id: housevoice_calendar_overflow_refresh
   alias: HouseVoice Calendar Overflow Refresh
   description: Store additional daily calendar events in overflow helpers

@@ -1,0 +1,84 @@
+{
+  "success": true,
+  "operation": "get",
+  "resource_type": "dashboard",
+  "data": {
+    "views": [
+      {
+        "icon": "mdi:battery-alert",
+        "path": "battery-warnings",
+        "sections": [
+          {
+            "cards": [
+              {
+                "content": "Monitor battery health, device availability, and the HouseVoice E-Ink status.\n\n**Guidance:** warn below 30%; critical below 15%. An unavailable entity indicates a device or connectivity issue.",
+                "title": "Battery \u0026 Warnings",
+                "type": "markdown"
+              },
+              {
+                "entity": "sensor.reterminal_e1002_battery_level",
+                "max": 100,
+                "min": 0,
+                "name": "HouseVoice E-Ink Battery",
+                "severity": {
+                  "green": 30,
+                  "red": 0,
+                  "yellow": 15
+                },
+                "type": "gauge"
+              },
+              {
+                "entities": [
+                  "sensor.reterminal_e1002_battery_level",
+                  "sensor.reterminal_e1002_battery_voltage",
+                  "button.reterminal_e1002_refresh_housevoice_e_ink",
+                  "sensor.reterminal_e1002_hv_debug_readiness"
+                ],
+                "title": "HouseVoice E-Ink",
+                "type": "entities"
+              },
+              {
+                "entities": [
+                  "sensor.cora_s_room_display_battery_level",
+                  "sensor.grahams_ipad_battery_level",
+                  "sensor.grahams_echo_battery_level",
+                  "sensor.aarons_iphone_battery_level",
+                  "sensor.ring_keypad_battery_level",
+                  "sensor.t6_pro_z_wave_programmable_thermostat_battery_level",
+                  "sensor.reterminal_e1002_battery_level",
+                  "sensor.grahams_door_battery"
+                ],
+                "show_header_toggle": false,
+                "title": "Battery Levels",
+                "type": "entities"
+              }
+            ],
+            "type": "grid"
+          }
+        ],
+        "title": "Battery \u0026 Warnings",
+        "type": "sections"
+      }
+    ]
+  },
+  "message": "",
+  "partial_result": false,
+  "warnings": [],
+  "fallbacks_applied": [],
+  "missing_sections": [],
+  "verification_commands": [],
+  "next_suggested_commands": [],
+  "error": null,
+  "metadata": {
+    "auth_source": "supervisor",
+    "default_operation": "get",
+    "default_resource_type": "dashboard",
+    "interactive_input": false,
+    "interactive_output": false,
+    "output_mode": "json",
+    "timestamp": "2026-09-21T18:06:24Z",
+    "transports_used": [
+      "websocket"
+    ]
+  }
+}
