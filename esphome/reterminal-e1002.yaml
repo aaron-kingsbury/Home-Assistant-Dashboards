@@ -64,7 +64,7 @@ logger:
 font:
   - file: "gfonts://Lora@700"
     id: font_date
-    size: 16
+    size: 18
   - file: "gfonts://Inter@700"
     id: font_event_title
     size: 12
@@ -809,9 +809,9 @@ display:
         for (char *character = date_text; *character != '\0'; character++) {
           if (*character >= 'a' && *character <= 'z') *character -= 'a' - 'A';
         }
-         it.printf(407, 150, id(font_date), BLACK, TextAlign::TOP_CENTER, "%s", date_text);
+         it.printf(346, 150, id(font_date), BLACK, TextAlign::TOP_CENTER, "%s", date_text);
       } else {
-        it.printf(407, 150, id(font_date), BLACK, TextAlign::TOP_CENTER, "WAITING FOR DATE");
+        it.printf(346, 150, id(font_date), BLACK, TextAlign::TOP_CENTER, "WAITING FOR DATE");
       }
 
         draw_events(id(calendar_today_events).state, 237, 70);
