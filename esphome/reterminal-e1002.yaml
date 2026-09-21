@@ -85,7 +85,7 @@ font:
     size: 12
   - file: "gfonts://Lora@700"
     id: font_scripture_verse
-    size: 40
+    size: 30
   - file: "gfonts://Lora@700"
     id: font_scripture_reference
     size: 20
