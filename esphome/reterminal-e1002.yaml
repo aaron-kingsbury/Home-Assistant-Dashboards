@@ -372,7 +372,7 @@ script:
                                id(sunset).state.c_str());
                       ESP_LOGI("housevoice", "[HouseVoice] DATA READY - PERFORMING INITIAL DISPLAY REFRESH");
                   - component.update: epaper_display
-                  - delay: 10s
+                  - delay: 90s
                   - deep_sleep.enter:
                       id: housevoice_deep_sleep
                       until: "05:00:00"
