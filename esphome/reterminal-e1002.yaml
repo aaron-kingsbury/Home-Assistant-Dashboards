@@ -83,9 +83,9 @@ font:
   - file: "gfonts://Inter@700"
     id: font_battery
     size: 12
-  - file: "gfonts://Lora@400"
+  - file: "gfonts://Playfair+Display@500"
     id: font_scripture_verse
-    size: 30
+    size: 40
   - file: "gfonts://Lora@700"
     id: font_scripture_reference
     size: 20
