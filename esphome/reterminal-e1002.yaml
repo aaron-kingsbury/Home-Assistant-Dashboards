@@ -371,12 +371,12 @@ script:
                                id(weather_low).state.c_str(), id(sunrise).state.c_str(),
                                id(sunset).state.c_str());
                       ESP_LOGI("housevoice", "[HouseVoice] DATA READY - PERFORMING INITIAL DISPLAY REFRESH");
-                   - component.update: epaper_display
-                   - delay: 10s
-                   - deep_sleep.enter:
-                       id: housevoice_deep_sleep
-                       until: "05:00:00"
-                       time_id: ha_time
+                  - component.update: epaper_display
+                  - delay: 10s
+                  - deep_sleep.enter:
+                      id: housevoice_deep_sleep
+                      until: "05:00:00"
+                      time_id: ha_time
 
 text_sensor:
   - platform: homeassistant
