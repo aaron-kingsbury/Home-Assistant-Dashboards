@@ -696,9 +696,15 @@ deep_sleep:
   esp32_ext1_wakeup:
     mode: ANY_LOW
     pins:
-      - pin: GPIO3
-      - pin: GPIO4
-      - pin: GPIO5
+      - pin:
+          number: GPIO3
+          ignore_pin_validation_error: true
+      - pin:
+          number: GPIO4
+          ignore_pin_validation_error: true
+      - pin:
+          number: GPIO5
+          ignore_pin_validation_error: true
 
 # =============================================================================
 # [1] ePaper display (7.5" COLOR, 800x480)
