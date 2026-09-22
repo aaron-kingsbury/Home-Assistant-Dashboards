@@ -693,18 +693,6 @@ captive_portal:
 
 deep_sleep:
   id: housevoice_deep_sleep
-  esp32_ext1_wakeup:
-    mode: ANY_LOW
-    pins:
-      - pin:
-          number: GPIO3
-          ignore_pin_validation_error: true
-      - pin:
-          number: GPIO4
-          ignore_pin_validation_error: true
-      - pin:
-          number: GPIO5
-          ignore_pin_validation_error: true
 
 # =============================================================================
 # [1] ePaper display (7.5" COLOR, 800x480)
