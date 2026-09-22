@@ -913,7 +913,7 @@ display:
          }
          ESP_LOGI("housevoice", "Scripture render: weekday=%d verse=\"%s\" reference=\"%s\"",
                   weekday, verse, reference);
-         it.printf(400, 379, id(font_scripture_verse), WHITE, TextAlign::TOP_CENTER,
+         it.printf(400, 374, id(font_scripture_verse), WHITE, TextAlign::TOP_CENTER,
                    "%s", verse);
          it.printf(400, 424, id(font_scripture_reference), WHITE, TextAlign::TOP_CENTER,
                    "%s", reference);
