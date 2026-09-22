@@ -83,7 +83,7 @@ font:
   - file: "gfonts://Inter@700"
     id: font_battery
     size: 12
-  - file: "gfonts://Libre+Baskerville@400"
+  - file: "gfonts://Alegreya@500"
     id: font_scripture_verse
     size: 30
   - file: "gfonts://Lora@700"
