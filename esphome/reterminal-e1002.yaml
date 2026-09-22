@@ -915,7 +915,7 @@ display:
                   weekday, verse, reference);
          it.printf(400, 374, id(font_scripture_verse), WHITE, TextAlign::TOP_CENTER,
                    "%s", verse);
-         it.printf(400, 424, id(font_scripture_reference), WHITE, TextAlign::TOP_CENTER,
+          it.printf(400, 424, id(font_scripture_reference), YELLOW, TextAlign::TOP_CENTER,
                    "%s", reference);
        }
 
