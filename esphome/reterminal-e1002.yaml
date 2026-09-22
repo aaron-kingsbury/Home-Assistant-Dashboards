@@ -591,7 +591,6 @@ binary_sensor:
     on_press:
       then:
         - logger.log: "KEY0 (GPIO3) pressed"
-        - component.update: epaper_display
 
   # KEY1 (GPIO4)
   - platform: gpio
