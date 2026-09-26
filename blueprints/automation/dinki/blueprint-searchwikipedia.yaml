@@ -1,7 +1,7 @@
 blueprint:
   name: View Assist - Search Wikipedia
   description: Search for a search term using Wikipedia (View Assist wikisearch v
-    1.1.4)
+    1.1.6)
   domain: automation
   input:
     language:
@@ -15,6 +15,8 @@ blueprint:
           - de
           - en
           - es
+          - it
+          - nl
           - pl
           - pt
           native_name: false
@@ -59,6 +61,14 @@ action:
         responses:
           view_title: Búsqueda en Wikipedia
           search_error: Lo siento, no he podido encontrar nada en Wikipedia para eso
+      it:
+        responses:
+          view_title: Ricerca su Wikipedia
+          search_error: Mi dispiace, non ho trovato niente su Wikipedia
+      nl:
+        responses:
+          view_title: Wikipedia zoeken
+          search_error: Sorry, Ik kon niets vinden hierover op Wikipedia
       pl:
         responses:
           view_title: Wyszukiwanie Wikipedia

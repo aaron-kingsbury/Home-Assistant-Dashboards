@@ -1,6 +1,6 @@
 blueprint:
   name: View Assist - Locate a Person
-  description: Ask Assist to locate a person (View Assist locateaperson v 1.1.3)
+  description: Ask Assist to locate a person (View Assist locateaperson v 1.1.4)
   domain: automation
   input:
     language:
@@ -16,6 +16,7 @@ blueprint:
           - es
           - fr
           - it
+          - nl
           - pl
           - pt
           native_name: false
@@ -49,9 +50,9 @@ blueprint:
           options:
           - dark
           - light
-          sort: false
           multiple: false
           custom_value: false
+          sort: false
 trigger:
   platform: conversation
   command: !input command_prompt
@@ -133,6 +134,17 @@ action:
           minute_label: Minuten zuvor
           hour_label: Stunden zuvor
           day_label: Tage zuvor
+      nl:
+        responses:
+          person_away: '{person} is weg.'
+          person_location: '{person} is op {location}'
+          person_undefined: '{person} is niet gedefineerd'
+        last_update:
+          prefix: Laatst geupdated
+          now_label: nu
+          minute_label: minuten geleden
+          hour_label: uren geleden
+          day_label: dagen geleden
       pl:
         responses:
           person_away: '{person} jest poza domem.'

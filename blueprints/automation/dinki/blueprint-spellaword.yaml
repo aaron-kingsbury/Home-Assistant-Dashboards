@@ -1,7 +1,7 @@
 blueprint:
   name: View Assist - Spell a Word
   description: Ask Assist to spell a word and it spells the word letter-by-letter
-    and displays the word on screen where applicable (View Assist spellaword v 1.0.4)
+    and displays the word on screen where applicable (View Assist spellaword v 1.0.5)
   domain: automation
   input:
     language:
@@ -17,6 +17,7 @@ blueprint:
           - es
           - fr
           - it
+          - nl
           - pl
           - pt
           native_name: false
@@ -72,6 +73,9 @@ action:
       it:
         responses:
           spell: '{word} si scrive ... {spaced_text}'
+      nl:
+        responses:
+          spell: '{word} is gespelt ... {spaced_text}'
       pl:
         responses:
           spell: '{word} pisze się ... {spaced_text}'

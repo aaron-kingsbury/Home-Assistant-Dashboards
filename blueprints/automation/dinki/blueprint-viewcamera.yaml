@@ -4,7 +4,7 @@ blueprint:
 
     Supports showing individual cameras or all cameras at once.
 
-    You can use multiple names for the same camera entity. (v 2.0.2)
+    You can use multiple names for the same camera entity. (v 2.0.4)
 
     '
   domain: automation
@@ -20,6 +20,8 @@ blueprint:
           - de
           - en
           - es
+          - it
+          - nl
           - pl
           - pt
           native_name: false
@@ -99,9 +101,9 @@ blueprint:
             value: speak_error
           - label: Do nothing
             value: do_nothing
-          sort: false
           multiple: false
           custom_value: false
+          sort: false
 trigger:
 - trigger: conversation
   command: !input command
@@ -172,6 +174,20 @@ action:
             camera_not_found_error: 'Entschuldigung, ich konnte keine Kamera namens
               ''{camera}'' finden. Verfügbare Kameras sind: {available}.'
             camera_not_found_short: Kamera '{camera}' nicht gefunden.
+        it:
+          responses:
+            camera_not_found_show: Telecamera '{camera}' non trovata. Mostro le telecamere
+              configurate.
+            camera_not_found_error: 'Mi dispiace, non ho trovato nessuna telecamera
+              chiamata ''{camera}''. Le telecamere disponibili sono: {available}.'
+            camera_not_found_short: Telecamera '{camera}' non trovata.
+        nl:
+          responses:
+            camera_not_found_show: Camera '{camera}' niet gevonden. Geconfigureerde
+              cameras worden getoond.
+            camera_not_found_error: 'Sorry, Ik kan de camera genaamd ''{camera}''
+              niet vinden. Beschikbare cameras zijn: {available}.'
+            camera_not_found_short: Camera '{camera}' niet gevonden.
         pl:
           responses:
             camera_not_found_show: Kamera '{camera}' nie znaleziona. Wyświetlam skonfigurowane

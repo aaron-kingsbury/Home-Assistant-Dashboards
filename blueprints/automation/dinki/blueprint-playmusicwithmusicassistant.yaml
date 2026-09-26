@@ -2,7 +2,7 @@ blueprint:
   name: View Assist - Play Music with Music Assistant
   description: Use various methods to play individual songs, add to queue, play artist
     and playlists from your Music Assistant server (View Assist Play Music with Music
-    Assistant v 1.2.7)
+    Assistant v 1.2.8)
   domain: automation
   input:
     ma_instance:
@@ -27,6 +27,7 @@ blueprint:
           - de
           - en
           - es
+          - it
           - nl
           - pl
           - pt
@@ -79,6 +80,16 @@ actions:
     ma_instance: !input ma_instance
     language: !input language
     translations:
+      it:
+        responses:
+          playartist_found: Riproduco la musica di {artist}
+          playartist_not_found: Non ho trovato musica di {search_artist}
+          playlist_found: Riproduco la playlist {playlist}
+          playlist_not_found: Mi dispiace, non ho trovato nessuna playlist chiamata
+            {search_playlist}
+          playsong_found: Riproduco {song} di {artist}
+          playsong_not_found: Mi dispiace, non ho trovato {song} di {artist}
+          playsong_queue: Aggiungo alla coda {song} di {artist}
       ca:
         responses:
           playartist_found: Reproduint música de {artist}
@@ -350,7 +361,7 @@ actions:
               value_template: '{{ target_use_announce is not false }}'
             then:
             - variables:
-                conversation_response: '{{ translations[language][''responses''][''playsong_found''].replace("{artist}",
+                conversation_response: '{{ translations[language][''responses''][''playsong_queue''].replace("{artist}",
                   found_track.tracks[0].artists[0].name).replace("{song}", found_track.tracks[0].name)
                   }}'
             - set_conversation_response: '{{ conversation_response }}'

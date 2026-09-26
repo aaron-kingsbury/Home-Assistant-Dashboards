@@ -1,7 +1,7 @@
 blueprint:
   name: View Assist - What time is it
   description: Ask Assist for time, date and day of the week and receive response
-    (View Assist whattimeisit v 1.0.3)
+    (View Assist whattimeisit v 1.0.6)
   domain: automation
   input:
     language:
@@ -179,17 +179,80 @@ action:
         responses:
           time: Il est {time}
           day_of_week: Aujourd'hui, c'est {day_of_week}
-          date: Aujourd'hui, c'est {date}
+          date: Aujourd'hui, c'est {day_of_week} {day_of_month} {month} {year}
+        weekdays:
+          mon: lundi
+          tue: mardi
+          wed: mercredi
+          thu: jeudi
+          fri: vendredi
+          sat: samedi
+          sun: dimanche
+        months:
+          jan: janvier
+          feb: février
+          mar: mars
+          apr: avril
+          may: mai
+          jun: juin
+          jul: juillet
+          aug: août
+          sep: septembre
+          oct: octobre
+          nov: novembre
+          dec: décembre
       it:
         responses:
           time: Sono le {time}
           day_of_week: Oggi è {day_of_week}
-          date: Oggi è {date}
+          date: Oggi è {day_of_week} {day_of_month} {month} {year}
+        weekdays:
+          mon: Lunedì
+          tue: Martedì
+          wed: Mercoledì
+          thu: Giovedì
+          fri: Venerdì
+          sat: Sabato
+          sun: Domenica
+        months:
+          jan: Gennaio
+          feb: Febbraio
+          mar: Marzo
+          apr: Aprile
+          may: Maggio
+          jun: Giugno
+          jul: Luglio
+          aug: Agosto
+          sep: Settembre
+          oct: Ottobre
+          nov: Novembre
+          dec: Dicembre
       nl:
         responses:
           time: Het is {time}
           day_of_week: Vandaag is {day_of_week}
-          date: Vandaag is {date}
+          date: Vandaag is {day_of_week} {day_of_month} {month} {year}
+        weekdays:
+          mon: Maandag
+          tue: Dinsdag
+          wed: Woensdag
+          thu: Donderdag
+          fri: Vrijdag
+          sat: Zaterdag
+          sun: Zondag
+        months:
+          jan: Januari
+          feb: Februari
+          mar: Maart
+          apr: April
+          may: Mei
+          jun: Juni
+          jul: Juli
+          aug: Augustus
+          sep: September
+          oct: October
+          nov: November
+          dec: December
       pl:
         responses:
           time: Jest {time}
