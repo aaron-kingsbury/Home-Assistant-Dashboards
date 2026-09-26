@@ -76,7 +76,7 @@ font:
     size: 17
   - file: "gfonts://Lora@700"
     id: font_condition
-    size: 31
+    size: 29
   - file: "gfonts://Lora@700"
     id: font_temperature
     size: 34
