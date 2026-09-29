@@ -879,7 +879,7 @@
   alias: E-Ink Daily Weather Refresh
   description: Store the daily forecast used by the overnight e-ink board.
   triggers:
-    - at: 00:10:00
+    - at: 04:50:00
       trigger: time
     - event: start
       trigger: homeassistant

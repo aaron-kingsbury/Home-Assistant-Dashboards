@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from collections.abc import Callable
 from typing import Any
 
@@ -14,6 +15,7 @@ DOMAIN = "housevoice_walkie"
 REQUEST_EVENT = "housevoice_walkie_request"
 SIGNAL_EVENT = "housevoice_walkie_signal"
 STATE_EVENT = "housevoice_walkie_state"
+CALL_TIMEOUT_SECONDS = 30
 
 ROOMS = {
     "graham": {"name": "Graham", "enabled": True},
@@ -29,6 +31,7 @@ class WalkieCoordinator:
     def __init__(self, hass: HomeAssistant) -> None:
         self.hass = hass
         self.active: dict[str, dict[str, str]] = {}
+        self._call_timeouts: dict[str, asyncio.TimerHandle] = {}
         self.unsubscribe: Callable[[], None] | None = None
 
     @callback
@@ -85,6 +88,9 @@ class WalkieCoordinator:
         if self.unsubscribe:
             self.unsubscribe()
             self.unsubscribe = None
+        for handle in self._call_timeouts.values():
+            handle.cancel()
+        self._call_timeouts.clear()
         self.hass.services.async_remove(DOMAIN, "call")
         self.hass.services.async_remove(DOMAIN, "client_log")
 
@@ -106,6 +112,7 @@ class WalkieCoordinator:
         call = {"call_id": f"{sender}-{target}", "from": sender, "to": target}
         self.active[sender] = call
         self.active[target] = call
+        self._schedule_timeout(call)
         self._set_diagnostics(state="ringing", sender=sender, target=target)
         self._emit_state(call, "ringing")
         self._forward(
@@ -140,9 +147,35 @@ class WalkieCoordinator:
 
     @callback
     def _release(self, call: dict[str, str], state: str) -> None:
+        timeout = self._call_timeouts.pop(call["call_id"], None)
+        if timeout:
+            timeout.cancel()
         self.active.pop(call["from"], None)
         self.active.pop(call["to"], None)
         self._emit_state(call, state)
+
+    def _schedule_timeout(self, call: dict[str, str]) -> None:
+        self._call_timeouts[call["call_id"]] = self.hass.loop.call_later(
+            CALL_TIMEOUT_SECONDS, self._timeout_call, call["call_id"]
+        )
+
+    @callback
+    def _timeout_call(self, call_id: str) -> None:
+        call = next(
+            (active for active in self.active.values() if active["call_id"] == call_id),
+            None,
+        )
+        if not call:
+            return
+        self._release(call, "timeout")
+        self._forward(
+            {
+                "kind": "end",
+                "call_id": call_id,
+                "from": "housevoice_walkie",
+                "to": call["from"],
+            }
+        )
 
     async def _handle_request(self, event: Event) -> None:
         data = dict(event.data)
@@ -162,11 +195,17 @@ class WalkieCoordinator:
 
         call = {"call_id": call_id, "from": sender, "to": target}
         if kind == "offer":
-            if sender in self.active or target in self.active:
+            active = self.active.get(sender)
+            if active and (
+                active["call_id"] != call_id
+                or {active["from"], active["to"]} != {sender, target}
+            ):
                 self._forward({"kind": "decline", "call_id": call_id, "from": "housevoice_walkie", "to": sender})
                 return
-            self.active[sender] = call
-            self.active[target] = call
+            if not active:
+                self.active[sender] = call
+                self.active[target] = call
+                self._schedule_timeout(call)
             self._emit_state(call, "ringing")
             self._forward(data)
             return
@@ -179,6 +218,9 @@ class WalkieCoordinator:
         ):
             return
         if kind == "answer":
+            timeout = self._call_timeouts.pop(call_id, None)
+            if timeout:
+                timeout.cancel()
             self._emit_state(active, "connected")
         elif kind in ("decline", "end"):
             self._release(active, "declined" if kind == "decline" else "ended")

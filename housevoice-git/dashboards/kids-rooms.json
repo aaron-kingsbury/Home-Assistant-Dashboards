@@ -24,7 +24,7 @@
     },
     {
       "type": "module",
-      "url": "/local/housevoice/walkie.js?v=7"
+      "url": "/local/housevoice/walkie.js?v=12"
     }
   ],
   "views": [
@@ -586,110 +586,11 @@
                 ]
               },
               "tap_action": {
-                "action": "fire-dom-event",
-                "browser_mod": {
-                  "data": {
-                    "content": {
-                      "cards": [
-                        {
-                          "content": "## Who do you want to call?",
-                          "type": "markdown"
-                        },
-                        {
-                          "cards": [
-                            {
-                              "icon": "mdi:account-voice",
-                              "label": "Graham's Room",
-                              "name": "GRAHAM",
-                              "show_label": true,
-                              "show_name": true,
-                              "show_state": false,
-                              "styles": {
-                                "card": [
-                                  {
-                                    "height": "150px"
-                                  },
-                                  {
-                                    "padding": "18px 8px"
-                                  },
-                                  {
-                                    "border-radius": "16px"
-                                  },
-                                  {
-                                    "display": "flex"
-                                  },
-                                  {
-                                    "flex-direction": "column"
-                                  },
-                                  {
-                                    "justify-content": "center"
-                                  }
-                                ],
-                                "grid": [
-                                  {
-                                    "grid-template-areas": "\"i\" \"n\" \"l\""
-                                  },
-                                  {
-                                    "grid-template-rows": "1fr min-content min-content"
-                                  },
-                                  {
-                                    "row-gap": "8px"
-                                  }
-                                ],
-                                "icon": [
-                                  {
-                                    "width": "72px"
-                                  },
-                                  {
-                                    "height": "72px"
-                                  }
-                                ],
-                                "label": [
-                                  {
-                                    "font-size": "17px"
-                                  },
-                                  {
-                                    "line-height": "1.2"
-                                  },
-                                  {
-                                    "color": "rgba(217,237,255,.78)"
-                                  }
-                                ],
-                                "name": [
-                                  {
-                                    "font-size": "27px"
-                                  },
-                                  {
-                                    "font-weight": "600"
-                                  },
-                                  {
-                                    "line-height": "1.1"
-                                  }
-                                ]
-                              },
-                              "tap_action": {
-                                "action": "call-service",
-                                "service": "housevoice_walkie.call",
-                                "service_data": {
-                                  "from": "cora",
-                                  "to": "graham"
-                                }
-                              },
-                              "type": "custom:button-card"
-                            }
-                          ],
-                          "columns": 1,
-                          "square": false,
-                          "type": "grid"
-                        }
-                      ],
-                      "type": "vertical-stack"
-                    },
-                    "dismissable": true,
-                    "initial_style": "classic",
-                    "title": "Walkie"
-                  },
-                  "service": "browser_mod.popup"
+                "action": "call-service",
+                "service": "housevoice_walkie.call",
+                "service_data": {
+                  "from": "cora",
+                  "to": "graham"
                 }
               },
               "type": "custom:button-card"
