@@ -320,7 +320,7 @@ script:
       - if:
           condition:
             lambda: |-
-              if (id(housevoice_initial_refresh_done) || !id(housevoice_api_connected) || !id(housevoice_time_synced)) {
+              if (id(housevoice_initial_refresh_done) || !id(housevoice_time_synced)) {
                 return false;
               }
               if (!id(calendar_today_events).has_state() ||
@@ -345,7 +345,7 @@ script:
                 condition:
                   lambda: |-
                     return !id(housevoice_initial_refresh_done) &&
-                        id(housevoice_api_connected) && id(housevoice_time_synced) &&
+                        id(housevoice_time_synced) &&
                         id(calendar_today_events).has_state() &&
                         id(calendar_sun_events).has_state() &&
                         id(calendar_mon_events).has_state() &&
