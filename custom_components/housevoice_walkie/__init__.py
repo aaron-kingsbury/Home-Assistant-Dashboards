@@ -30,7 +30,7 @@ class WalkieCoordinator:
 
     def __init__(self, hass: HomeAssistant) -> None:
         self.hass = hass
-        self.active: dict[str, dict[str, str]] = {}
+        self.active: dict[str, dict[str, Any]] = {}
         self._call_timeouts: dict[str, asyncio.TimerHandle] = {}
         self.unsubscribe: Callable[[], None] | None = None
 
@@ -109,7 +109,12 @@ class WalkieCoordinator:
         ):
             self._set_diagnostics(state="rejected", sender=sender, target=target)
             return
-        call = {"call_id": f"{sender}-{target}", "from": sender, "to": target}
+        call: dict[str, Any] = {
+            "call_id": f"{sender}-{target}",
+            "from": sender,
+            "to": target,
+            "state": "ringing",
+        }
         self.active[sender] = call
         self.active[target] = call
         self._schedule_timeout(call)
@@ -125,7 +130,7 @@ class WalkieCoordinator:
         )
 
     @callback
-    def _emit_state(self, call: dict[str, str] | None, state: str) -> None:
+    def _emit_state(self, call: dict[str, Any] | None, state: str) -> None:
         self._set_diagnostics(
             state=state,
             sender=call.get("from") if call else None,
@@ -146,7 +151,7 @@ class WalkieCoordinator:
         self.hass.bus.async_fire(SIGNAL_EVENT, data)
 
     @callback
-    def _release(self, call: dict[str, str], state: str) -> None:
+    def _release(self, call: dict[str, Any], state: str) -> None:
         timeout = self._call_timeouts.pop(call["call_id"], None)
         if timeout:
             timeout.cancel()
@@ -154,7 +159,7 @@ class WalkieCoordinator:
         self.active.pop(call["to"], None)
         self._emit_state(call, state)
 
-    def _schedule_timeout(self, call: dict[str, str]) -> None:
+    def _schedule_timeout(self, call: dict[str, Any]) -> None:
         self._call_timeouts[call["call_id"]] = self.hass.loop.call_later(
             CALL_TIMEOUT_SECONDS, self._timeout_call, call["call_id"]
         )
@@ -168,11 +173,24 @@ class WalkieCoordinator:
         if not call:
             return
         self._release(call, "timeout")
+        self._forward_terminal(call, "end")
+
+    @callback
+    def _forward_terminal(self, call: dict[str, Any], kind: str) -> None:
+        """Tell every browser in both rooms to release this call."""
         self._forward(
             {
-                "kind": "end",
-                "call_id": call_id,
-                "from": "housevoice_walkie",
+                "kind": kind,
+                "call_id": call["call_id"],
+                "from": call["from"],
+                "to": call["to"],
+            }
+        )
+        self._forward(
+            {
+                "kind": kind,
+                "call_id": call["call_id"],
+                "from": call["to"],
                 "to": call["from"],
             }
         )
@@ -193,7 +211,12 @@ class WalkieCoordinator:
         ):
             return
 
-        call = {"call_id": call_id, "from": sender, "to": target}
+        call: dict[str, Any] = {
+            "call_id": call_id,
+            "from": sender,
+            "to": target,
+            "state": "ringing",
+        }
         if kind == "offer":
             active = self.active.get(sender)
             if active and (
@@ -206,6 +229,31 @@ class WalkieCoordinator:
                 self.active[sender] = call
                 self.active[target] = call
                 self._schedule_timeout(call)
+                active = call
+            client_id = data.get("client_id")
+            selected_client_id = active.get("offer_client_id")
+            if selected_client_id:
+                if selected_client_id != client_id:
+                    self._forward(
+                        {
+                            "kind": "caller_selected",
+                            "call_id": call_id,
+                            "from": target,
+                            "to": sender,
+                            "winner_client_id": selected_client_id,
+                        }
+                    )
+                return
+            active["offer_client_id"] = client_id
+            self._forward(
+                {
+                    "kind": "caller_selected",
+                    "call_id": call_id,
+                    "from": target,
+                    "to": sender,
+                    "winner_client_id": client_id,
+                }
+            )
             self._emit_state(call, "ringing")
             self._forward(data)
             return
@@ -218,12 +266,29 @@ class WalkieCoordinator:
         ):
             return
         if kind == "answer":
+            if active.get("state") == "connected":
+                return
+            active["state"] = "connected"
+            active["answer_client_id"] = data.get("client_id")
             timeout = self._call_timeouts.pop(call_id, None)
             if timeout:
                 timeout.cancel()
             self._emit_state(active, "connected")
+            self._forward(data)
+            self._forward(
+                {
+                    "kind": "accepted_elsewhere",
+                    "call_id": call_id,
+                    "from": target,
+                    "to": sender,
+                    "winner_client_id": data.get("client_id"),
+                }
+            )
+            return
         elif kind in ("decline", "end"):
             self._release(active, "declined" if kind == "decline" else "ended")
+            self._forward_terminal(active, kind)
+            return
         self._forward(data)
 
 

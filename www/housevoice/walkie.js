@@ -46,12 +46,14 @@ class HouseVoiceWalkie extends HTMLElement {
     super();
     this.attachShadow({ mode: "open" });
     this._roomId = null;
+    this._clientId = this._createCallId();
     this._alwaysVisible = false;
     this._hass = null;
     this._unsubscribe = null;
     this._subscribePromise = null;
     this._peer = null;
     this._localStream = null;
+    this._remoteStream = null;
     this._pendingCandidates = [];
     this._pendingOffer = null;
     this._call = null;
@@ -97,7 +99,10 @@ class HouseVoiceWalkie extends HTMLElement {
   async _subscribe() {
     if (this._unsubscribe || this._subscribePromise || !this._hass?.connection) return;
     const connection = this._hass.connection;
-    this._diagnose("component_loaded", `room_id=${this._roomId}`);
+    this._diagnose(
+      "component_loaded",
+      `room_id=${this._roomId} client_id=${this._clientId} secure=${window.isSecureContext} mediaDevices=${Boolean(navigator.mediaDevices)} getUserMedia=${Boolean(navigator.mediaDevices?.getUserMedia)}`,
+    );
     const subscribePromise = connection.subscribeEvents(
       (event) => this._receive(event),
       "housevoice_walkie_signal",
@@ -138,6 +143,7 @@ class HouseVoiceWalkie extends HTMLElement {
       event_data: {
         ...data,
         from: this._roomId,
+        client_id: this._clientId,
       },
     }).catch((error) => {
       console.error("[HouseVoice Walkie] signaling send failed", error);
@@ -210,6 +216,13 @@ class HouseVoiceWalkie extends HTMLElement {
     const signalKey = this._signalKey(event, message);
     if (this._hasSeenSignal(signalKey) || !this._claimSignalOwnership(message)) return;
     this._rememberSignal(signalKey);
+    if (["caller_selected", "accepted_elsewhere"].includes(message.kind)) {
+      if (this._call?.id === message.call_id && message.winner_client_id !== this._clientId) {
+        this._diagnose("duplicate_client_released", `kind=${message.kind}`);
+        this._cleanup(false);
+      }
+      return;
+    }
     if (message.kind === "offer") {
       this._diagnose("incoming_call_detected", `from=${message.from}`);
       this._receiveOffer(message);
@@ -228,10 +241,7 @@ class HouseVoiceWalkie extends HTMLElement {
 
   async _receiveOffer(message) {
     if (!this._ownsRoom() && !this._claimRoomOwnership()) return;
-    if (this._call) {
-      this._send({ kind: "decline", call_id: message.call_id, to: message.from });
-      return;
-    }
+    if (this._call) return;
     this._pendingOffer = message;
     this._call = {
       id: message.call_id,
@@ -307,10 +317,13 @@ class HouseVoiceWalkie extends HTMLElement {
       }
     };
     peer.oniceconnectionstatechange = () => this._diagnose("ice_state", peer.iceConnectionState);
-    peer.ontrack = ({ streams }) => {
+    peer.ontrack = ({ track, streams }) => {
       if (!this._isCurrentCall(call, peer)) return;
+      const remoteStream = streams[0] || new MediaStream([track]);
+      this._remoteStream = remoteStream;
       const audio = this.shadowRoot.querySelector("audio");
-      if (audio && streams[0]) audio.srcObject = streams[0];
+      if (audio) audio.srcObject = remoteStream;
+      this._diagnose("remote_track", `${track.kind}:${track.readyState}:muted=${track.muted}`);
     };
     peer.onconnectionstatechange = () => {
       this._diagnose("peer_connection_state", peer.connectionState);
@@ -453,6 +466,7 @@ class HouseVoiceWalkie extends HTMLElement {
     }
     this._peer = null;
     this._localStream = null;
+    this._remoteStream = null;
     this._pendingCandidates = [];
     this._pendingOffer = null;
     this._call = null;
@@ -503,6 +517,8 @@ class HouseVoiceWalkie extends HTMLElement {
       .actions button { flex: 1; }
       audio { display: none; }
     </style>${panel}<audio autoplay playsinline></audio>`;
+    const audio = this.shadowRoot.querySelector("audio");
+    if (audio && this._remoteStream) audio.srcObject = this._remoteStream;
     this.shadowRoot.querySelectorAll("[data-call]").forEach((button) => {
       button.onclick = () => this._callRoom(button.dataset.call);
     });
@@ -513,14 +529,14 @@ class HouseVoiceWalkie extends HTMLElement {
   }
 }
 
-if (!customElements.get("housevoice-walkie")) {
-  customElements.define("housevoice-walkie", HouseVoiceWalkie);
+if (!customElements.get("housevoice-walkie-v14")) {
+  customElements.define("housevoice-walkie-v14", HouseVoiceWalkie);
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((card) => card.type === "housevoice-walkie")) {
+if (!window.customCards.some((card) => card.type === "housevoice-walkie-v14")) {
   window.customCards.push({
-    type: "housevoice-walkie",
+    type: "housevoice-walkie-v14",
     name: "HouseVoice Walkie",
     description: "Local HouseVoice room-to-room audio intercom",
     preview: false,
