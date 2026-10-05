@@ -172,6 +172,18 @@ class HouseVoiceWalkie extends HTMLElement {
     return HOUSEVOICE_WALKIE_OWNERS.get(this._roomId) === this;
   }
 
+  _pauseAutoRefresh() {
+    window.__housevoiceWalkieActive = true;
+    clearTimeout(window.__housevoiceAutoRefresh);
+    window.__housevoiceAutoRefresh = -1;
+  }
+
+  _resumeAutoRefresh() {
+    window.__housevoiceWalkieActive = false;
+    if (window.__housevoiceAutoRefresh !== -1 || !this.isConnected) return;
+    window.__housevoiceAutoRefresh = setTimeout(() => window.location.reload(), 30000);
+  }
+
   _signalKey(event, message) {
     if (event?.context?.id) return `context:${event.context.id}`;
     return `payload:${event?.time_fired || ""}:${JSON.stringify(message)}`;
@@ -242,6 +254,7 @@ class HouseVoiceWalkie extends HTMLElement {
   async _receiveOffer(message) {
     if (!this._ownsRoom() && !this._claimRoomOwnership()) return;
     if (this._call) return;
+    this._pauseAutoRefresh();
     this._pendingOffer = message;
     this._call = {
       id: message.call_id,
@@ -370,6 +383,7 @@ class HouseVoiceWalkie extends HTMLElement {
 
   async _callRoom(roomId, callId) {
     if (this._call || !this._claimRoomOwnership()) return false;
+    this._pauseAutoRefresh();
     callId ||= this._createCallId();
     this._error = null;
     const call = { id: callId, from: this._roomId, to: roomId, state: "calling" };
@@ -477,6 +491,7 @@ class HouseVoiceWalkie extends HTMLElement {
     if (audio) audio.srcObject = null;
     this._muted = false;
     this._render();
+    this._resumeAutoRefresh();
   }
 
   _render() {
@@ -529,14 +544,14 @@ class HouseVoiceWalkie extends HTMLElement {
   }
 }
 
-if (!customElements.get("housevoice-walkie-v14")) {
-  customElements.define("housevoice-walkie-v14", HouseVoiceWalkie);
+if (!customElements.get("housevoice-walkie-v16")) {
+  customElements.define("housevoice-walkie-v16", HouseVoiceWalkie);
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((card) => card.type === "housevoice-walkie-v14")) {
+if (!window.customCards.some((card) => card.type === "housevoice-walkie-v16")) {
   window.customCards.push({
-    type: "housevoice-walkie-v14",
+    type: "housevoice-walkie-v16",
     name: "HouseVoice Walkie",
     description: "Local HouseVoice room-to-room audio intercom",
     preview: false,
