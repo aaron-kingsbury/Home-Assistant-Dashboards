@@ -4637,23 +4637,30 @@
                         },
                         {
                           "color": "rgba(238, 245, 250, 0.92)"
+                        },
+                        {
+                          "pointer-events": "none"
+                        }
+                      ],
+                      "img_cell": [
+                        {
+                          "pointer-events": "none"
                         }
                       ]
                     },
                     "tap_action": {
-                      "action": "fire-dom-event",
-                      "browser_mod": {
-                        "data": {
-                          "code": "(() => { const origin = localStorage.getItem(\"housevoice_panel_origin\"); if (origin) { window.location.assign(origin); return; } if (window.history.length > 1) { window.history.back(); return; } const home = localStorage.getItem(\"housevoice_home\") || \"/my-floorplan\"; window.location.assign(home); })()"
-                        },
-                        "service": "browser_mod.javascript"
-                      }
+                      "action": "navigate",
+                      "navigation_path": "[[[ const queryOrigin = new URLSearchParams(location.search).get(\"housevoice_origin\"); if (queryOrigin === \"parents\") return \"/parents-room/parents-room\"; if (queryOrigin === \"hallway\") return \"/my-floorplan\"; return localStorage.getItem(\"housevoice_panel_origin\") || localStorage.getItem(\"housevoice_home\") || \"/my-floorplan\"; ]]]"
                     },
                     "type": "custom:button-card",
                     "view_layout": {
                       "align-self": "center",
                       "grid-area": "back",
                       "justify-self": "center"
+                    },
+                    "icon_tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "[[[ const queryOrigin = new URLSearchParams(location.search).get(\"housevoice_origin\"); if (queryOrigin === \"parents\") return \"/parents-room/parents-room\"; if (queryOrigin === \"hallway\") return \"/my-floorplan\"; return localStorage.getItem(\"housevoice_panel_origin\") || localStorage.getItem(\"housevoice_home\") || \"/my-floorplan\"; ]]]"
                     }
                   },
                   {
@@ -4725,6 +4732,62 @@
                       "grid-area": "title",
                       "justify-self": "stretch"
                     }
+                  },
+                  {
+                    "type": "custom:button-card",
+                    "show_icon": false,
+                    "show_name": false,
+                    "show_state": false,
+                    "variables": {
+                      "control_id": "housevoice_back_touch_overlay"
+                    },
+                    "tap_action": {
+                      "action": "navigate",
+                      "navigation_path": "[[[ const queryOrigin = new URLSearchParams(location.search).get(\"housevoice_origin\"); if (queryOrigin === \"parents\") return \"/parents-room/parents-room\"; if (queryOrigin === \"hallway\") return \"/my-floorplan\"; return localStorage.getItem(\"housevoice_panel_origin\") || localStorage.getItem(\"housevoice_home\") || \"/my-floorplan\"; ]]]"
+                    },
+                    "hold_action": {
+                      "action": "none"
+                    },
+                    "styles": {
+                      "card": [
+                        {
+                          "position": "fixed"
+                        },
+                        {
+                          "left": "5.90vw"
+                        },
+                        {
+                          "top": "6.94vh"
+                        },
+                        {
+                          "width": "6.04vw"
+                        },
+                        {
+                          "height": "9.65vh"
+                        },
+                        {
+                          "padding": 0
+                        },
+                        {
+                          "margin": 0
+                        },
+                        {
+                          "background": "transparent"
+                        },
+                        {
+                          "border": 0
+                        },
+                        {
+                          "box-shadow": "none"
+                        },
+                        {
+                          "z-index": 500
+                        },
+                        {
+                          "pointer-events": "auto"
+                        }
+                      ]
+                    }
                   }
                 ],
                 "layout": {
@@ -4749,7 +4812,7 @@
                   "style": ".hv-badge-wrap {\n  width: 100%;\n  height: 40px;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  box-sizing: border-box;\n  padding: 0 20px;\n  border-radius: 19px;\n  border: 1px solid rgba(146, 180, 207, 0.24);\n  background: rgba(8,22,37,0.76);\n}\n\n:host { margin-left: -150px !important; }"
                 },
                 "custom_fields": {
-                  "badge": "[[[\n  const lights = [\n    { id: 'input_boolean.primary_bedroom_light' },\n    { id: 'input_boolean.small_bedroom_light' },\n    { id: 'input_boolean.right_bedroom_light' },\n    { id: 'input_boolean.hall_light_mock' },\n    { id: 'input_boolean.kitchen_light_mock' },\n    { id: 'input_boolean.living_room_light_mock' },\n    { id: 'switch.tp_link_smart_switch' },\n    { id: 'light.driveway_floodlight' },\n    { id: 'light.outside_back_yard_floodlight' },\n    { id: 'light.reolink_duo_3_poe_floodlight' }\n  ];\n  const total = lights.length;\n  const on = lights.filter(l => states[l.id]?.state === 'on').length;\n  const color = on > 0 ? '#FFD089' : 'rgba(210,221,231,0.50)';\n  const text = on > 0 ? on + ' OF ' + total + ' LIGHTS ON' : 'ALL LIGHTS OFF';\n  return '<div class=\"hv-badge-wrap\" style=\"border-color:' + color + ';box-shadow:' + (on > 0 ? '0 0 0px rgba(255,208,137,0)' : 'none') + '\"><span style=\"font-size:13px;font-weight:700;letter-spacing:1.2px;color:' + color + '\">' + text + '</span></div>';\n]]]"
+                  "badge": "[[[\n  const lights = [\n    { id: 'input_boolean.primary_bedroom_light' },\n    { id: 'input_boolean.small_bedroom_light' },\n    { id: 'input_boolean.right_bedroom_light' },\n    { id: 'input_boolean.hall_light_mock' },\n    { id: 'input_boolean.kitchen_light_mock' },\n    { id: 'input_boolean.living_room_light_mock' },\n    { id: 'light.kasa_smart_wi_fi_light_switch' },\n    { id: 'light.driveway_floodlight' },\n    { id: 'light.outside_back_yard_floodlight' },\n    { id: 'light.reolink_duo_3_poe_floodlight' }\n  ];\n  const total = lights.length;\n  const on = lights.filter(l => states[l.id]?.state === 'on').length;\n  const color = on > 0 ? '#FFD089' : 'rgba(210,221,231,0.50)';\n  const text = on > 0 ? on + ' OF ' + total + ' LIGHTS ON' : 'ALL LIGHTS OFF';\n  return '<div class=\"hv-badge-wrap\" style=\"border-color:' + color + ';box-shadow:' + (on > 0 ? '0 0 0px rgba(255,208,137,0)' : 'none') + '\"><span style=\"font-size:13px;font-weight:700;letter-spacing:1.2px;color:' + color + '\">' + text + '</span></div>';\n]]]"
                 },
                 "show_icon": false,
                 "show_label": false,
@@ -4775,7 +4838,7 @@
                 "cards": [
                   {
                     "custom_fields": {
-                      "status": "[[[\n  const lights = [\n    { id: 'input_boolean.primary_bedroom_light' },\n    { id: 'input_boolean.small_bedroom_light' },\n    { id: 'input_boolean.right_bedroom_light' },\n    { id: 'input_boolean.hall_light_mock' },\n    { id: 'input_boolean.kitchen_light_mock' },\n    { id: 'input_boolean.living_room_light_mock' },\n    { id: 'switch.tp_link_smart_switch' },\n    { id: 'light.driveway_floodlight' },\n    { id: 'light.outside_back_yard_floodlight' },\n    { id: 'light.reolink_duo_3_poe_floodlight' }\n  ];\n  const on = lights.filter(l => states[l.id]?.state === 'on').length;\n  const isOn = on > 0;\n  const amber = '#FFD089';\n  const gray = 'rgba(210,221,231,0.45)';\n  const c = isOn ? amber : gray;\n  const fill = isOn\n    ? 'radial-gradient(circle at 50% 40%, rgba(255,208,137,0.45), rgba(255,190,80,0.18) 50%, transparent 65%)'\n    : 'transparent';\n  const iconColor = isOn ? amber : gray;\n  const glow = isOn ? '0 0 12px rgba(255,190,80,0.20)' : 'none';\n  const icon = isOn ? 'mdi:lightbulb' : 'mdi:lightbulb-outline';\n  return '<div style=\"width:190px;height:190px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + fill + ';border:10px solid ' + c + ';box-shadow:' + glow + ';color:' + iconColor + '\"><ha-icon icon=\"' + icon + '\" style=\"--mdc-icon-size:120px;width:120px;height:120px\"></ha-icon></div>';\n]]]\n"
+                      "status": "[[[\n  const lights = [\n    { id: 'input_boolean.primary_bedroom_light' },\n    { id: 'input_boolean.small_bedroom_light' },\n    { id: 'input_boolean.right_bedroom_light' },\n    { id: 'input_boolean.hall_light_mock' },\n    { id: 'input_boolean.kitchen_light_mock' },\n    { id: 'input_boolean.living_room_light_mock' },\n    { id: 'light.kasa_smart_wi_fi_light_switch' },\n    { id: 'light.driveway_floodlight' },\n    { id: 'light.outside_back_yard_floodlight' },\n    { id: 'light.reolink_duo_3_poe_floodlight' }\n  ];\n  const on = lights.filter(l => states[l.id]?.state === 'on').length;\n  const isOn = on > 0;\n  const amber = '#FFD089';\n  const gray = 'rgba(210,221,231,0.45)';\n  const c = isOn ? amber : gray;\n  const fill = isOn\n    ? 'radial-gradient(circle at 50% 40%, rgba(255,208,137,0.45), rgba(255,190,80,0.18) 50%, transparent 65%)'\n    : 'transparent';\n  const iconColor = isOn ? amber : gray;\n  const glow = isOn ? '0 0 12px rgba(255,190,80,0.20)' : 'none';\n  const icon = isOn ? 'mdi:lightbulb' : 'mdi:lightbulb-outline';\n  return '<div style=\"width:140px;height:140px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:' + fill + ';border:8px solid ' + c + ';box-shadow:' + glow + ';color:' + iconColor + '\"><ha-icon icon=\"' + icon + '\" style=\"--mdc-icon-size:84px;width:84px;height:84px\"></ha-icon></div>';\n]]]\n"
                     },
                     "show_icon": false,
                     "show_label": false,
@@ -4784,10 +4847,10 @@
                     "styles": {
                       "card": [
                         {
-                          "width": "210px"
+                          "width": "150px"
                         },
                         {
-                          "height": "210px"
+                          "height": "150px"
                         },
                         {
                           "margin": "0"
@@ -4805,7 +4868,7 @@
                           "box-shadow": "none"
                         },
                         {
-                          "margin-top": "35px"
+                          "margin-top": "0"
                         },
                         {
                           "margin-left": "0"
@@ -4855,7 +4918,7 @@
                       "style": ":host { margin-left: -5px !important; text-transform: lowercase !important; }"
                     },
                     "custom_fields": {
-                      "text": "[[[\n  const lights = [\n    { id: 'input_boolean.primary_bedroom_light' },\n    { id: 'input_boolean.small_bedroom_light' },\n    { id: 'input_boolean.right_bedroom_light' },\n    { id: 'input_boolean.hall_light_mock' },\n    { id: 'input_boolean.kitchen_light_mock' },\n    { id: 'input_boolean.living_room_light_mock' },\n    { id: 'switch.tp_link_smart_switch' },\n    { id: 'light.driveway_floodlight' },\n    { id: 'light.outside_back_yard_floodlight' },\n    { id: 'light.reolink_duo_3_poe_floodlight' }\n  ];\n  const total = lights.length;\n  const on = lights.filter(l => states[l.id]?.state === 'on').length;\n  const color = on > 0 ? '#FFD089' : 'rgba(210,221,231,0.50)';\n  return '<div style=\"text-align:center\"><span style=\"font-size:36px;font-weight:700;letter-spacing:1px;color:' + color + '\">' + on + '</span><br><span style=\"font-size:13px;color:rgba(190,205,218,0.62)\">of ' + total + ' Lights</span></div>';\n]]]\n"
+                      "text": "[[[\n  const lights = [\n    { id: 'input_boolean.primary_bedroom_light' },\n    { id: 'input_boolean.small_bedroom_light' },\n    { id: 'input_boolean.right_bedroom_light' },\n    { id: 'input_boolean.hall_light_mock' },\n    { id: 'input_boolean.kitchen_light_mock' },\n    { id: 'input_boolean.living_room_light_mock' },\n    { id: 'light.kasa_smart_wi_fi_light_switch' },\n    { id: 'light.driveway_floodlight' },\n    { id: 'light.outside_back_yard_floodlight' },\n    { id: 'light.reolink_duo_3_poe_floodlight' }\n  ];\n  const total = lights.length;\n  const on = lights.filter(l => states[l.id]?.state === 'on').length;\n  const color = on > 0 ? '#FFD089' : 'rgba(210,221,231,0.50)';\n  return '<div style=\"text-align:center\"><span style=\"font-size:36px;font-weight:700;letter-spacing:1px;color:' + color + '\">' + on + '</span><br><span style=\"font-size:13px;color:rgba(190,205,218,0.62)\">of ' + total + ' Lights</span></div>';\n]]]\n"
                     },
                     "show_icon": false,
                     "show_label": false,
@@ -5036,13 +5099,13 @@
                   "align-content": "center",
                   "grid-template-areas": "\"circle\" \"count\" \"brightness-label\" \"hint\"",
                   "grid-template-columns": "1fr",
-                  "grid-template-rows": "220px 68px 22px 34px",
+                  "grid-template-rows": "160px 55px 20px 30px",
                   "height": "100%",
                   "margin": 0,
                   "min-height": "0",
                   "overflow": "visible",
                   "padding": 0,
-                  "row-gap": "8px",
+                  "row-gap": "6px",
                   "width": "100%"
                 },
                 "layout_type": "custom:grid-layout",
@@ -5215,13 +5278,13 @@
                           "overflow": "hidden"
                         },
                         {
-                          "padding": "0 18px"
+                          "padding": "0 12px"
                         },
                         {
                           "margin": "0 0 0 -5px"
                         },
                         {
-                          "width": "198px"
+                          "width": "175px"
                         },
                         {
                           "min-width": "198px"
@@ -5230,7 +5293,7 @@
                           "max-width": "198px"
                         },
                         {
-                          "height": "75px"
+                          "height": "68px"
                         }
                       ],
                       "grid": [
@@ -5340,13 +5403,13 @@
                           "overflow": "hidden"
                         },
                         {
-                          "padding": "0 18px"
+                          "padding": "0 12px"
                         },
                         {
                           "margin": "0 0 0 -5px"
                         },
                         {
-                          "width": "198px"
+                          "width": "175px"
                         },
                         {
                           "min-width": "198px"
@@ -5355,7 +5418,7 @@
                           "max-width": "198px"
                         },
                         {
-                          "height": "75px"
+                          "height": "68px"
                         }
                       ],
                       "grid": [
@@ -5465,13 +5528,13 @@
                           "overflow": "hidden"
                         },
                         {
-                          "padding": "0 18px"
+                          "padding": "0 12px"
                         },
                         {
                           "margin": "0 0 0 -5px"
                         },
                         {
-                          "width": "198px"
+                          "width": "175px"
                         },
                         {
                           "min-width": "198px"
@@ -5480,7 +5543,7 @@
                           "max-width": "198px"
                         },
                         {
-                          "height": "75px"
+                          "height": "68px"
                         }
                       ],
                       "grid": [
@@ -5590,13 +5653,13 @@
                           "overflow": "hidden"
                         },
                         {
-                          "padding": "0 18px"
+                          "padding": "0 12px"
                         },
                         {
                           "margin": "0 0 0 -5px"
                         },
                         {
-                          "width": "198px"
+                          "width": "175px"
                         },
                         {
                           "min-width": "198px"
@@ -5605,7 +5668,7 @@
                           "max-width": "198px"
                         },
                         {
-                          "height": "75px"
+                          "height": "68px"
                         }
                       ],
                       "grid": [
@@ -5693,11 +5756,11 @@
                   "grid-template-rows": "24px repeat(4, auto)",
                   "height": "100%",
                   "margin": 0,
-                  "max-width": "300px",
+                  "max-width": "185px",
                   "min-height": "0",
                   "overflow": "visible",
-                  "padding": "0 4px",
-                  "row-gap": "15px",
+                  "padding": "0",
+                  "row-gap": "10px",
                   "width": "100%"
                 },
                 "layout_type": "custom:grid-layout",
@@ -5888,22 +5951,22 @@
                               "overflow": "hidden"
                             },
                             {
-                              "padding": "0 0 0 14px"
+                              "padding": "0 7px"
                             },
                             {
                               "margin": "0"
                             },
                             {
-                              "height": "50px"
+                              "height": "64px"
                             },
                             {
-                              "width": "225px"
+                              "width": "100%"
                             },
                             {
-                              "min-width": "225px"
+                              "min-width": "0"
                             },
                             {
-                              "max-width": "225px"
+                              "max-width": "none"
                             }
                           ],
                           "grid": [
@@ -5911,7 +5974,7 @@
                               "grid-template-areas": "\"i n l\""
                             },
                             {
-                              "grid-template-columns": "36px 1fr auto"
+                              "grid-template-columns": "27px minmax(0, 1fr) auto"
                             },
                             {
                               "grid-template-rows": "1fr"
@@ -5920,12 +5983,12 @@
                               "align-items": "center"
                             },
                             {
-                              "column-gap": "10px"
+                              "column-gap": "4px"
                             }
                           ],
                           "icon": [
                             {
-                              "width": "20px"
+                              "width": "18px"
                             }
                           ],
                           "label": [
@@ -5933,7 +5996,7 @@
                               "justify-self": "end"
                             },
                             {
-                              "font-size": "11px"
+                              "font-size": "10px"
                             },
                             {
                               "font-weight": 700
@@ -5942,7 +6005,7 @@
                               "letter-spacing": "0.8px"
                             },
                             {
-                              "margin-right": "5px"
+                              "margin-right": "0"
                             }
                           ],
                           "name": [
@@ -5953,7 +6016,7 @@
                               "color": "rgba(255,255,255,0.85)"
                             },
                             {
-                              "font-size": "13px"
+                              "font-size": "11.5px"
                             },
                             {
                               "font-weight": 600
@@ -6059,22 +6122,22 @@
                               "overflow": "hidden"
                             },
                             {
-                              "padding": "0 0 0 14px"
+                              "padding": "0 7px"
                             },
                             {
                               "margin": "0"
                             },
                             {
-                              "height": "50px"
+                              "height": "64px"
                             },
                             {
-                              "width": "225px"
+                              "width": "100%"
                             },
                             {
-                              "min-width": "225px"
+                              "min-width": "0"
                             },
                             {
-                              "max-width": "225px"
+                              "max-width": "none"
                             }
                           ],
                           "grid": [
@@ -6082,7 +6145,7 @@
                               "grid-template-areas": "\"i n l\""
                             },
                             {
-                              "grid-template-columns": "36px 1fr auto"
+                              "grid-template-columns": "27px minmax(0, 1fr) auto"
                             },
                             {
                               "grid-template-rows": "1fr"
@@ -6091,12 +6154,12 @@
                               "align-items": "center"
                             },
                             {
-                              "column-gap": "10px"
+                              "column-gap": "4px"
                             }
                           ],
                           "icon": [
                             {
-                              "width": "20px"
+                              "width": "18px"
                             }
                           ],
                           "label": [
@@ -6104,7 +6167,7 @@
                               "justify-self": "end"
                             },
                             {
-                              "font-size": "11px"
+                              "font-size": "10px"
                             },
                             {
                               "font-weight": 700
@@ -6113,7 +6176,7 @@
                               "letter-spacing": "0.8px"
                             },
                             {
-                              "margin-right": "5px"
+                              "margin-right": "0"
                             }
                           ],
                           "name": [
@@ -6124,7 +6187,7 @@
                               "color": "rgba(255,255,255,0.85)"
                             },
                             {
-                              "font-size": "13px"
+                              "font-size": "11.5px"
                             },
                             {
                               "font-weight": 600
@@ -6230,22 +6293,22 @@
                               "overflow": "hidden"
                             },
                             {
-                              "padding": "0 0 0 14px"
+                              "padding": "0 7px"
                             },
                             {
                               "margin": "0"
                             },
                             {
-                              "height": "50px"
+                              "height": "64px"
                             },
                             {
-                              "width": "225px"
+                              "width": "100%"
                             },
                             {
-                              "min-width": "225px"
+                              "min-width": "0"
                             },
                             {
-                              "max-width": "225px"
+                              "max-width": "none"
                             }
                           ],
                           "grid": [
@@ -6253,7 +6316,7 @@
                               "grid-template-areas": "\"i n l\""
                             },
                             {
-                              "grid-template-columns": "36px 1fr auto"
+                              "grid-template-columns": "27px minmax(0, 1fr) auto"
                             },
                             {
                               "grid-template-rows": "1fr"
@@ -6262,12 +6325,12 @@
                               "align-items": "center"
                             },
                             {
-                              "column-gap": "10px"
+                              "column-gap": "4px"
                             }
                           ],
                           "icon": [
                             {
-                              "width": "20px"
+                              "width": "18px"
                             }
                           ],
                           "label": [
@@ -6275,7 +6338,7 @@
                               "justify-self": "end"
                             },
                             {
-                              "font-size": "11px"
+                              "font-size": "10px"
                             },
                             {
                               "font-weight": 700
@@ -6284,7 +6347,7 @@
                               "letter-spacing": "0.8px"
                             },
                             {
-                              "margin-right": "5px"
+                              "margin-right": "0"
                             }
                           ],
                           "name": [
@@ -6295,7 +6358,7 @@
                               "color": "rgba(255,255,255,0.85)"
                             },
                             {
-                              "font-size": "13px"
+                              "font-size": "11.5px"
                             },
                             {
                               "font-weight": 600
@@ -6401,22 +6464,22 @@
                               "overflow": "hidden"
                             },
                             {
-                              "padding": "0 0 0 14px"
+                              "padding": "0 7px"
                             },
                             {
                               "margin": "0"
                             },
                             {
-                              "height": "50px"
+                              "height": "64px"
                             },
                             {
-                              "width": "225px"
+                              "width": "100%"
                             },
                             {
-                              "min-width": "225px"
+                              "min-width": "0"
                             },
                             {
-                              "max-width": "225px"
+                              "max-width": "none"
                             }
                           ],
                           "grid": [
@@ -6424,7 +6487,7 @@
                               "grid-template-areas": "\"i n l\""
                             },
                             {
-                              "grid-template-columns": "36px 1fr auto"
+                              "grid-template-columns": "27px minmax(0, 1fr) auto"
                             },
                             {
                               "grid-template-rows": "1fr"
@@ -6433,12 +6496,12 @@
                               "align-items": "center"
                             },
                             {
-                              "column-gap": "10px"
+                              "column-gap": "4px"
                             }
                           ],
                           "icon": [
                             {
-                              "width": "20px"
+                              "width": "18px"
                             }
                           ],
                           "label": [
@@ -6446,7 +6509,7 @@
                               "justify-self": "end"
                             },
                             {
-                              "font-size": "11px"
+                              "font-size": "10px"
                             },
                             {
                               "font-weight": 700
@@ -6455,7 +6518,7 @@
                               "letter-spacing": "0.8px"
                             },
                             {
-                              "margin-right": "5px"
+                              "margin-right": "0"
                             }
                           ],
                           "name": [
@@ -6466,7 +6529,7 @@
                               "color": "rgba(255,255,255,0.85)"
                             },
                             {
-                              "font-size": "13px"
+                              "font-size": "11.5px"
                             },
                             {
                               "font-weight": 600
@@ -6572,22 +6635,22 @@
                               "overflow": "hidden"
                             },
                             {
-                              "padding": "0 0 0 14px"
+                              "padding": "0 7px"
                             },
                             {
                               "margin": "0"
                             },
                             {
-                              "height": "50px"
+                              "height": "64px"
                             },
                             {
-                              "width": "225px"
+                              "width": "100%"
                             },
                             {
-                              "min-width": "225px"
+                              "min-width": "0"
                             },
                             {
-                              "max-width": "225px"
+                              "max-width": "none"
                             }
                           ],
                           "grid": [
@@ -6595,7 +6658,7 @@
                               "grid-template-areas": "\"i n l\""
                             },
                             {
-                              "grid-template-columns": "36px 1fr auto"
+                              "grid-template-columns": "27px minmax(0, 1fr) auto"
                             },
                             {
                               "grid-template-rows": "1fr"
@@ -6604,12 +6667,12 @@
                               "align-items": "center"
                             },
                             {
-                              "column-gap": "10px"
+                              "column-gap": "4px"
                             }
                           ],
                           "icon": [
                             {
-                              "width": "20px"
+                              "width": "18px"
                             }
                           ],
                           "label": [
@@ -6617,7 +6680,7 @@
                               "justify-self": "end"
                             },
                             {
-                              "font-size": "11px"
+                              "font-size": "10px"
                             },
                             {
                               "font-weight": 700
@@ -6626,7 +6689,7 @@
                               "letter-spacing": "0.8px"
                             },
                             {
-                              "margin-right": "5px"
+                              "margin-right": "0"
                             }
                           ],
                           "name": [
@@ -6637,7 +6700,7 @@
                               "color": "rgba(255,255,255,0.85)"
                             },
                             {
-                              "font-size": "13px"
+                              "font-size": "11.5px"
                             },
                             {
                               "font-weight": 600
@@ -6743,22 +6806,22 @@
                               "overflow": "hidden"
                             },
                             {
-                              "padding": "0 0 0 14px"
+                              "padding": "0 7px"
                             },
                             {
                               "margin": "0"
                             },
                             {
-                              "height": "50px"
+                              "height": "64px"
                             },
                             {
-                              "width": "225px"
+                              "width": "100%"
                             },
                             {
-                              "min-width": "225px"
+                              "min-width": "0"
                             },
                             {
-                              "max-width": "225px"
+                              "max-width": "none"
                             }
                           ],
                           "grid": [
@@ -6766,7 +6829,7 @@
                               "grid-template-areas": "\"i n l\""
                             },
                             {
-                              "grid-template-columns": "36px 1fr auto"
+                              "grid-template-columns": "27px minmax(0, 1fr) auto"
                             },
                             {
                               "grid-template-rows": "1fr"
@@ -6775,12 +6838,12 @@
                               "align-items": "center"
                             },
                             {
-                              "column-gap": "10px"
+                              "column-gap": "4px"
                             }
                           ],
                           "icon": [
                             {
-                              "width": "20px"
+                              "width": "18px"
                             }
                           ],
                           "label": [
@@ -6788,7 +6851,7 @@
                               "justify-self": "end"
                             },
                             {
-                              "font-size": "11px"
+                              "font-size": "10px"
                             },
                             {
                               "font-weight": 700
@@ -6797,7 +6860,7 @@
                               "letter-spacing": "0.8px"
                             },
                             {
-                              "margin-right": "5px"
+                              "margin-right": "0"
                             }
                           ],
                           "name": [
@@ -6808,7 +6871,7 @@
                               "color": "rgba(255,255,255,0.85)"
                             },
                             {
-                              "font-size": "13px"
+                              "font-size": "11.5px"
                             },
                             {
                               "font-weight": 600
@@ -6840,12 +6903,12 @@
                         }
                       },
                       {
-                        "entity": "switch.tp_link_smart_switch",
+                        "entity": "light.kasa_smart_wi_fi_light_switch",
                         "hold_action": {
                           "action": "more-info"
                         },
                         "icon": "mdi:light-switch-outline",
-                        "label": "[[[ return entity.state === 'on' ? 'ON' : 'OFF'; ]]]",
+                        "label": "[[[ return entity.state === 'unavailable' ? 'UNAVAILABLE' : (entity.state === 'on' ? 'ON' : 'OFF'); ]]]",
                         "name": "Hallway Switch",
                         "show_icon": true,
                         "show_label": true,
@@ -6914,22 +6977,22 @@
                               "overflow": "hidden"
                             },
                             {
-                              "padding": "0 0 0 14px"
+                              "padding": "0 7px"
                             },
                             {
                               "margin": "0"
                             },
                             {
-                              "height": "50px"
+                              "height": "64px"
                             },
                             {
-                              "width": "225px"
+                              "width": "100%"
                             },
                             {
-                              "min-width": "225px"
+                              "min-width": "0"
                             },
                             {
-                              "max-width": "225px"
+                              "max-width": "none"
                             }
                           ],
                           "grid": [
@@ -6937,7 +7000,7 @@
                               "grid-template-areas": "\"i n l\""
                             },
                             {
-                              "grid-template-columns": "36px 1fr auto"
+                              "grid-template-columns": "27px minmax(0, 1fr) auto"
                             },
                             {
                               "grid-template-rows": "1fr"
@@ -6946,12 +7009,12 @@
                               "align-items": "center"
                             },
                             {
-                              "column-gap": "10px"
+                              "column-gap": "4px"
                             }
                           ],
                           "icon": [
                             {
-                              "width": "20px"
+                              "width": "18px"
                             }
                           ],
                           "label": [
@@ -6959,7 +7022,7 @@
                               "justify-self": "end"
                             },
                             {
-                              "font-size": "11px"
+                              "font-size": "10px"
                             },
                             {
                               "font-weight": 700
@@ -6968,7 +7031,7 @@
                               "letter-spacing": "0.8px"
                             },
                             {
-                              "margin-right": "5px"
+                              "margin-right": "0"
                             }
                           ],
                           "name": [
@@ -6979,7 +7042,7 @@
                               "color": "rgba(255,255,255,0.85)"
                             },
                             {
-                              "font-size": "13px"
+                              "font-size": "11.5px"
                             },
                             {
                               "font-weight": 600
@@ -7000,10 +7063,10 @@
                         },
                         "tap_action": {
                           "action": "call-service",
+                          "service": "light.toggle",
                           "data": {
-                            "entity_id": "switch.tp_link_smart_switch"
-                          },
-                          "service": "switch.toggle"
+                            "entity_id": "light.kasa_smart_wi_fi_light_switch"
+                          }
                         },
                         "type": "custom:button-card",
                         "view_layout": {
@@ -7012,15 +7075,16 @@
                       }
                     ],
                     "layout": {
-                      "grid-template-columns": "1fr",
+                      "grid-template-columns": "repeat(2, minmax(0, 1fr))",
                       "height": "100%",
                       "margin": 0,
                       "min-height": "0",
                       "overflow-x": "hidden",
-                      "overflow-y": "auto",
+                      "overflow-y": "hidden",
                       "padding": 0,
-                      "row-gap": "6px",
-                      "width": "100%"
+                      "row-gap": "8px",
+                      "width": "100%",
+                      "column-gap": "8px"
                     },
                     "layout_type": "custom:grid-layout",
                     "type": "custom:layout-card",
@@ -7110,7 +7174,7 @@
                         },
                         "icon": "mdi:light-flood-down",
                         "label": "[[[ return entity.state === 'on' ? 'ON' : 'OFF'; ]]]",
-                        "name": "Driveway Duo 3 Light",
+                        "name": "Driveway",
                         "show_icon": true,
                         "show_label": true,
                         "show_name": true,
@@ -7178,22 +7242,22 @@
                               "overflow": "hidden"
                             },
                             {
-                              "padding": "0"
+                              "padding": "0 7px"
                             },
                             {
                               "margin": "0"
                             },
                             {
-                              "height": "50px"
+                              "height": "70px"
                             },
                             {
-                              "width": "200px"
+                              "width": "100%"
                             },
                             {
-                              "min-width": "200px"
+                              "min-width": "0"
                             },
                             {
-                              "max-width": "200px"
+                              "max-width": "none"
                             }
                           ],
                           "grid": [
@@ -7201,7 +7265,7 @@
                               "grid-template-areas": "\"i n l\""
                             },
                             {
-                              "grid-template-columns": "36px 1fr auto"
+                              "grid-template-columns": "27px minmax(0, 1fr) auto"
                             },
                             {
                               "grid-template-rows": "1fr"
@@ -7210,12 +7274,12 @@
                               "align-items": "center"
                             },
                             {
-                              "column-gap": "10px"
+                              "column-gap": "4px"
                             }
                           ],
                           "icon": [
                             {
-                              "width": "20px"
+                              "width": "18px"
                             }
                           ],
                           "label": [
@@ -7223,7 +7287,7 @@
                               "justify-self": "end"
                             },
                             {
-                              "font-size": "11px"
+                              "font-size": "10px"
                             },
                             {
                               "font-weight": 700
@@ -7240,7 +7304,7 @@
                               "color": "rgba(255,255,255,0.85)"
                             },
                             {
-                              "font-size": "13px"
+                              "font-size": "11.5px"
                             },
                             {
                               "font-weight": 600
@@ -7278,7 +7342,7 @@
                         },
                         "icon": "mdi:light-flood-down",
                         "label": "[[[ return entity.state === 'on' ? 'ON' : 'OFF'; ]]]",
-                        "name": "Backyard Duo 3 Light",
+                        "name": "Backyard",
                         "show_icon": true,
                         "show_label": true,
                         "show_name": true,
@@ -7346,22 +7410,22 @@
                               "overflow": "hidden"
                             },
                             {
-                              "padding": "0"
+                              "padding": "0 7px"
                             },
                             {
                               "margin": "0"
                             },
                             {
-                              "height": "50px"
+                              "height": "70px"
                             },
                             {
-                              "width": "200px"
+                              "width": "100%"
                             },
                             {
-                              "min-width": "200px"
+                              "min-width": "0"
                             },
                             {
-                              "max-width": "200px"
+                              "max-width": "none"
                             }
                           ],
                           "grid": [
@@ -7369,7 +7433,7 @@
                               "grid-template-areas": "\"i n l\""
                             },
                             {
-                              "grid-template-columns": "36px 1fr auto"
+                              "grid-template-columns": "27px minmax(0, 1fr) auto"
                             },
                             {
                               "grid-template-rows": "1fr"
@@ -7378,12 +7442,12 @@
                               "align-items": "center"
                             },
                             {
-                              "column-gap": "10px"
+                              "column-gap": "4px"
                             }
                           ],
                           "icon": [
                             {
-                              "width": "20px"
+                              "width": "18px"
                             }
                           ],
                           "label": [
@@ -7391,7 +7455,7 @@
                               "justify-self": "end"
                             },
                             {
-                              "font-size": "11px"
+                              "font-size": "10px"
                             },
                             {
                               "font-weight": 700
@@ -7408,7 +7472,7 @@
                               "color": "rgba(255,255,255,0.85)"
                             },
                             {
-                              "font-size": "13px"
+                              "font-size": "11.5px"
                             },
                             {
                               "font-weight": 600
@@ -7446,7 +7510,7 @@
                         },
                         "icon": "mdi:light-flood-down",
                         "label": "[[[ return entity.state === 'on' ? 'ON' : 'OFF'; ]]]",
-                        "name": "Cul-de-sac Duo 3 Light",
+                        "name": "Cul-de-sac",
                         "show_icon": true,
                         "show_label": true,
                         "show_name": true,
@@ -7514,22 +7578,22 @@
                               "overflow": "hidden"
                             },
                             {
-                              "padding": "0"
+                              "padding": "0 7px"
                             },
                             {
                               "margin": "0"
                             },
                             {
-                              "height": "50px"
+                              "height": "70px"
                             },
                             {
-                              "width": "200px"
+                              "width": "100%"
                             },
                             {
-                              "min-width": "200px"
+                              "min-width": "0"
                             },
                             {
-                              "max-width": "200px"
+                              "max-width": "none"
                             }
                           ],
                           "grid": [
@@ -7537,7 +7601,7 @@
                               "grid-template-areas": "\"i n l\""
                             },
                             {
-                              "grid-template-columns": "36px 1fr auto"
+                              "grid-template-columns": "27px minmax(0, 1fr) auto"
                             },
                             {
                               "grid-template-rows": "1fr"
@@ -7546,12 +7610,12 @@
                               "align-items": "center"
                             },
                             {
-                              "column-gap": "10px"
+                              "column-gap": "4px"
                             }
                           ],
                           "icon": [
                             {
-                              "width": "20px"
+                              "width": "18px"
                             }
                           ],
                           "label": [
@@ -7559,7 +7623,7 @@
                               "justify-self": "end"
                             },
                             {
-                              "font-size": "11px"
+                              "font-size": "10px"
                             },
                             {
                               "font-weight": 700
@@ -7576,7 +7640,7 @@
                               "color": "rgba(255,255,255,0.85)"
                             },
                             {
-                              "font-size": "13px"
+                              "font-size": "11.5px"
                             },
                             {
                               "font-weight": 600
@@ -7614,7 +7678,7 @@
                       "min-height": "0",
                       "overflow-x": "hidden",
                       "padding": 0,
-                      "row-gap": "6px",
+                      "row-gap": "10px",
                       "width": "100%"
                     },
                     "layout_type": "custom:grid-layout",
@@ -7722,32 +7786,35 @@
                   ]
                 },
                 "tap_action": {
-                  "action": "fire-dom-event",
-                  "browser_mod": {
-                    "data": {
-                      "code": "(() => { const home = localStorage.getItem(\"housevoice_home\") || \"/my-floorplan\"; window.location.assign(home); })()"
-                    },
-                    "service": "browser_mod.javascript"
-                  }
+                  "action": "navigate",
+                  "navigation_path": "[[[ const queryOrigin = new URLSearchParams(location.search).get(\"housevoice_origin\"); if (queryOrigin === \"parents\") return \"/parents-room/parents-room\"; if (queryOrigin === \"hallway\") return \"/my-floorplan\"; return localStorage.getItem(\"housevoice_home\") || \"/my-floorplan\"; ]]]"
                 },
                 "type": "custom:button-card",
                 "view_layout": {
                   "align-self": "stretch",
                   "grid-area": "footer",
                   "justify-self": "stretch"
+                },
+                "icon_tap_action": {
+                  "action": "navigate",
+                  "navigation_path": "[[[ const queryOrigin = new URLSearchParams(location.search).get(\"housevoice_origin\"); if (queryOrigin === \"parents\") return \"/parents-room/parents-room\"; if (queryOrigin === \"hallway\") return \"/my-floorplan\"; return localStorage.getItem(\"housevoice_home\") || \"/my-floorplan\"; ]]]"
+                },
+                "name_tap_action": {
+                  "action": "navigate",
+                  "navigation_path": "[[[ const queryOrigin = new URLSearchParams(location.search).get(\"housevoice_origin\"); if (queryOrigin === \"parents\") return \"/parents-room/parents-room\"; if (queryOrigin === \"hallway\") return \"/my-floorplan\"; return localStorage.getItem(\"housevoice_home\") || \"/my-floorplan\"; ]]]"
                 }
               }
             ],
             "layout": {
               "column-gap": "0px",
               "grid-template-areas": "\"header header header header badge .\" \"left divider1 scenes divider2 house-lights ext-lights\" \"footer footer footer footer footer footer\"",
-              "grid-template-columns": "minmax(270px,0.85fr) 1px minmax(240px,1fr) 1px minmax(280px,1.2fr) 1.2fr",
+              "grid-template-columns": "155px 1px 185px 1px minmax(300px, 1fr) 170px",
               "grid-template-rows": "76px minmax(0, 1fr) 58px",
               "height": "100%",
               "margin": 0,
               "overflow": "visible",
               "padding": 0,
-              "row-gap": "10px",
+              "row-gap": "8px",
               "width": "100%"
             },
             "layout_type": "custom:grid-layout",
