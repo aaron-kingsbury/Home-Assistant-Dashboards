@@ -63,6 +63,7 @@ class HouseVoiceWalkie extends HTMLElement {
     this._errorTimer = null;
     this._requestPending = false;
     this._portal = null;
+    this._portalRoot = null;
   }
 
   setConfig(config) {
@@ -560,17 +561,25 @@ class HouseVoiceWalkie extends HTMLElement {
 
   _ensurePortal() {
     if (this._portal?.isConnected) return this._portal;
-    const portal = document.createElement("div");
+    const portal = document.createElement("dialog");
     portal.dataset.housevoiceWalkieOverlay = this._clientId;
-    portal.attachShadow({ mode: "open" });
+    portal.style.cssText = "position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;overflow:visible";
+    const surface = document.createElement("div");
+    surface.attachShadow({ mode: "open" });
+    portal.appendChild(surface);
+    portal.addEventListener("cancel", (event) => event.preventDefault());
     document.body.appendChild(portal);
+    portal.showModal();
     this._portal = portal;
+    this._portalRoot = surface.shadowRoot;
     return portal;
   }
 
   _removePortal() {
+    if (this._portal?.open) this._portal.close();
     this._portal?.remove();
     this._portal = null;
+    this._portalRoot = null;
   }
 
   _escapeHtml(value) {
@@ -614,9 +623,10 @@ class HouseVoiceWalkie extends HTMLElement {
       this._removePortal();
       return;
     }
-    const portalRoot = this._ensurePortal().shadowRoot;
+    this._ensurePortal();
+    const portalRoot = this._portalRoot;
     portalRoot.innerHTML = `<style>
-      :host { all: initial; }
+      :host { all: initial; position: fixed; inset: 0; z-index: 2147483000; display: block; pointer-events: auto; }
       .overlay { position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 16px; background: rgba(0, 4, 14, .58); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
       .modal { width: min(390px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; box-sizing: border-box; padding: 22px; color: #f4f8ff; text-align: center; background: linear-gradient(145deg, rgba(6, 23, 48, .98), rgba(20, 7, 38, .98)); border: 1px solid #346f9d; border-radius: 20px; box-shadow: 0 18px 70px rgba(0, 0, 0, .72), inset 0 1px 0 rgba(255, 255, 255, .05); }
       .chooser { border-color: #7043ad; }
@@ -655,14 +665,24 @@ class HouseVoiceWalkie extends HTMLElement {
   }
 }
 
-if (!customElements.get("housevoice-walkie-v18")) {
-  customElements.define("housevoice-walkie-v18", HouseVoiceWalkie);
+const registeredWalkieV19 = customElements.get("housevoice-walkie-v19");
+if (registeredWalkieV19) {
+  for (const name of Object.getOwnPropertyNames(HouseVoiceWalkie.prototype)) {
+    if (name === "constructor") continue;
+    Object.defineProperty(
+      registeredWalkieV19.prototype,
+      name,
+      Object.getOwnPropertyDescriptor(HouseVoiceWalkie.prototype, name),
+    );
+  }
+} else {
+  customElements.define("housevoice-walkie-v19", HouseVoiceWalkie);
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((card) => card.type === "housevoice-walkie-v18")) {
+if (!window.customCards.some((card) => card.type === "housevoice-walkie-v19")) {
   window.customCards.push({
-    type: "housevoice-walkie-v18",
+    type: "housevoice-walkie-v19",
     name: "HouseVoice Walkie",
     description: "Local HouseVoice room-to-room audio intercom",
     preview: false,
