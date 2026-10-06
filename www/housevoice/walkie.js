@@ -59,7 +59,10 @@ class HouseVoiceWalkie extends HTMLElement {
     this._call = null;
     this._muted = false;
     this._error = null;
+    this._errorDetail = null;
+    this._errorTimer = null;
     this._requestPending = false;
+    this._portal = null;
   }
 
   setConfig(config) {
@@ -95,6 +98,7 @@ class HouseVoiceWalkie extends HTMLElement {
     this._unsubscribe?.();
     this._unsubscribe = null;
     this._cleanup(Boolean(this._call));
+    this._removePortal();
   }
 
   async _subscribe() {
@@ -239,8 +243,10 @@ class HouseVoiceWalkie extends HTMLElement {
     if (message.kind === "busy") {
       this._requestPending = false;
       this._error = "Walkie is busy";
+      this._errorDetail = "Another Walkie call is already in progress.";
       this._diagnose("busy", `call_id=${message.call_id}`);
       this._render();
+      this._scheduleErrorClear();
       return;
     }
     if (message.kind === "offer") {
@@ -394,6 +400,7 @@ class HouseVoiceWalkie extends HTMLElement {
     this._pauseAutoRefresh();
     callId ||= this._createCallId();
     this._error = null;
+    this._errorDetail = null;
     const call = { id: callId, from: this._roomId, to: roomId, state: "calling" };
     this._call = call;
     this._render();
@@ -404,6 +411,7 @@ class HouseVoiceWalkie extends HTMLElement {
     } catch (error) {
       if (!this._isCurrentCall(call)) return false;
       this._error = error.message;
+      this._errorDetail = "Please try again.";
       this._diagnose("error", `${error.name}: ${error.message}`);
       this._call.state = "error";
       this._render();
@@ -416,6 +424,7 @@ class HouseVoiceWalkie extends HTMLElement {
     if (this._call || this._requestPending || !target?.available || !this._claimRoomOwnership()) return;
     this._requestPending = true;
     this._error = null;
+    this._errorDetail = null;
     this._render();
     const callId = this._createCallId();
     try {
@@ -427,6 +436,7 @@ class HouseVoiceWalkie extends HTMLElement {
     } catch (error) {
       this._requestPending = false;
       this._error = error.message;
+      this._errorDetail = "The call could not connect.";
       this._diagnose("request_error", `${error.name}: ${error.message}`);
       this._render();
     }
@@ -441,6 +451,7 @@ class HouseVoiceWalkie extends HTMLElement {
   async _answer() {
     if (!this._pendingOffer || !this._call) return;
     this._error = null;
+    this._errorDetail = null;
     const offer = this._pendingOffer;
     this._pendingOffer = null;
     this._call.state = "answering";
@@ -469,6 +480,7 @@ class HouseVoiceWalkie extends HTMLElement {
     } catch (error) {
       if (!this._isCurrentCall(call)) return;
       this._error = error.message;
+      this._errorDetail = "The call could not be answered.";
       this._diagnose("error", `${error.name}: ${error.message}`);
       this._call.state = "error";
       this._render();
@@ -521,8 +533,50 @@ class HouseVoiceWalkie extends HTMLElement {
     const audio = this.shadowRoot.querySelector("audio");
     if (audio) audio.srcObject = null;
     this._muted = false;
+    this._error = null;
+    this._errorDetail = null;
+    clearTimeout(this._errorTimer);
+    this._errorTimer = null;
     this._render();
     this._resumeAutoRefresh();
+  }
+
+  _scheduleErrorClear() {
+    clearTimeout(this._errorTimer);
+    this._errorTimer = setTimeout(() => {
+      this._error = null;
+      this._errorDetail = null;
+      this._render();
+    }, 4500);
+  }
+
+  _dismissError() {
+    clearTimeout(this._errorTimer);
+    this._errorTimer = null;
+    this._error = null;
+    this._errorDetail = null;
+    this._render();
+  }
+
+  _ensurePortal() {
+    if (this._portal?.isConnected) return this._portal;
+    const portal = document.createElement("div");
+    portal.dataset.housevoiceWalkieOverlay = this._clientId;
+    portal.attachShadow({ mode: "open" });
+    document.body.appendChild(portal);
+    this._portal = portal;
+    return portal;
+  }
+
+  _removePortal() {
+    this._portal?.remove();
+    this._portal = null;
+  }
+
+  _escapeHtml(value) {
+    const text = document.createElement("span");
+    text.textContent = String(value ?? "");
+    return text.innerHTML;
   }
 
   _render() {
@@ -532,61 +586,83 @@ class HouseVoiceWalkie extends HTMLElement {
     this.toggleAttribute("active", Boolean(call));
     this.toggleAttribute("visible", this._alwaysVisible || Boolean(call));
     const target = call && HOUSEVOICE_WALKIE_PARTICIPANTS[call.from === this._roomId ? call.to : call.from];
+    const label = this._escapeHtml(target?.name || "Room");
     const buttons = Object.entries(HOUSEVOICE_WALKIE_PARTICIPANTS)
       .filter(([id]) => id !== this._roomId)
-      .map(([id, item]) => `<button data-call="${id}" ${item.available ? "" : "disabled"}>CALL ${item.name.toUpperCase()}<small>${item.available ? `${item.name}'s Room` : "Unavailable — not configured"}</small></button>`)
+      .map(([id, item]) => `<button class="target" data-call="${id}" ${item.available ? "" : "disabled"}><span>${this._escapeHtml(item.name)}</span><small>${item.available ? "Available" : "Unavailable"}</small></button>`)
       .join("");
-    let panel = `<section class="idle"><strong>WHO DO YOU WANT TO CALL?</strong>${buttons}${this._requestPending ? "<p>Starting call…</p>" : this._error ? `<p class="error">${this._error}</p>` : ""}</section>`;
-    if (call) {
-      const label = target?.name || "Room";
-      if (call.state === "incoming") {
-        panel = `<section><div class="eyebrow">INCOMING WALKIE</div><h2>${label}</h2><p>${label} is calling ${room.name}'s Room</p><div class="actions"><button data-answer>ANSWER</button><button class="secondary" data-decline>DECLINE</button></div></section>`;
-      } else {
-        const state = call.state === "connected" ? "CONNECTED" : call.state === "error" ? "ERROR" : "CALLING";
-        panel = `<section><div class="eyebrow">${state}</div><h2>${label}</h2><p>${this._error || (call.state === "connected" ? "Two-way audio is live" : "Waiting for an answer")}</p><div class="actions">${call.state === "connected" ? `<button data-mute>${this._muted ? "UNMUTE" : "MUTE"}</button>` : ""}<button class="secondary" data-end>END CALL</button></div></section>`;
-      }
+    let panel = `<section class="modal chooser"><div class="eyebrow">WALKIE</div><h2>Who do you want to call?</h2><div class="targets">${buttons}</div>${this._requestPending ? "<p class=\"progress\">Starting call…</p>" : ""}</section>`;
+    if (this._error && !call) {
+      panel = `<section class="modal error-state"><div class="eyebrow">WALKIE</div><h2>${this._escapeHtml(this._error)}</h2><p>${this._escapeHtml(this._errorDetail || "Please try again.")}</p><button data-dismiss-error>OK</button></section>`;
+    } else if (call?.state === "incoming") {
+      panel = `<section class="modal incoming"><div class="eyebrow">INCOMING WALKIE</div><h2>📡 ${label} is calling</h2><p>Walkie call from ${label}</p><div class="actions"><button data-answer>ANSWER</button><button class="secondary" data-decline>DECLINE</button></div></section>`;
+    } else if (call?.state === "connected") {
+      panel = `<section class="modal connected"><div class="eyebrow">WALKIE</div><h2>📡 Talking with ${label}</h2><p class="status"><span class="dot"></span>${this._muted ? "Connected · Microphone muted" : "Connected"}</p><div class="actions"><button data-mute>${this._muted ? "UNMUTE" : "MUTE"}</button><button class="secondary danger" data-end>END CALL</button></div></section>`;
+    } else if (call?.state === "error") {
+      panel = `<section class="modal error-state"><div class="eyebrow">WALKIE ERROR</div><h2>Could not call ${label}</h2><p>${this._escapeHtml(this._errorDetail || this._error || "Please try again.")}</p><button class="secondary" data-end>DISMISS</button></section>`;
+    } else if (call) {
+      panel = `<section class="modal outgoing"><div class="eyebrow">OUTGOING WALKIE</div><h2>📡 Calling ${label}</h2><p>Waiting for ${label} to answer…</p><button class="secondary danger" data-end>CANCEL</button></section>`;
     }
-    this.shadowRoot.innerHTML = `<style>
-      :host { display: block; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; position: fixed; inset: 0; z-index: 9999; font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-      :host([visible]) { width: auto; height: auto; overflow: visible; opacity: 1; pointer-events: auto; }
-      .idle { display: flex; gap: 8px; }
-      section { min-width: 280px; padding: 26px; color: #f4f8ff; background: linear-gradient(145deg, rgba(6, 23, 48, .98), rgba(11, 5, 28, .98)); border: 1px solid #28658e; border-radius: 20px; box-shadow: 0 18px 70px rgba(0, 0, 0, .6); }
-      :host([active]) section { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(430px, calc(100vw - 40px)); box-sizing: border-box; text-align: center; }
-      button { display: block; width: 100%; min-height: 52px; margin-top: 10px; padding: 10px 16px; border: 1px solid #2ea8ff; border-radius: 12px; background: rgba(12, 72, 130, .65); color: #f4f8ff; font-size: 15px; font-weight: 700; letter-spacing: .8px; cursor: pointer; }
-      .idle { display: grid; gap: 10px; }
-      .idle button { width: 100%; margin-top: 0; }
-      button:disabled { border-color: #526273; background: rgba(42, 49, 58, .7); color: #8794a1; cursor: not-allowed; }
-      button:disabled small { color: #a5afb8; }
-      .error { margin-top: 10px; color: #ff9a9a; }
-      button small { display: block; margin-top: 3px; color: #8fcfff; font-size: 11px; font-weight: 400; letter-spacing: 0; }
-      button.secondary { border-color: #9c65d6; background: rgba(55, 25, 78, .7); }
-      .eyebrow { color: #00e9ad; font-size: 12px; letter-spacing: 2px; }
-      h2 { margin: 10px 0 4px; font-size: 30px; }
-      p { margin: 0 0 16px; color: rgba(217, 237, 255, .75); }
-      .actions { display: flex; gap: 10px; }
-      .actions button { flex: 1; }
-      audio { display: none; }
-    </style>${panel}<audio autoplay playsinline></audio>`;
+    if (!this.shadowRoot.querySelector("audio")) {
+      this.shadowRoot.innerHTML = `<style>:host { display: block; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; } audio { display: none; }</style><audio autoplay playsinline></audio>`;
+    }
     const audio = this.shadowRoot.querySelector("audio");
     if (audio && this._remoteStream) audio.srcObject = this._remoteStream;
-    this.shadowRoot.querySelectorAll("[data-call]").forEach((button) => {
+
+    const showOverlay = this._alwaysVisible || Boolean(call) || this._requestPending || Boolean(this._error);
+    if (!showOverlay) {
+      this._removePortal();
+      return;
+    }
+    const portalRoot = this._ensurePortal().shadowRoot;
+    portalRoot.innerHTML = `<style>
+      :host { all: initial; }
+      .overlay { position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 16px; background: rgba(0, 4, 14, .58); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .modal { width: min(390px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; box-sizing: border-box; padding: 22px; color: #f4f8ff; text-align: center; background: linear-gradient(145deg, rgba(6, 23, 48, .98), rgba(20, 7, 38, .98)); border: 1px solid #346f9d; border-radius: 20px; box-shadow: 0 18px 70px rgba(0, 0, 0, .72), inset 0 1px 0 rgba(255, 255, 255, .05); }
+      .chooser { border-color: #7043ad; }
+      .outgoing { border-color: #347fc0; }
+      .incoming { border-color: #9d56d6; box-shadow: 0 18px 70px rgba(0, 0, 0, .72), 0 0 24px rgba(157, 86, 214, .22); }
+      .connected { border-color: #00b98f; }
+      .error-state { border-color: #d4678e; }
+      .eyebrow { color: #75caff; font-size: 12px; font-weight: 700; letter-spacing: 2.2px; }
+      .incoming .eyebrow { color: #d49aff; }
+      .connected .eyebrow { color: #55e4bd; }
+      h2 { margin: 10px 0 6px; overflow-wrap: anywhere; color: #f7f9ff; font-size: clamp(22px, 5.2vw, 30px); line-height: 1.16; }
+      p { margin: 0 0 17px; overflow-wrap: anywhere; color: rgba(217, 237, 255, .78); font-size: 15px; line-height: 1.35; }
+      .targets { display: grid; gap: 10px; margin-top: 17px; }
+      button { display: block; width: 100%; min-height: 56px; box-sizing: border-box; margin: 0; padding: 10px 16px; border: 1px solid #2ea8ff; border-radius: 13px; background: rgba(12, 72, 130, .72); color: #f4f8ff; font: inherit; font-size: 16px; font-weight: 750; letter-spacing: .6px; cursor: pointer; touch-action: manipulation; }
+      button.target { display: flex; align-items: center; justify-content: space-between; gap: 12px; text-align: left; }
+      button small { flex: 0 0 auto; color: #8fcfff; font-size: 12px; font-weight: 500; letter-spacing: 0; }
+      button:disabled { border-color: #535b72; background: rgba(42, 45, 63, .74); color: #939bad; cursor: not-allowed; }
+      button:disabled small { color: #9aa1ae; }
+      button.secondary { border-color: #8a55c7; background: rgba(63, 28, 91, .76); }
+      button.danger { border-color: #bd527d; background: rgba(88, 24, 55, .76); }
+      .actions { display: flex; gap: 10px; }
+      .actions button { flex: 1 1 0; min-width: 0; }
+      .status { display: flex; align-items: center; justify-content: center; gap: 8px; color: #8de8ce; }
+      .dot { width: 9px; height: 9px; flex: 0 0 auto; border-radius: 50%; background: #35e0ae; box-shadow: 0 0 10px rgba(53, 224, 174, .7); }
+      .progress { margin: 12px 0 0; }
+      @media (max-height: 420px) { .modal { padding: 17px 19px; } h2 { margin-top: 7px; } .targets { margin-top: 12px; } button { min-height: 50px; } }
+    </style><div class="overlay" role="dialog" aria-modal="true">${panel}</div>`;
+    portalRoot.querySelectorAll("[data-call]").forEach((button) => {
       button.onclick = () => this._requestCall(button.dataset.call);
     });
-    this.shadowRoot.querySelector("[data-answer]")?.addEventListener("click", () => this._answer());
-    this.shadowRoot.querySelector("[data-decline]")?.addEventListener("click", () => this._decline());
-    this.shadowRoot.querySelector("[data-end]")?.addEventListener("click", () => this._end());
-    this.shadowRoot.querySelector("[data-mute]")?.addEventListener("click", () => this._toggleMute());
+    portalRoot.querySelector("[data-answer]")?.addEventListener("click", () => this._answer());
+    portalRoot.querySelector("[data-decline]")?.addEventListener("click", () => this._decline());
+    portalRoot.querySelector("[data-end]")?.addEventListener("click", () => this._end());
+    portalRoot.querySelector("[data-mute]")?.addEventListener("click", () => this._toggleMute());
+    portalRoot.querySelector("[data-dismiss-error]")?.addEventListener("click", () => this._dismissError());
   }
 }
 
-if (!customElements.get("housevoice-walkie-v17")) {
-  customElements.define("housevoice-walkie-v17", HouseVoiceWalkie);
+if (!customElements.get("housevoice-walkie-v18")) {
+  customElements.define("housevoice-walkie-v18", HouseVoiceWalkie);
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((card) => card.type === "housevoice-walkie-v17")) {
+if (!window.customCards.some((card) => card.type === "housevoice-walkie-v18")) {
   window.customCards.push({
-    type: "housevoice-walkie-v17",
+    type: "housevoice-walkie-v18",
     name: "HouseVoice Walkie",
     description: "Local HouseVoice room-to-room audio intercom",
     preview: false,

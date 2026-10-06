@@ -24,7 +24,7 @@
     },
     {
       "type": "module",
-      "url": "/local/housevoice/walkie.js?v=17"
+      "url": "/local/housevoice/walkie.js?v=18"
     }
   ],
   "views": [
@@ -592,7 +592,7 @@
                     "content": {
                       "always_visible": true,
                       "room_id": "cora",
-                      "type": "custom:housevoice-walkie-v17"
+                      "type": "custom:housevoice-walkie-v18"
                     },
                     "dismissable": true,
                     "initial_style": "classic",
@@ -606,7 +606,7 @@
             {
               "always_visible": false,
               "room_id": "cora",
-              "type": "custom:housevoice-walkie-v17"
+              "type": "custom:housevoice-walkie-v18"
             }
           ],
           "columns": 1,
@@ -1125,7 +1125,7 @@
             {
               "always_visible": false,
               "room_id": "cora",
-              "type": "custom:housevoice-walkie-v17"
+              "type": "custom:housevoice-walkie-v18"
             }
           ],
           "columns": 1,
@@ -2089,7 +2089,7 @@
             {
               "always_visible": false,
               "room_id": "cora",
-              "type": "custom:housevoice-walkie-v17"
+              "type": "custom:housevoice-walkie-v18"
             }
           ],
           "columns": 1,
@@ -2607,7 +2607,7 @@
             {
               "always_visible": false,
               "room_id": "cora",
-              "type": "custom:housevoice-walkie-v17"
+              "type": "custom:housevoice-walkie-v18"
             },
             {
               "custom_fields": {
@@ -3350,7 +3350,7 @@
                     "content": {
                       "always_visible": true,
                       "room_id": "graham",
-                      "type": "custom:housevoice-walkie-v17"
+                      "type": "custom:housevoice-walkie-v18"
                     },
                     "dismissable": true,
                     "initial_style": "classic",
@@ -3364,7 +3364,7 @@
             {
               "always_visible": false,
               "room_id": "graham",
-              "type": "custom:housevoice-walkie-v17"
+              "type": "custom:housevoice-walkie-v18"
             }
           ],
           "columns": 1,
@@ -3883,7 +3883,7 @@
             {
               "always_visible": false,
               "room_id": "graham",
-              "type": "custom:housevoice-walkie-v17"
+              "type": "custom:housevoice-walkie-v18"
             }
           ],
           "columns": 1,
@@ -4846,7 +4846,7 @@
             {
               "always_visible": false,
               "room_id": "graham",
-              "type": "custom:housevoice-walkie-v17"
+              "type": "custom:housevoice-walkie-v18"
             }
           ],
           "columns": 1,
@@ -5515,7 +5515,7 @@
             {
               "always_visible": false,
               "room_id": "graham",
-              "type": "custom:housevoice-walkie-v17"
+              "type": "custom:housevoice-walkie-v18"
             }
           ],
           "columns": 1,
