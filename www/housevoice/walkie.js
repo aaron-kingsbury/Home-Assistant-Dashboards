@@ -1,39 +1,39 @@
-const HOUSEVOICE_WALKIE_ROOMS = {
+const HOUSEVOICE_WALKIE_PARTICIPANTS = {
   graham: {
+    id: "graham",
     name: "Graham",
     assist: "assist_satellite.vaca_96ed4d2c4",
     media_player: "media_player.vaca_96ed4d2c4_media_player",
     home_path: "/kids-rooms/grahams-room",
     walkie_path: "/kids-rooms/grahams-room",
     peer_id: "graham",
-    enabled: true,
+    available: true,
+    presence_entity: "assist_satellite.vaca_96ed4d2c4",
+    browser_id: "browser_mod_9dc10b6c_933f892f",
   },
   cora: {
+    id: "cora",
     name: "Cora",
     assist: "assist_satellite.vaca_c958413a0",
     media_player: "media_player.cora_s_room_display_media_player",
     home_path: "/kids-rooms/home",
     walkie_path: "/kids-rooms/home",
     peer_id: "cora",
-    enabled: true,
+    available: true,
+    presence_entity: "assist_satellite.vaca_c958413a0",
+    browser_id: "browser_mod_6ed46135_9e8ea402",
   },
-  room3: {
-    name: "Room 3",
+  parents: {
+    id: "parents",
+    name: "Parents",
     assist: null,
     media_player: null,
     home_path: null,
     walkie_path: null,
-    peer_id: "room3",
-    enabled: false,
-  },
-  room4: {
-    name: "Room 4",
-    assist: null,
-    media_player: null,
-    home_path: null,
-    walkie_path: null,
-    peer_id: "room4",
-    enabled: false,
+    peer_id: "parents",
+    available: false,
+    presence_entity: null,
+    browser_id: null,
   },
 };
 
@@ -59,11 +59,12 @@ class HouseVoiceWalkie extends HTMLElement {
     this._call = null;
     this._muted = false;
     this._error = null;
+    this._requestPending = false;
   }
 
   setConfig(config) {
     const configuredRoom = config?.room_id || config?.room;
-    this._roomId = HOUSEVOICE_WALKIE_ROOMS[configuredRoom]
+    this._roomId = HOUSEVOICE_WALKIE_PARTICIPANTS[configuredRoom]
       ? configuredRoom
       : window.location.pathname.includes("graham")
         ? "graham"
@@ -93,7 +94,7 @@ class HouseVoiceWalkie extends HTMLElement {
   disconnectedCallback() {
     this._unsubscribe?.();
     this._unsubscribe = null;
-    this._cleanup(false);
+    this._cleanup(Boolean(this._call));
   }
 
   async _subscribe() {
@@ -233,6 +234,13 @@ class HouseVoiceWalkie extends HTMLElement {
         this._diagnose("duplicate_client_released", `kind=${message.kind}`);
         this._cleanup(false);
       }
+      return;
+    }
+    if (message.kind === "busy") {
+      this._requestPending = false;
+      this._error = "Walkie is busy";
+      this._diagnose("busy", `call_id=${message.call_id}`);
+      this._render();
       return;
     }
     if (message.kind === "offer") {
@@ -403,7 +411,29 @@ class HouseVoiceWalkie extends HTMLElement {
     }
   }
 
+  async _requestCall(roomId) {
+    const target = HOUSEVOICE_WALKIE_PARTICIPANTS[roomId];
+    if (this._call || this._requestPending || !target?.available || !this._claimRoomOwnership()) return;
+    this._requestPending = true;
+    this._error = null;
+    this._render();
+    const callId = this._createCallId();
+    try {
+      await this._hass.callService("housevoice_walkie", "call", {
+        from: this._roomId,
+        to: roomId,
+        call_id: callId,
+      });
+    } catch (error) {
+      this._requestPending = false;
+      this._error = error.message;
+      this._diagnose("request_error", `${error.name}: ${error.message}`);
+      this._render();
+    }
+  }
+
   async _startOutgoing(roomId, callId) {
+    this._requestPending = false;
     if (this._call || !this._ownsRoom()) return;
     return this._callRoom(roomId, callId);
   }
@@ -484,6 +514,7 @@ class HouseVoiceWalkie extends HTMLElement {
     this._pendingCandidates = [];
     this._pendingOffer = null;
     this._call = null;
+    this._requestPending = false;
     if (this._ownsRoom()) HOUSEVOICE_WALKIE_OWNERS.delete(this._roomId);
     if (peer?.signalingState !== "closed") peer?.close();
     localStream?.getTracks().forEach((track) => track.stop());
@@ -496,16 +527,16 @@ class HouseVoiceWalkie extends HTMLElement {
 
   _render() {
     if (!this.shadowRoot || !this._roomId) return;
-    const room = HOUSEVOICE_WALKIE_ROOMS[this._roomId];
+    const room = HOUSEVOICE_WALKIE_PARTICIPANTS[this._roomId];
     const call = this._call;
     this.toggleAttribute("active", Boolean(call));
     this.toggleAttribute("visible", this._alwaysVisible || Boolean(call));
-    const target = call && HOUSEVOICE_WALKIE_ROOMS[call.from === this._roomId ? call.to : call.from];
-    const buttons = Object.entries(HOUSEVOICE_WALKIE_ROOMS)
-      .filter(([id, item]) => id !== this._roomId && item.enabled)
-      .map(([id, item]) => `<button data-call="${id}">CALL ${item.name.toUpperCase()}<small>${item.name}'s Room</small></button>`)
+    const target = call && HOUSEVOICE_WALKIE_PARTICIPANTS[call.from === this._roomId ? call.to : call.from];
+    const buttons = Object.entries(HOUSEVOICE_WALKIE_PARTICIPANTS)
+      .filter(([id]) => id !== this._roomId)
+      .map(([id, item]) => `<button data-call="${id}" ${item.available ? "" : "disabled"}>CALL ${item.name.toUpperCase()}<small>${item.available ? `${item.name}'s Room` : "Unavailable — not configured"}</small></button>`)
       .join("");
-    let panel = `<section class="idle"><strong>WALKIE</strong>${buttons}</section>`;
+    let panel = `<section class="idle"><strong>WHO DO YOU WANT TO CALL?</strong>${buttons}${this._requestPending ? "<p>Starting call…</p>" : this._error ? `<p class="error">${this._error}</p>` : ""}</section>`;
     if (call) {
       const label = target?.name || "Room";
       if (call.state === "incoming") {
@@ -522,7 +553,11 @@ class HouseVoiceWalkie extends HTMLElement {
       section { min-width: 280px; padding: 26px; color: #f4f8ff; background: linear-gradient(145deg, rgba(6, 23, 48, .98), rgba(11, 5, 28, .98)); border: 1px solid #28658e; border-radius: 20px; box-shadow: 0 18px 70px rgba(0, 0, 0, .6); }
       :host([active]) section { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(430px, calc(100vw - 40px)); box-sizing: border-box; text-align: center; }
       button { display: block; width: 100%; min-height: 52px; margin-top: 10px; padding: 10px 16px; border: 1px solid #2ea8ff; border-radius: 12px; background: rgba(12, 72, 130, .65); color: #f4f8ff; font-size: 15px; font-weight: 700; letter-spacing: .8px; cursor: pointer; }
-      .idle button { width: 190px; margin-top: 0; }
+      .idle { display: grid; gap: 10px; }
+      .idle button { width: 100%; margin-top: 0; }
+      button:disabled { border-color: #526273; background: rgba(42, 49, 58, .7); color: #8794a1; cursor: not-allowed; }
+      button:disabled small { color: #a5afb8; }
+      .error { margin-top: 10px; color: #ff9a9a; }
       button small { display: block; margin-top: 3px; color: #8fcfff; font-size: 11px; font-weight: 400; letter-spacing: 0; }
       button.secondary { border-color: #9c65d6; background: rgba(55, 25, 78, .7); }
       .eyebrow { color: #00e9ad; font-size: 12px; letter-spacing: 2px; }
@@ -535,7 +570,7 @@ class HouseVoiceWalkie extends HTMLElement {
     const audio = this.shadowRoot.querySelector("audio");
     if (audio && this._remoteStream) audio.srcObject = this._remoteStream;
     this.shadowRoot.querySelectorAll("[data-call]").forEach((button) => {
-      button.onclick = () => this._callRoom(button.dataset.call);
+      button.onclick = () => this._requestCall(button.dataset.call);
     });
     this.shadowRoot.querySelector("[data-answer]")?.addEventListener("click", () => this._answer());
     this.shadowRoot.querySelector("[data-decline]")?.addEventListener("click", () => this._decline());
@@ -544,14 +579,14 @@ class HouseVoiceWalkie extends HTMLElement {
   }
 }
 
-if (!customElements.get("housevoice-walkie-v16")) {
-  customElements.define("housevoice-walkie-v16", HouseVoiceWalkie);
+if (!customElements.get("housevoice-walkie-v17")) {
+  customElements.define("housevoice-walkie-v17", HouseVoiceWalkie);
 }
 
 window.customCards = window.customCards || [];
-if (!window.customCards.some((card) => card.type === "housevoice-walkie-v16")) {
+if (!window.customCards.some((card) => card.type === "housevoice-walkie-v17")) {
   window.customCards.push({
-    type: "housevoice-walkie-v16",
+    type: "housevoice-walkie-v17",
     name: "HouseVoice Walkie",
     description: "Local HouseVoice room-to-room audio intercom",
     preview: false,

@@ -24,7 +24,7 @@
     },
     {
       "type": "module",
-      "url": "/local/housevoice/walkie.js?v=16"
+      "url": "/local/housevoice/walkie.js?v=17"
     }
   ],
   "views": [
@@ -586,11 +586,19 @@
                 ]
               },
               "tap_action": {
-                "action": "call-service",
-                "service": "housevoice_walkie.call",
-                "service_data": {
-                  "from": "cora",
-                  "to": "graham"
+                "action": "fire-dom-event",
+                "browser_mod": {
+                  "data": {
+                    "content": {
+                      "always_visible": true,
+                      "room_id": "cora",
+                      "type": "custom:housevoice-walkie-v17"
+                    },
+                    "dismissable": true,
+                    "initial_style": "classic",
+                    "title": "Walkie"
+                  },
+                  "service": "browser_mod.popup"
                 }
               },
               "type": "custom:button-card"
@@ -598,7 +606,7 @@
             {
               "always_visible": false,
               "room_id": "cora",
-              "type": "custom:housevoice-walkie-v16"
+              "type": "custom:housevoice-walkie-v17"
             }
           ],
           "columns": 1,
@@ -1117,7 +1125,7 @@
             {
               "always_visible": false,
               "room_id": "cora",
-              "type": "custom:housevoice-walkie-v16"
+              "type": "custom:housevoice-walkie-v17"
             }
           ],
           "columns": 1,
@@ -2081,7 +2089,7 @@
             {
               "always_visible": false,
               "room_id": "cora",
-              "type": "custom:housevoice-walkie-v16"
+              "type": "custom:housevoice-walkie-v17"
             }
           ],
           "columns": 1,
@@ -2599,7 +2607,7 @@
             {
               "always_visible": false,
               "room_id": "cora",
-              "type": "custom:housevoice-walkie-v16"
+              "type": "custom:housevoice-walkie-v17"
             },
             {
               "custom_fields": {
@@ -3340,100 +3348,9 @@
                 "browser_mod": {
                   "data": {
                     "content": {
-                      "cards": [
-                        {
-                          "content": "## Who do you want to call?",
-                          "type": "markdown"
-                        },
-                        {
-                          "cards": [
-                            {
-                              "icon": "mdi:account-voice",
-                              "label": "Cora's Room",
-                              "name": "CORA",
-                              "show_label": true,
-                              "show_name": true,
-                              "show_state": false,
-                              "styles": {
-                                "card": [
-                                  {
-                                    "height": "150px"
-                                  },
-                                  {
-                                    "padding": "18px 8px"
-                                  },
-                                  {
-                                    "border-radius": "16px"
-                                  },
-                                  {
-                                    "display": "flex"
-                                  },
-                                  {
-                                    "flex-direction": "column"
-                                  },
-                                  {
-                                    "justify-content": "center"
-                                  }
-                                ],
-                                "grid": [
-                                  {
-                                    "grid-template-areas": "\"i\" \"n\" \"l\""
-                                  },
-                                  {
-                                    "grid-template-rows": "1fr min-content min-content"
-                                  },
-                                  {
-                                    "row-gap": "8px"
-                                  }
-                                ],
-                                "icon": [
-                                  {
-                                    "width": "72px"
-                                  },
-                                  {
-                                    "height": "72px"
-                                  }
-                                ],
-                                "label": [
-                                  {
-                                    "font-size": "17px"
-                                  },
-                                  {
-                                    "line-height": "1.2"
-                                  },
-                                  {
-                                    "color": "rgba(217,237,255,.78)"
-                                  }
-                                ],
-                                "name": [
-                                  {
-                                    "font-size": "27px"
-                                  },
-                                  {
-                                    "font-weight": "600"
-                                  },
-                                  {
-                                    "line-height": "1.1"
-                                  }
-                                ]
-                              },
-                              "tap_action": {
-                                "action": "call-service",
-                                "service": "housevoice_walkie.call",
-                                "service_data": {
-                                  "from": "graham",
-                                  "to": "cora"
-                                }
-                              },
-                              "type": "custom:button-card"
-                            }
-                          ],
-                          "columns": 1,
-                          "square": false,
-                          "type": "grid"
-                        }
-                      ],
-                      "type": "vertical-stack"
+                      "always_visible": true,
+                      "room_id": "graham",
+                      "type": "custom:housevoice-walkie-v17"
                     },
                     "dismissable": true,
                     "initial_style": "classic",
@@ -3447,7 +3364,7 @@
             {
               "always_visible": false,
               "room_id": "graham",
-              "type": "custom:housevoice-walkie-v16"
+              "type": "custom:housevoice-walkie-v17"
             }
           ],
           "columns": 1,
@@ -3966,7 +3883,7 @@
             {
               "always_visible": false,
               "room_id": "graham",
-              "type": "custom:housevoice-walkie-v16"
+              "type": "custom:housevoice-walkie-v17"
             }
           ],
           "columns": 1,
@@ -4929,7 +4846,7 @@
             {
               "always_visible": false,
               "room_id": "graham",
-              "type": "custom:housevoice-walkie-v16"
+              "type": "custom:housevoice-walkie-v17"
             }
           ],
           "columns": 1,
@@ -5598,7 +5515,7 @@
             {
               "always_visible": false,
               "room_id": "graham",
-              "type": "custom:housevoice-walkie-v16"
+              "type": "custom:housevoice-walkie-v17"
             }
           ],
           "columns": 1,

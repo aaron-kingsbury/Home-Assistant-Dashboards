@@ -20,8 +20,7 @@ CALL_TIMEOUT_SECONDS = 30
 ROOMS = {
     "graham": {"name": "Graham", "enabled": True},
     "cora": {"name": "Cora", "enabled": True},
-    "room3": {"name": "Room 3", "enabled": False},
-    "room4": {"name": "Room 4", "enabled": False},
+    "parents": {"name": "Parents", "enabled": False},
 }
 
 
@@ -58,6 +57,7 @@ class WalkieCoordinator:
                 {
                     vol.Required("from"): cv.string,
                     vol.Required("to"): cv.string,
+                    vol.Optional("call_id"): cv.string,
                 }
             ),
         )
@@ -97,6 +97,7 @@ class WalkieCoordinator:
     async def _call_service(self, service_call: Any) -> None:
         sender = service_call.data["from"]
         target = service_call.data["to"]
+        call_id = service_call.data.get("call_id") or f"{sender}-{target}"
         self._set_diagnostics(state="requested", sender=sender, target=target)
         if (
             sender not in ROOMS
@@ -104,13 +105,20 @@ class WalkieCoordinator:
             or sender == target
             or not ROOMS[sender]["enabled"]
             or not ROOMS[target]["enabled"]
-            or sender in self.active
-            or target in self.active
+            or bool(self.active)
         ):
             self._set_diagnostics(state="rejected", sender=sender, target=target)
+            self._forward(
+                {
+                    "kind": "busy",
+                    "call_id": call_id,
+                    "from": "housevoice_walkie",
+                    "to": sender,
+                }
+            )
             return
         call: dict[str, Any] = {
-            "call_id": f"{sender}-{target}",
+            "call_id": call_id,
             "from": sender,
             "to": target,
             "state": "ringing",
@@ -219,6 +227,9 @@ class WalkieCoordinator:
         }
         if kind == "offer":
             active = self.active.get(sender)
+            if self.active and not active:
+                self._forward({"kind": "decline", "call_id": call_id, "from": "housevoice_walkie", "to": sender})
+                return
             if active and (
                 active["call_id"] != call_id
                 or {active["from"], active["to"]} != {sender, target}
