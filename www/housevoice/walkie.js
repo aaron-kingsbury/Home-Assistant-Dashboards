@@ -26,13 +26,13 @@ const HOUSEVOICE_WALKIE_PARTICIPANTS = {
   parents: {
     id: "parents",
     name: "Parents",
-    assist: null,
-    media_player: null,
-    home_path: null,
-    walkie_path: null,
+    assist: "assist_satellite.vaca_a2fc97a76",
+    media_player: "media_player.vaca_a2fc97a76_media_player",
+    home_path: "/parents-room/parents-room",
+    walkie_path: "/parents-room/parents-room",
     peer_id: "parents",
-    available: false,
-    presence_entity: null,
+    available: true,
+    presence_entity: "assist_satellite.vaca_a2fc97a76",
     browser_id: null,
   },
 };
@@ -48,6 +48,7 @@ class HouseVoiceWalkie extends HTMLElement {
     this._roomId = null;
     this._clientId = this._createCallId();
     this._alwaysVisible = false;
+    this._featureLabel = "WALKIE";
     this._hass = null;
     this._unsubscribe = null;
     this._subscribePromise = null;
@@ -74,6 +75,7 @@ class HouseVoiceWalkie extends HTMLElement {
         ? "graham"
         : "cora";
     this._alwaysVisible = config?.always_visible !== false;
+    this._featureLabel = config?.feature_label || (this._roomId === "parents" ? "INTERCOM" : "WALKIE");
     this._render();
     if (this._hass) this._diagnose("room_detected", `room_id=${this._roomId}`);
   }
@@ -364,7 +366,13 @@ class HouseVoiceWalkie extends HTMLElement {
     };
 
     this._diagnose("microphone_request", `secure=${window.isSecureContext} mediaDevices=${Boolean(navigator.mediaDevices)} getUserMedia=${Boolean(navigator.mediaDevices?.getUserMedia)}`);
-    const localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const localStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      },
+    });
     if (!this._isCurrentCall(call, peer)) {
       this._discardPeer(peer, localStream);
       return false;
@@ -596,21 +604,22 @@ class HouseVoiceWalkie extends HTMLElement {
     this.toggleAttribute("visible", this._alwaysVisible || Boolean(call));
     const target = call && HOUSEVOICE_WALKIE_PARTICIPANTS[call.from === this._roomId ? call.to : call.from];
     const label = this._escapeHtml(target?.name || "Room");
+    const featureLabel = this._escapeHtml(this._featureLabel);
     const buttons = Object.entries(HOUSEVOICE_WALKIE_PARTICIPANTS)
       .filter(([id]) => id !== this._roomId)
       .map(([id, item]) => `<button class="target" data-call="${id}" ${item.available ? "" : "disabled"}><span>${this._escapeHtml(item.name)}</span><small>${item.available ? "Available" : "Unavailable"}</small></button>`)
       .join("");
-    let panel = `<section class="modal chooser"><div class="eyebrow">WALKIE</div><h2>Who do you want to call?</h2><div class="targets">${buttons}</div>${this._requestPending ? "<p class=\"progress\">Starting call…</p>" : ""}</section>`;
+    let panel = `<section class="modal chooser"><div class="eyebrow">${featureLabel}</div><h2>Who do you want to call?</h2><div class="targets">${buttons}</div>${this._requestPending ? "<p class=\"progress\">Starting call…</p>" : ""}</section>`;
     if (this._error && !call) {
-      panel = `<section class="modal error-state"><div class="eyebrow">WALKIE</div><h2>${this._escapeHtml(this._error)}</h2><p>${this._escapeHtml(this._errorDetail || "Please try again.")}</p><button data-dismiss-error>OK</button></section>`;
+      panel = `<section class="modal error-state"><div class="eyebrow">${featureLabel}</div><h2>${this._escapeHtml(this._error)}</h2><p>${this._escapeHtml(this._errorDetail || "Please try again.")}</p><button data-dismiss-error>OK</button></section>`;
     } else if (call?.state === "incoming") {
-      panel = `<section class="modal incoming"><div class="eyebrow">INCOMING WALKIE</div><h2>📡 ${label} is calling</h2><p>Walkie call from ${label}</p><div class="actions"><button data-answer>ANSWER</button><button class="secondary" data-decline>DECLINE</button></div></section>`;
+      panel = `<section class="modal incoming"><div class="eyebrow">INCOMING ${featureLabel}</div><h2>📡 ${label} is calling</h2><p>${featureLabel === "INTERCOM" ? "Intercom" : "Walkie"} call from ${label}</p><div class="actions"><button data-answer>ANSWER</button><button class="secondary" data-decline>DECLINE</button></div></section>`;
     } else if (call?.state === "connected") {
-      panel = `<section class="modal connected"><div class="eyebrow">WALKIE</div><h2>📡 Talking with ${label}</h2><p class="status"><span class="dot"></span>${this._muted ? "Connected · Microphone muted" : "Connected"}</p><div class="actions"><button data-mute>${this._muted ? "UNMUTE" : "MUTE"}</button><button class="secondary danger" data-end>END CALL</button></div></section>`;
+      panel = `<section class="modal connected"><div class="eyebrow">${featureLabel}</div><h2>📡 Connected to ${label}</h2><p class="status"><span class="dot"></span>${this._muted ? "Connected · Microphone muted" : "Connected"}</p><div class="actions"><button data-mute>${this._muted ? "UNMUTE" : "MUTE"}</button><button class="secondary danger" data-end>END CALL</button></div></section>`;
     } else if (call?.state === "error") {
-      panel = `<section class="modal error-state"><div class="eyebrow">WALKIE ERROR</div><h2>Could not call ${label}</h2><p>${this._escapeHtml(this._errorDetail || this._error || "Please try again.")}</p><button class="secondary" data-end>DISMISS</button></section>`;
+      panel = `<section class="modal error-state"><div class="eyebrow">${featureLabel} ERROR</div><h2>Could not call ${label}</h2><p>${this._escapeHtml(this._errorDetail || this._error || "Please try again.")}</p><button class="secondary" data-end>DISMISS</button></section>`;
     } else if (call) {
-      panel = `<section class="modal outgoing"><div class="eyebrow">OUTGOING WALKIE</div><h2>📡 Calling ${label}</h2><p>Waiting for ${label} to answer…</p><button class="secondary danger" data-end>CANCEL</button></section>`;
+      panel = `<section class="modal outgoing"><div class="eyebrow">OUTGOING ${featureLabel}</div><h2>📡 Calling ${label}</h2><p>Waiting for ${label} to answer…</p><button class="secondary danger" data-end>CANCEL</button></section>`;
     }
     if (!this.shadowRoot.querySelector("audio")) {
       this.shadowRoot.innerHTML = `<style>:host { display: block; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; } audio { display: none; }</style><audio autoplay playsinline></audio>`;

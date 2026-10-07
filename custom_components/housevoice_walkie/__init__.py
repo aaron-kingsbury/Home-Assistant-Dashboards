@@ -20,7 +20,7 @@ CALL_TIMEOUT_SECONDS = 30
 ROOMS = {
     "graham": {"name": "Graham", "enabled": True},
     "cora": {"name": "Cora", "enabled": True},
-    "parents": {"name": "Parents", "enabled": False},
+    "parents": {"name": "Parents", "enabled": True},
 }
 
 
