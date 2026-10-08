@@ -65,6 +65,10 @@ class HouseVoiceWalkie extends HTMLElement {
     this._requestPending = false;
     this._portal = null;
     this._portalRoot = null;
+    this._portalMode = null;
+    this._portalGuardTarget = null;
+    this._portalGuard = null;
+    this._connectedRenderTimer = null;
   }
 
   setConfig(config) {
@@ -95,9 +99,18 @@ class HouseVoiceWalkie extends HTMLElement {
 
   connectedCallback() {
     if (this._hass) this._subscribe();
+    requestAnimationFrame(() => {
+      if (this.isConnected) this._render();
+    });
+    clearTimeout(this._connectedRenderTimer);
+    this._connectedRenderTimer = setTimeout(() => {
+      if (this.isConnected) this._render();
+    }, 250);
   }
 
   disconnectedCallback() {
+    clearTimeout(this._connectedRenderTimer);
+    this._connectedRenderTimer = null;
     this._unsubscribe?.();
     this._unsubscribe = null;
     this._cleanup(Boolean(this._call));
@@ -567,27 +580,71 @@ class HouseVoiceWalkie extends HTMLElement {
     this._render();
   }
 
+  _findAncestorDialog() {
+    let node = this;
+    while (node) {
+      if (node.localName === "dialog" && node.open) return node;
+      node = node.assignedSlot || node.parentNode || node.getRootNode?.().host || null;
+    }
+    return null;
+  }
+
   _ensurePortal() {
-    if (this._portal?.isConnected) return this._portal;
-    const portal = document.createElement("dialog");
+    const ancestorDialog = this._findAncestorDialog();
+    const portalMode = ancestorDialog ? "inline" : "modal";
+    if (this._portal?.isConnected) {
+      if (this._portalMode === portalMode) return this._portal;
+      this._removePortal();
+    }
+    const portal = document.createElement(portalMode === "inline" ? "div" : "dialog");
     portal.dataset.housevoiceWalkieOverlay = this._clientId;
-    portal.style.cssText = "position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;overflow:visible";
+    portal.style.cssText = portalMode === "inline"
+      ? "display:block;width:100%;margin:0;padding:0;border:0;background:transparent;overflow:visible"
+      : "position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;overflow:visible";
     const surface = document.createElement("div");
     surface.attachShadow({ mode: "open" });
     portal.appendChild(surface);
     portal.addEventListener("cancel", (event) => event.preventDefault());
-    document.body.appendChild(portal);
-    portal.showModal();
+    for (const eventName of ["touchstart", "touchend", "pointerdown", "pointerup", "mousedown", "mouseup", "click"]) {
+      portal.addEventListener(eventName, (event) => event.stopPropagation());
+    }
+    (portalMode === "inline" ? this.shadowRoot : document.body).appendChild(portal);
+    if (portalMode === "modal") portal.showModal();
     this._portal = portal;
     this._portalRoot = surface.shadowRoot;
+    this._portalMode = portalMode;
+    this.toggleAttribute("inline-overlay", portalMode === "inline");
+    if (portalMode === "inline") {
+      this._portalGuardTarget = ancestorDialog;
+      this._portalGuard = (event) => {
+        const path = event.composedPath();
+        if (!path.includes(portal)) return;
+        const button = path.find((item) => item?.localName === "button");
+        if (!button || button.disabled) return;
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        if (button.dataset.call) this._requestCall(button.dataset.call);
+        else if (button.hasAttribute("data-answer")) this._answer();
+        else if (button.hasAttribute("data-decline")) this._decline();
+        else if (button.hasAttribute("data-end")) this._end();
+        else if (button.hasAttribute("data-mute")) this._toggleMute();
+        else if (button.hasAttribute("data-dismiss-error")) this._dismissError();
+      };
+      ancestorDialog.addEventListener("click", this._portalGuard, true);
+    }
     return portal;
   }
 
   _removePortal() {
-    if (this._portal?.open) this._portal.close();
+    this._portalGuardTarget?.removeEventListener("click", this._portalGuard, true);
+    this._portalGuardTarget = null;
+    this._portalGuard = null;
+    if (this._portal?.localName === "dialog" && this._portal.open) this._portal.close();
     this._portal?.remove();
     this._portal = null;
     this._portalRoot = null;
+    this._portalMode = null;
+    this.removeAttribute("inline-overlay");
   }
 
   _escapeHtml(value) {
@@ -622,7 +679,7 @@ class HouseVoiceWalkie extends HTMLElement {
       panel = `<section class="modal outgoing"><div class="eyebrow">OUTGOING ${featureLabel}</div><h2>📡 Calling ${label}</h2><p>Waiting for ${label} to answer…</p><button class="secondary danger" data-end>CANCEL</button></section>`;
     }
     if (!this.shadowRoot.querySelector("audio")) {
-      this.shadowRoot.innerHTML = `<style>:host { display: block; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; } audio { display: none; }</style><audio autoplay playsinline></audio>`;
+      this.shadowRoot.innerHTML = `<style>:host { display: block; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; } :host([inline-overlay]) { width: 100%; height: auto; overflow: visible; opacity: 1; pointer-events: auto; } audio { display: none; }</style><audio autoplay playsinline></audio>`;
     }
     const audio = this.shadowRoot.querySelector("audio");
     if (audio && this._remoteStream) audio.srcObject = this._remoteStream;
@@ -634,9 +691,10 @@ class HouseVoiceWalkie extends HTMLElement {
     }
     this._ensurePortal();
     const portalRoot = this._portalRoot;
+    const inlineOverlay = this._portalMode === "inline";
     portalRoot.innerHTML = `<style>
-      :host { all: initial; position: fixed; inset: 0; z-index: 2147483000; display: block; pointer-events: auto; }
-      .overlay { position: fixed; inset: 0; z-index: 2147483000; display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 16px; background: rgba(0, 4, 14, .58); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      :host { all: initial; ${inlineOverlay ? "display: block; width: 100%; pointer-events: auto;" : "position: fixed; inset: 0; z-index: 2147483000; display: block; pointer-events: auto;"} }
+      .overlay { ${inlineOverlay ? "position: relative; width: 100%;" : "position: fixed; inset: 0; z-index: 2147483000;"} display: flex; align-items: center; justify-content: center; box-sizing: border-box; padding: 16px; background: ${inlineOverlay ? "transparent" : "rgba(0, 4, 14, .58)"}; ${inlineOverlay ? "" : "backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);"} font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
       .modal { width: min(390px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow: auto; box-sizing: border-box; padding: 22px; color: #f4f8ff; text-align: center; background: linear-gradient(145deg, rgba(6, 23, 48, .98), rgba(20, 7, 38, .98)); border: 1px solid #346f9d; border-radius: 20px; box-shadow: 0 18px 70px rgba(0, 0, 0, .72), inset 0 1px 0 rgba(255, 255, 255, .05); }
       .chooser { border-color: #7043ad; }
       .outgoing { border-color: #347fc0; }
