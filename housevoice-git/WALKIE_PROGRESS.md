@@ -69,6 +69,7 @@ Repeat calls also passed: Parents → Graham, Graham → Cora, and Cora → Pare
 
 - `fa6ab6a` — working Graham/Cora baseline before Parents integration.
 - `ca3b5f1` — Parents enabled in shared Walkie signaling/frontend.
+- `c598338` — 9/9 RTP matrix, split DNS, Parents dashboard additions, and healthy-session reload protection.
 - Parents dashboard mirror additions are staged separately from pre-existing unrelated edits; do not stage the whole dirty file.
 
 ## Next exact action
