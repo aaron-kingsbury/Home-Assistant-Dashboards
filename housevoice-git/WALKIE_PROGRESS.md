@@ -18,6 +18,7 @@ Updated: 2026-10-08
 
 ## Confirmed working
 
+- Parents completed Home Assistant OAuth reauthorization after the invalid VACA credential was removed without clearing pairing. A fresh read-only verification confirmed a new persisted refresh credential, the original `paired_device_id`, the production `/parents-room/parents-room` dashboard, a connected HA WebSocket, and `/local/housevoice/walkie.js?v=19&build=6`.
 - On 2026-10-08 the production-path harness passed all six directions plus three repeat calls (9/9).
 - After the reported physical failure, a second harness reproduced and then passed the complete production touchscreen workflow in all six directions plus three repeats (9/9): dashboard button, visible room chooser, Calling/Incoming UI, visible ANSWER, connected RTP, visible END CALL, and idle cleanup.
 - The final 9/9 touchscreen matrix was rerun after Graham and Cora received a clean VACA refresh and loaded build 6 directly from the persisted Lovelace resource.
@@ -30,14 +31,17 @@ Updated: 2026-10-08
 
 ## Current failures/blockers
 
-- Parents VACA's stored external-auth refresh credential does not survive a cold HA page reload. The page can be restored with a short-lived in-memory token relay and then passes real calls, but a later hard reload returns to the HA init page.
-- VACA's native `externalApp.getExternalAuth` and `revokeExternalAuth` bridge methods return without issuing a token callback or navigating to the OAuth page on Parents, preventing autonomous renewal of VACA's stored refresh token.
-- Durable completion therefore requires one Parents VACA OAuth sign-in/reauthorization unless the native bridge starts responding. Do not re-pair the Wyoming/VACA integration.
+- Parents authentication is repaired. The remaining completion checks are three verified genuine VACA cold starts and the requested Parents ↔ Graham/Cora touchscreen regression.
 
 ## Root causes/fixes discovered
 
 - Parents originally used `http://192.168.50.10:8123`, giving `isSecureContext=false` and no `navigator.mediaDevices`; kids use `https://housevoice.duckdns.org` and do expose microphone APIs.
 - Parents VACA HA URL was changed to the same DuckDNS HTTPS origin.
+- Home Assistant Core logs correlate Parents (`192.168.50.146`, Ktor client) with repeated rejected `/auth/token` requests, including the fresh startup attempt. This proves the native bridge reaches HA and rules out DuckDNS/TLS, a missing refresh request, and loss of the stored credential.
+- VACA 0.13.4 source stores access/refresh tokens in Android SharedPreferences. On refresh failure it receives no usable access token and redirects to OAuth; it does not supply `externalAuthSetToken(false)` first. The observed `Uncaught (in promise) 1` is in that failed external-auth path and is not a Walkie/dashboard exception.
+- ADB inspection confirmed `refresh_token` persisted as a non-empty 128-character value while `paired_device_id` remained a separate setting. An on-device private preferences backup was created; only `auth_token`, `refresh_token`, and `token_expiry` were removed. `paired_device_id` was verified present before VACA was re-enabled.
+- VACA's foreground service automatically restarted after a normal `force-stop`, so the package was briefly disabled and re-enabled to obtain a genuine cold process start. The repaired start reached Home Assistant's OAuth login page for `https://vaca.homeassistant`; no app storage, pairing, dashboard, HA integration, or Walkie code was cleared.
+- After the one-time on-screen OAuth authorization, VACA stored a replacement refresh credential and loaded the Parents dashboard normally. The repeatable credential-safe procedure and proposed VACA correction are documented in `VACA_AUTH_RECOVERY.md`.
 - Added an AdGuard split-DNS filter mapping only `housevoice.duckdns.org` to `192.168.50.10`; direct AdGuard DNS verification returns `192.168.50.10`.
 - DevTools confirmed navigation reaches `192.168.50.10:443` with HTTP 200, proving split DNS and TLS routing work.
 - Kids frontend initialization was recovered by closing stale DevTools frontends and using VACA-managed refresh, then attaching to the new targets.
@@ -79,4 +83,4 @@ Repeat calls also passed: Parents → Graham, Graham → Cora, and Cora → Pare
 
 ## Next exact action
 
-Complete one OAuth sign-in/reauthorization inside Parents VACA so it stores a valid refresh token for `https://housevoice.duckdns.org`. Then cold-reload Parents, verify build 6 loads without token relay, rerun the 9-call touchscreen matrix, and create the final completion commit without unrelated working-tree changes.
+Perform three genuine Parents VACA cold starts and the Parents ↔ Graham/Cora touchscreen regression without token relay. If those pass, update this record with the results and create the focused completion checkpoint without unrelated working-tree changes.
