@@ -17,6 +17,10 @@
     {
       "type": "module",
       "url": "/local/community/kiosk-mode/kiosk-mode.js"
+    },
+    {
+      "type": "module",
+      "url": "/local/housevoice/walkie.js?v=19&build=4"
     }
   ],
   "views": [
@@ -369,6 +373,78 @@
                 }
               },
               "type": "custom:button-card"
+            },
+            {
+              "type": "custom:button-card",
+              "show_icon": false,
+              "show_name": false,
+              "show_state": false,
+              "styles": {
+                "card": [
+                  {
+                    "position": "fixed"
+                  },
+                  {
+                    "left": "70.03vw"
+                  },
+                  {
+                    "top": "53.28vh"
+                  },
+                  {
+                    "width": "22.37vw"
+                  },
+                  {
+                    "height": "10.48vh"
+                  },
+                  {
+                    "padding": 0
+                  },
+                  {
+                    "margin": 0
+                  },
+                  {
+                    "background": "transparent"
+                  },
+                  {
+                    "border": 0
+                  },
+                  {
+                    "box-shadow": "none"
+                  },
+                  {
+                    "border-radius": "12px"
+                  },
+                  {
+                    "z-index": 110
+                  },
+                  {
+                    "pointer-events": "auto"
+                  }
+                ]
+              },
+              "tap_action": {
+                "action": "fire-dom-event",
+                "browser_mod": {
+                  "service": "browser_mod.popup",
+                  "data": {
+                    "title": "Intercom",
+                    "content": {
+                      "type": "custom:housevoice-walkie-v19",
+                      "room_id": "parents",
+                      "feature_label": "INTERCOM",
+                      "always_visible": true
+                    },
+                    "dismissable": true,
+                    "initial_style": "classic"
+                  }
+                }
+              }
+            },
+            {
+              "type": "custom:housevoice-walkie-v19",
+              "room_id": "parents",
+              "feature_label": "INTERCOM",
+              "always_visible": false
             }
           ],
           "columns": 1,
