@@ -1,6 +1,6 @@
 # HOUSEVOICE Walkie/Intercom Progress
 
-Updated: 2026-10-08
+Updated: 2026-10-09
 
 ## Architecture
 
@@ -28,6 +28,8 @@ Updated: 2026-10-08
 - Historical physical Graham ↔ Cora tests also passed audible two-way audio, reverse calling, and repeat calling.
 - Backend and frontend syntax/config validation passed after Parents activation.
 - Local NGINX HTTPS endpoint for `housevoice.duckdns.org` answers successfully with the valid certificate origin.
+- Parents dashboard redesign was verified on the actual Echo Show 8 at a 961.5 × 600.9 CSS-pixel WebView on the 1280 × 800 physical display. The final device screenshot has no clipping, overlap, or panel overflow.
+- Physical ADB touchscreen taps passed all five bottom navigation targets, toggled and restored the Bedroom Light entity, and opened/dismissed the Intercom chooser with Graham and Cora available.
 
 ## Current failures/blockers
 
@@ -54,7 +56,8 @@ Updated: 2026-10-08
 
 - `www/housevoice/walkie.js`: Parents live entity/path mapping, INTERCOM branding, audio-processing constraints, and Browser Mod-safe physical touch handling.
 - `custom_components/housevoice_walkie/__init__.py`: Parents enabled.
-- Parents live dashboard: shared card/resource and INTERCOM hit target added without layout redesign.
+- Parents live dashboard and Git mirror: responsive reference-driven redesign with centered dynamic clock/weather, upper-right HOUSEVOICE branding, enlarged At a Glance and Quick Actions panels, larger bottom navigation, preserved automatic day/night backgrounds, and aligned physical touch overlays.
+- Parents dashboard resource was read back and corrected to `/local/housevoice/walkie.js?v=19&build=6` after the live storage copy was found on build 4.
 - Kids live dashboard and Git mirror: eight recovery timers no longer reload healthy sessions.
 - Global Lovelace resource: `/local/housevoice/walkie.js?v=19&build=6`.
 - `www/housevoice/duckdns-local-rewrite.txt`: narrow split-DNS filter; registered in AdGuard as `HouseVoice local HTTPS`.
