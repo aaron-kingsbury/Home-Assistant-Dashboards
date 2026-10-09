@@ -244,6 +244,7 @@ class HouseVoiceWalkie extends HTMLElement {
   }
 
   _receive(event) {
+    if (!this.isConnected) return;
     const message = event?.data || event;
     if (!message || message.to !== this._roomId || message.from === this._roomId) return;
     const signalKey = this._signalKey(event, message);

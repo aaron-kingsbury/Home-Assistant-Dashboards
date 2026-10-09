@@ -30,10 +30,12 @@ Updated: 2026-10-09
 - Local NGINX HTTPS endpoint for `housevoice.duckdns.org` answers successfully with the valid certificate origin.
 - Parents dashboard redesign was verified on the actual Echo Show 8 at a 961.5 × 600.9 CSS-pixel WebView on the 1280 × 800 physical display. The final device screenshot has no clipping, overlap, or panel overflow.
 - Physical ADB touchscreen taps passed all five bottom navigation targets, toggled and restored the Bedroom Light entity, and opened/dismissed the Intercom chooser with Graham and Cora available.
+- Parents passed three genuine VACA cold starts on 2026-10-09. Each test proved the previous PID was gone, created a new process, retained the OAuth refresh credential and `paired_device_id`, loaded `/parents-room/parents-room` without token relay, connected the HA WebSocket, rendered exactly one Parents Walkie card, and loaded build 6. The temporary private auth rollback backup was then deleted by its exact filename.
+- After deploying Walkie build 7, the final clean-load physical touchscreen matrix passed all six directions plus three repeat calls (9/9). Every call showed chooser/calling/incoming/answer/end UI, connected both WebRTC peers, increased inbound and outbound RTP packet/byte counters at both devices, hung up, and returned both endpoints to idle with no live tracks.
 
 ## Current failures/blockers
 
-- Parents authentication is repaired. The remaining completion checks are three verified genuine VACA cold starts and the requested Parents ↔ Graham/Cora touchscreen regression.
+- None. Parents authentication, cold-start persistence, ADB access, and the three-room physical touchscreen/RTP matrix are verified.
 
 ## Root causes/fixes discovered
 
@@ -51,15 +53,16 @@ Updated: 2026-10-09
 - The actual global Lovelace resource (ID `67c09047891942e8a4231fb3b6206ce8`) was updated from build 3 to build 4. Graham and Cora cold reloads then loaded build 4 directly.
 - Physical taps initially failed because the chooser was a second top-layer `<dialog>` behind Browser Mod's popup. The labels were visible, but Android hit-testing targeted Browser Mod's dialog; Browser Mod closed and the room handler never ran.
 - Rendering inside Browser Mod first exposed its asynchronous attachment and click-retargeting behavior. The final fix delays attachment detection, renders chooser/call controls inline in the existing popup, and captures Walkie action clicks before Browser Mod can dismiss the caller card. Hidden incoming-call cards retain the standalone modal path.
+- A later clean-device run exposed detached Walkie cards whose event subscriptions could still receive a signal before the live card and consume its shared deduplication key. Build 7 rejects every signal on a disconnected card before ownership or deduplication, preventing invisible stale instances from stealing incoming calls.
 
 ## Changes made
 
-- `www/housevoice/walkie.js`: Parents live entity/path mapping, INTERCOM branding, audio-processing constraints, and Browser Mod-safe physical touch handling.
+- `www/housevoice/walkie.js`: Parents live entity/path mapping, INTERCOM branding, audio-processing constraints, Browser Mod-safe physical touch handling, and the build-7 disconnected-card signaling guard.
 - `custom_components/housevoice_walkie/__init__.py`: Parents enabled.
 - Parents live dashboard and Git mirror: responsive reference-driven redesign with centered dynamic clock/weather, upper-right HOUSEVOICE branding, enlarged At a Glance and Quick Actions panels, larger bottom navigation, preserved automatic day/night backgrounds, and aligned physical touch overlays.
 - Parents dashboard resource was read back and corrected to `/local/housevoice/walkie.js?v=19&build=6` after the live storage copy was found on build 4.
 - Kids live dashboard and Git mirror: eight recovery timers no longer reload healthy sessions.
-- Global Lovelace resource: `/local/housevoice/walkie.js?v=19&build=6`.
+- Parents, kids, and global Lovelace resources: `/local/housevoice/walkie.js?v=19&build=7`.
 - `www/housevoice/duckdns-local-rewrite.txt`: narrow split-DNS filter; registered in AdGuard as `HouseVoice local HTTPS`.
 - Reusable real-device harness: `/data/v2/cache/opencode/housevoice-matrix.mjs`; latest detailed result: `/data/v2/cache/opencode/housevoice-matrix-results.json`.
 - Reusable touchscreen harness: `/data/v2/cache/opencode/housevoice-ui-matrix.mjs`; latest detailed result: `/data/v2/cache/opencode/housevoice-ui-matrix-results.json`.
@@ -86,4 +89,4 @@ Repeat calls also passed: Parents → Graham, Graham → Cora, and Cora → Pare
 
 ## Next exact action
 
-Perform three genuine Parents VACA cold starts and the Parents ↔ Graham/Cora touchscreen regression without token relay. If those pass, update this record with the results and create the focused completion checkpoint without unrelated working-tree changes.
+Completed. Preserve build 7 and the six-direction 9/9 regression as the known-good three-room baseline.
