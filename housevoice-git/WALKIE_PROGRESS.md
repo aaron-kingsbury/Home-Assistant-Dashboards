@@ -59,7 +59,7 @@ Updated: 2026-10-09
 
 - `www/housevoice/walkie.js`: Parents live entity/path mapping, INTERCOM branding, audio-processing constraints, Browser Mod-safe physical touch handling, and the build-7 disconnected-card signaling guard.
 - `custom_components/housevoice_walkie/__init__.py`: Parents enabled.
-- Parents live dashboard and Git mirror: responsive reference-driven redesign with centered dynamic clock/weather, upper-right HOUSEVOICE branding, enlarged At a Glance and Quick Actions panels, larger bottom navigation, preserved automatic day/night backgrounds, and aligned physical touch overlays.
+- Parents live dashboard and Git mirror: responsive reference-driven redesign with a larger centered clock, upper-left outdoor weather, no HOUSEVOICE branding, enlarged At a Glance and Quick Actions panels, raised bottom-navigation labels, `Thermostat` labels, preserved automatic day/night backgrounds, and aligned physical touch overlays.
 - Parents dashboard resource was read back and corrected to `/local/housevoice/walkie.js?v=19&build=6` after the live storage copy was found on build 4.
 - Kids live dashboard and Git mirror: eight recovery timers no longer reload healthy sessions.
 - Parents, kids, and global Lovelace resources: `/local/housevoice/walkie.js?v=19&build=7`.
@@ -79,6 +79,17 @@ Updated: 2026-10-09
 | Cora → Graham | PASS |
 
 Repeat calls also passed: Parents → Graham, Graham → Cora, and Cora → Parents.
+
+## 2026-10-09 touchscreen, layout, and clock follow-up
+
+- All three Android touch controllers were enabled and raw taps reached each focused, responsive VACA window, but no pointer/touch events reached Chromium. DOM hit-testing found no invisible overlay, open dialog, stale Walkie portal, peer, or media track.
+- A VACA-only force-stop/relaunch restored the native-to-WebView input bridge without clearing storage, OAuth, device pairing, or dashboard settings. Graham's restart also exposed the server's required VACA `0.13.4` minimum; it was updated in place from `0.13.3` with app data preserved. Parents and Cora were already on `0.13.4`.
+- Native Android touchscreen injection then reached DOM pointer/touch handlers on all three real VACA WebViews. Parents navigation, bedroom-light toggle/restore, and Intercom chooser passed. Graham and Cora Light and Walkie popups also passed and closed cleanly.
+- The Parents dashboard was backed up before its focused live patch. At the Echo Show 8 viewport, the clock is the dominant focal point, outdoor weather is upper-left, branding is absent, both `Thermostat` labels fit, and bottom labels have clear lower spacing.
+- Post-repair Walkie regression passed 9/9 again: all six directions plus Parents → Graham, Graham → Cora, and Cora → Parents repeats. Each call passed chooser/calling/incoming/answer/end UI, connected peers, bidirectional RTP growth, hangup, and idle cleanup.
+- Graham's one-minute lag was not an Android clock or timezone fault. Both kids' cards rendered on `sensor.date_time` updates but displayed `new Date()`, allowing a render just before Graham's local minute boundary to retain the prior minute. Cora and Graham now derive the displayed minute directly from the same HA `sensor.date_time` update used by Parents; styling and layout are unchanged.
+- Parents, Graham, and Cora matched across the consecutive 10:34, 10:35, and 10:36 transitions, with all three displays converging in 44 ms, 29 ms, and 62 ms respectively after the observed HA minute update.
+- Evidence: `/data/v2/cache/opencode/parents-updated-layout.png`, `/data/v2/cache/opencode/housevoice-ui-matrix-results.json`, and `/data/v2/cache/opencode/clock-sync-results.json`.
 
 ## Git checkpoints
 
