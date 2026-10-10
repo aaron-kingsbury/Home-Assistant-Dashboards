@@ -385,28 +385,9 @@
                 "browser_mod": {
                   "data": {
                     "content": {
-                      "cards": [
-                        {
-                          "card_mod": {
-                            "style": "ha-card { --mdc-icon-size: 54px; padding: 18px 30px; } hui-generic-entity-row { min-height: 96px; margin: 40px 0; border-radius: 16px; } hui-generic-entity-row .info, hui-input-number-entity-row .info { font-size: 30px; font-weight: 500; } hui-generic-entity-row ha-icon, hui-input-number-entity-row ha-icon { --mdc-icon-size: 54px; }"
-                          },
-                          "entities": [
-                            {
-                              "entity": "input_boolean.small_bedroom_light",
-                              "icon": "mdi:lamp",
-                              "name": "Room light"
-                            },
-                            {
-                              "entity": "input_number.housevoice_small_bedroom_brightness",
-                              "icon": "mdi:brightness-6",
-                              "name": "Brightness"
-                            }
-                          ],
-                          "show_header_toggle": false,
-                          "type": "entities"
-                        }
-                      ],
-                      "type": "vertical-stack"
+                      "entity": "input_boolean.small_bedroom_light",
+                      "name": "Cora Bedroom Light",
+                      "type": "tile"
                     },
                     "dismissable": true,
                     "initial_style": "classic",
