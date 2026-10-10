@@ -385,9 +385,9 @@
                 "browser_mod": {
                   "data": {
                     "content": {
-                      "entity": "input_boolean.small_bedroom_light",
+                      "entity": "light.cora_s_bedroom_light",
                       "name": "Cora Bedroom Light",
-                      "type": "tile"
+                      "type": "light"
                     },
                     "dismissable": true,
                     "initial_style": "classic",
