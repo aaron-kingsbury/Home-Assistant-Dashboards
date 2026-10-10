@@ -20,7 +20,8 @@ template:
   - light:
       - name: "Cora's Bedroom Light"
         unique_id: "cora_bedroom_light"
-        state: "{{ is_state('input_boolean.small_bedroom_light', 'on') }}"
+        state: "{{ 'on' if is_state('input_boolean.small_bedroom_light', 'on') else 'off' }}"
+        level: "{{ (float(states('input_number.housevoice_small_bedroom_brightness')) * 2.55) | int }}"
         turn_on:
           action: input_boolean.turn_on
           target:
@@ -29,6 +30,15 @@ template:
           action: input_boolean.turn_off
           target:
             entity_id: input_boolean.small_bedroom_light
+        set_level:
+          - action: input_number.set_value
+            target:
+              entity_id: input_number.housevoice_small_bedroom_brightness
+            data:
+              value: "{{ (float(brightness) / 2.55) | round(0) }}"
+          - action: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.small_bedroom_light
   - binary_sensor:
       - name: "HouseVoice Any Camera Motion"
         unique_id: "housevoice_any_camera_motion"
