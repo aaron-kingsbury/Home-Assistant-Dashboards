@@ -20,7 +20,7 @@ template:
   - light:
       - name: "Cora's Bedroom Light"
         unique_id: "cora_bedroom_light"
-        state: "{{ 'on' if is_state('input_boolean.small_bedroom_light', 'on') else 'off' }}"
+        state: "{{ is_state('input_boolean.small_bedroom_light', 'on') }}"
         level: "{{ (float(states('input_number.housevoice_small_bedroom_brightness')) * 2.55) | int }}"
         turn_on:
           action: input_boolean.turn_on
@@ -35,10 +35,31 @@ template:
             target:
               entity_id: input_number.housevoice_small_bedroom_brightness
             data:
-              value: "{{ (float(brightness) / 2.55) | round(0) }}"
+              value: "{{ (brightness / 2.55) | int }}"
           - action: input_boolean.turn_on
             target:
               entity_id: input_boolean.small_bedroom_light
+      - name: "Primary Bedroom Light"
+        unique_id: "primary_bedroom_light"
+        state: "{{ is_state('input_boolean.primary_bedroom_light', 'on') }}"
+        level: "{{ (float(states('input_number.housevoice_primary_bedroom_brightness')) * 2.55) | int }}"
+        turn_on:
+          action: input_boolean.turn_on
+          target:
+            entity_id: input_boolean.primary_bedroom_light
+        turn_off:
+          action: input_boolean.turn_off
+          target:
+            entity_id: input_boolean.primary_bedroom_light
+        set_level:
+          - action: input_number.set_value
+            target:
+              entity_id: input_number.housevoice_primary_bedroom_brightness
+            data:
+              value: "{{ (brightness / 2.55) | int }}"
+          - action: input_boolean.turn_on
+            target:
+              entity_id: input_boolean.primary_bedroom_light
   - binary_sensor:
       - name: "HouseVoice Any Camera Motion"
         unique_id: "housevoice_any_camera_motion"
@@ -107,6 +128,13 @@ input_number:
   housevoice_right_bedroom_brightness:
     name: "Right Bedroom Light Brightness"
     initial: 20
+    min: 0
+    max: 100
+    step: 1
+    mode: slider
+  housevoice_primary_bedroom_brightness:
+    name: "Primary Bedroom Light Brightness"
+    initial: 100
     min: 0
     max: 100
     step: 1
