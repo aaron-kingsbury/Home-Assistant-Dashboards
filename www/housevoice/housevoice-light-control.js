@@ -22,8 +22,32 @@ class HouseVoiceLightControl extends HTMLElement {
     this.nameEl = this.shadowRoot.querySelector('.name');
     this.button = this.shadowRoot.querySelector('button');
     this.slider = this.shadowRoot.querySelector('input');
-    this.button.addEventListener('click', (e) => { e.stopPropagation(); if (!this._unavailable) this.hass.callService('light', 'toggle', { entity_id: this.config.entity }); });
-    this.slider.addEventListener('input', (e) => { e.stopPropagation(); this._pending = Number(e.target.value); clearTimeout(this._timer); this._timer = setTimeout(() => { if (!this._unavailable) this.hass.callService('light', 'turn_on', { entity_id: this.config.entity, brightness_pct: this._pending }); }, 180); });
+    this.button.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!this._unavailable) {
+        const domain = this.config.entity.split('.')[0];
+        this.hass.callService(domain, 'toggle', { entity_id: this.config.entity });
+      }
+    });
+    this.slider.addEventListener('input', (e) => {
+      e.stopPropagation();
+      this._pending = Number(e.target.value);
+      clearTimeout(this._timer);
+      this._timer = setTimeout(() => {
+        if (this._unavailable) return;
+        if (this.config.brightness_entity) {
+          this.hass.callService('input_number', 'set_value', {
+            entity_id: this.config.brightness_entity,
+            value: this._pending,
+          });
+        } else {
+          this.hass.callService('light', 'turn_on', {
+            entity_id: this.config.entity,
+            brightness_pct: this._pending,
+          });
+        }
+      }, 180);
+    });
   }
   set hass(value) { this._hass = value; this.update(); }
   get hass() { return this._hass; }
@@ -32,8 +56,15 @@ class HouseVoiceLightControl extends HTMLElement {
     const entity = this.config && this.config.entity;
     const s = states && entity ? states[entity] : null;
     if (!s) return;
-    this._unavailable = ['unavailable','unknown'].includes(s.state);
-    const pct = s.attributes.brightness == null ? null : Math.round(Number(s.attributes.brightness) / 255 * 100);
+    const brightnessState = this.config.brightness_entity && states[this.config.brightness_entity];
+    this._unavailable = ['unavailable','unknown'].includes(s.state) ||
+      (this.config.brightness_entity && (!brightnessState || ['unavailable','unknown'].includes(brightnessState.state)));
+    let pct = null;
+    if (brightnessState && brightnessState.state !== 'unknown' && brightnessState.state !== 'unavailable') {
+      pct = Math.round(Number(brightnessState.state));
+    } else if (s.attributes.brightness != null) {
+      pct = Math.round(Number(s.attributes.brightness) / 255 * 100);
+    }
     this.nameEl.textContent = this.config.name || s.attributes.friendly_name || this.config.entity;
     const stateText = s.state === 'on' ? 'On' : 'Off';
     const brightnessText = pct != null ? ' · ' + pct + '%' : '';
@@ -41,7 +72,8 @@ class HouseVoiceLightControl extends HTMLElement {
     this.button.classList.toggle('off', s.state !== 'on'); this.button.disabled = this._unavailable;
     this.slider.value = String(pct == null ? 1 : pct);
     const colorModes = s.attributes.supported_color_modes || [];
-    const supportsBrightness = colorModes.some(x => ['brightness','color_temp','hs','xy','rgb','rgbw','rgbww'].includes(x));
+    const supportsBrightness = Boolean(this.config.brightness_entity) ||
+      colorModes.some(x => ['brightness','color_temp','hs','xy','rgb','rgbw','rgbww'].includes(x));
     this.slider.disabled = this._unavailable || !supportsBrightness;
   }
   getCardSize() { return 1; }
