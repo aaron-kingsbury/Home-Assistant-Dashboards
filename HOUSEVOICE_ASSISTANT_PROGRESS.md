@@ -50,6 +50,8 @@ Safe target behavior:
 
 No coexistence code has been changed yet. Until physical testing is available, Graham's wake word remains disabled to protect the known-good Walkie path.
 
+If explicit coordination proves necessary, the smallest safe insertion points are Graham-only hooks in `www/housevoice/walkie.js`: suspend VACA immediately before `_makePeer()` requests `getUserMedia()`, and restore the exact prior wake-word option from the idempotent `_cleanup()` path. Incoming ringing alone does not own the WebView microphone, so suspension should occur on answer rather than offer receipt. No such change should be deployed without Graham DevTools access because every decline, timeout, duplicate-client, peer-failure, refresh, and normal-end path must be physically regression-tested.
+
 ## Live configuration discovered
 
 ### Graham VACA device
@@ -82,7 +84,7 @@ No coexistence code has been changed yet. Until physical testing is available, G
 - `Focused local assistant`: Speech-to-Phrase, Home Assistant conversation, Piper.
 - `HouseVoice`: Speech-to-Phrase, Home Assistant conversation, Piper, local intents preferred.
 
-Graham's VACA assistant selector was changed from `preferred` to `HouseVoice` on 2026-10-17. This is the only retained runtime change from discovery.
+Graham's VACA assistant selector was changed from `preferred` to `HouseVoice` on 2026-10-17. The only other retained runtime change is Assist exposure for the existing weather entity.
 
 ## Wake word
 
@@ -96,6 +98,10 @@ VACA's built-in choices do not include HOUSEVOICE. VACA 0.13.5 supports custom f
 
 The preferred path is a custom OpenWakeWord ONNX model named for HOUSEVOICE, loaded through VACA's supported custom-files mechanism. The model must be trained and evaluated for Graham's voice, room acoustics, false activations, and Echo microphone response.
 
+The verified VACA 0.13.5 deployment location is `/homeassistant/vaca/custom/openwakeword/<model>.onnx`. VACA downloads custom files at app start or from its Quick Actions → Settings → Manage Custom Files sync action. The model appears in the wake-word selector only when the `openwakeword` engine is selected.
+
+No existing HOUSEVOICE ONNX model was found locally or in a public model search. The supported free training paths are the official openWakeWord training notebook/Training Center or another compatible local ONNX trainer. This Home Assistant host has 8 CPU cores and about 8 GB RAM but no GPU and none of the required PyTorch, TensorFlow, ONNX, ONNX Runtime, or openWakeWord training packages. Production training should not be installed into the live Home Assistant/OpenCode runtime. A real model therefore requires an external training run, followed by Graham-specific positive and false-activation recordings for tuning.
+
 During discovery, `Hey Jarvis` was selected briefly to verify that Graham's VACA wake-word control accepts updates. It was immediately restored to `None` because microphone coexistence with Walkie has not been tested.
 
 ## Command acceptance status
@@ -105,6 +111,7 @@ During discovery, `Hey Jarvis` was selected briefly to verify that Graham's VACA
 - Text intent test: passed.
 - Input: `what time is it`
 - Home Assistant returned the correct local time in `America/New_York`.
+- A full server-side `HouseVoice` intent-to-TTS pipeline generated `2:23 PM` through Piper `en_US-amy-low` and returned a valid MP3 TTS artifact.
 - Physical spoken input and Graham speaker output: not yet verified.
 
 ### Timer
@@ -125,6 +132,7 @@ During discovery, `Hey Jarvis` was selected briefly to verify that Graham's VACA
   - `input_number.living_room_light_brightness`
 - The unassigned `light.kasa_smart_wi_fi_light_switch` is unavailable and supports only on/off, not brightness.
 - No unrelated light was controlled and no duplicate light was created.
+- A fresh live inventory on 2026-10-17 again found zero `light.*` entities in the Living Room area.
 - Blocker: identify or configure the actual dimmable Living Room light before this acceptance item can pass.
 
 ### Weather
@@ -134,6 +142,7 @@ During discovery, `Hey Jarvis` was selected briefly to verify that Graham's VACA
 - Assist exposure was changed from disabled to enabled for this existing entity; all existing weather unit options were preserved.
 - Registry read-back confirmed `conversation.should_expose: true`.
 - A Graham-device-context intent then returned `53 °F and sunny` and identified `weather.forecast_housevoice_weather` as the successful source.
+- A full server-side `HouseVoice` intent-to-TTS run synthesized that response through Piper `en_US-amy-low` and produced a valid MP3 TTS artifact.
 - No new weather provider or duplicate entity was created.
 
 ## Test evidence
@@ -145,6 +154,7 @@ During discovery, `Hey Jarvis` was selected briefly to verify that Graham's VACA
 - Selecting and clearing a VACA wake word succeeded.
 - Assist weather exposure for the existing Met.no entity was enabled and verified by registry read-back and a successful intent response.
 - A native 60-second timer was created for Graham, independently queried throughout its countdown, and confirmed removed after expiry.
+- Server-side `HouseVoice` time and weather requests completed through intent recognition and Piper TTS generation.
 - `assist_satellite.announce` sent a test response to Graham.
 - Satellite state changed from `responding` to `idle` in approximately 6.1 seconds.
 - No Home Assistant Core errors were returned during discovery.
@@ -161,6 +171,7 @@ During discovery, `Hey Jarvis` was selected briefly to verify that Graham's VACA
 - Android microphone arbitration between VACA and WebView WebRTC.
 - Timer alert audibility and persistence across sleep/restart.
 - Recovery after Graham app restart, device reboot, or network interruption.
+- Physical playback of the generated time and weather TTS artifacts.
 
 ## Debugging access blocker
 
@@ -205,17 +216,19 @@ No restart or reload is required for these selector changes.
 - Claiming the TTS announcement was audible from state transitions alone: rejected; state transitions verify transport completion, not acoustic output.
 - Routing the Living Room request to another light: rejected because Home Assistant reports no valid Living Room light target.
 - Adding another weather provider: rejected because a working Met.no weather entity already exists.
+- Using `assist_satellite.start_conversation` for the no-wake test: rejected for this pipeline because Home Assistant explicitly does not support that service with its built-in conversation agent.
+- Installing a full ML training stack into the live Home Assistant/OpenCode runtime: rejected because production model training needs an external GPU-capable environment and device-specific evaluation data.
 
 ## Next actions
 
 1. Establish dedicated, safe debugging access to Graham's Echo.
-2. Run a physical no-wake pipeline test using `assist_satellite.start_conversation`.
+2. Run a physical no-wake pipeline test from VACA's own manual voice action on Graham.
 3. Verify Speech-to-Phrase transcription and Piper playback for time and weather.
 4. Identify the real dimmable Living Room light target and verify its area/name exposure.
 5. Physically verify native Assist timer acknowledgement, VACA onboard expiration audio, and alarm stop behavior.
-7. Test a built-in wake word on Graham while Walkie is idle.
-8. Test incoming/outgoing Walkie behavior with wake-word listening active.
-9. Implement explicit audio ownership only if Android does not arbitrate the two microphone clients safely.
-10. Train, install, and tune a custom HOUSEVOICE wake-word model.
-11. Test restart, sleep, reboot, network recovery, duplicate-command protection, and resource use.
-12. Create local milestone checkpoints without committing or pushing to `main` unless explicitly permitted.
+6. Test a built-in wake word on Graham while Walkie is idle.
+7. Test incoming/outgoing Walkie behavior with wake-word listening active.
+8. Implement explicit audio ownership only if Android does not arbitrate the two microphone clients safely.
+9. Train externally, install, and tune a custom HOUSEVOICE wake-word model.
+10. Test restart, sleep, reboot, network recovery, duplicate-command protection, and resource use.
+11. Continue local milestone checkpoints on `housevoice/graham-voice-poc`; do not push or commit this work to `main` without explicit permission.
