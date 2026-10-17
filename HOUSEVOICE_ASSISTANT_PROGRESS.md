@@ -216,6 +216,7 @@ No restart or reload is required for these selector changes.
 - Claiming the TTS announcement was audible from state transitions alone: rejected; state transitions verify transport completion, not acoustic output.
 - Routing the Living Room request to another light: rejected because Home Assistant reports no valid Living Room light target.
 - Adding another weather provider: rejected because a working Met.no weather entity already exists.
+- Replacing all entity-registry options in one weather update: rejected by Home Assistant with `invalid_format`; the supported domain-scoped `options_domain: conversation` update then succeeded and preserved weather unit options.
 - Using `assist_satellite.start_conversation` for the no-wake test: rejected for this pipeline because Home Assistant explicitly does not support that service with its built-in conversation agent.
 - Installing a full ML training stack into the live Home Assistant/OpenCode runtime: rejected because production model training needs an external GPU-capable environment and device-specific evaluation data.
 
