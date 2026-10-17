@@ -5162,7 +5162,7 @@
                         {
                           "type": "custom:housevoice-light-control",
                           "entity": "light.primary_bedroom_light",
-                          "name": "Primary Bedroom"
+                          "name": "Parent's Bedroom"
                         },
                         {
                           "type": "custom:housevoice-light-control",
