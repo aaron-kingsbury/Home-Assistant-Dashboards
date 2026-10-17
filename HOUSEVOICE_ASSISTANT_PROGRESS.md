@@ -177,6 +177,7 @@ No existing HOUSEVOICE ONNX model was found locally or in a public model search.
 - Parents → Graham Walkie connected while `Hey Jarvis` was configured. Graham sent 34,507 bytes/654 RTP packets and received 48,529 bytes/652 packets before clean teardown.
 - Both Walkie directions ended with no call, peer, local stream, or remote stream retained; Graham's microphone track reached `ended` and neither card reported an error.
 - Explicit Graham onboard-alarm playback was physically measured and alarm-off was verified.
+- A non-destructive Graham WebView page reload recovered without intervention: the Graham route, HA connection, and idle `room=graham` Walkie card returned with no retained streams or error. At nine seconds the document briefly reported `Cora's Room` and had not rendered the Walkie card; by approximately 19 seconds it corrected to `Graham's Room`. This is page-reload evidence only, not an app restart or device reboot test.
 - Temporary test settings were restored: wake word `None`, music volume `0`, voice volume `1`, diagnostics off, and alarm off. Graham's assistant remains `HouseVoice`.
 
 ### Not verified
