@@ -38,7 +38,7 @@ No additional Android application or always-running custom service is currently 
 
 ## Audio ownership requirement
 
-VACA continuously owns the microphone while an on-device wake word is enabled. Walkie independently requests microphone access from the dashboard WebView. Concurrent Android microphone behavior has not yet been verified on Graham's LineageOS build.
+VACA continuously owns the microphone while an on-device wake word is enabled. Walkie independently requests microphone access from the dashboard WebView. Graham's LineageOS build was physically tested on 2026-10-17 with VACA configured for `Hey Jarvis`: both outgoing and incoming Walkie calls acquired live WebView microphone tracks and completed bidirectional WebRTC transport.
 
 Safe target behavior:
 
@@ -48,7 +48,7 @@ Safe target behavior:
 4. Ending, declining, timing out, or failing a Walkie call releases WebRTC audio and resumes wake-word listening.
 5. Cleanup is idempotent so refreshes, failed calls, and duplicate signals cannot leave either path holding audio.
 
-No coexistence code has been changed yet. Until physical testing is available, Graham's wake word remains disabled to protect the known-good Walkie path.
+No coexistence code has been changed. Physical transport evidence does not justify adding audio-ownership coordination: while `Hey Jarvis` was configured, Graham completed both directions of a Walkie call with live local and remote audio tracks, non-zero RTP traffic, successful ICE, and complete track/peer cleanup. Wake recognition during an active call was not separately proven, so Graham's wake word was restored to `None` after testing.
 
 If explicit coordination proves necessary, the smallest safe insertion points are Graham-only hooks in `www/housevoice/walkie.js`: suspend VACA immediately before `_makePeer()` requests `getUserMedia()`, and restore the exact prior wake-word option from the idempotent `_cleanup()` path. Incoming ringing alone does not own the WebView microphone, so suspension should occur on answer rather than offer receipt. No such change should be deployed without Graham DevTools access because every decline, timeout, duplicate-client, peer-failure, refresh, and normal-end path must be physically regression-tested.
 
@@ -102,7 +102,7 @@ The verified VACA 0.13.5 deployment location is `/homeassistant/vaca/custom/open
 
 No existing HOUSEVOICE ONNX model was found locally or in a public model search. The supported free training paths are the official openWakeWord training notebook/Training Center or another compatible local ONNX trainer. This Home Assistant host has 8 CPU cores and about 8 GB RAM but no GPU and none of the required PyTorch, TensorFlow, ONNX, ONNX Runtime, or openWakeWord training packages. Production training should not be installed into the live Home Assistant/OpenCode runtime. A real model therefore requires an external training run, followed by Graham-specific positive and false-activation recordings for tuning.
 
-During discovery, `Hey Jarvis` was selected briefly to verify that Graham's VACA wake-word control accepts updates. It was immediately restored to `None` because microphone coexistence with Walkie has not been tested.
+`Hey Jarvis` was used only as a development wake word during physical testing. At Graham's temporary music volume of 6, Piper playback of the wake phrase through the physical Echo speaker activated VACA. A separated command clip was transcribed as `what is the weather`, handled locally, and answered with `55 °F and sunny`. The selector was restored to `None` after the tests because the production wake word remains HOUSEVOICE.
 
 ## Command acceptance status
 
@@ -112,16 +112,21 @@ During discovery, `Hey Jarvis` was selected briefly to verify that Graham's VACA
 - Input: `what time is it`
 - Home Assistant returned the correct local time in `America/New_York`.
 - A full server-side `HouseVoice` intent-to-TTS pipeline generated `2:23 PM` through Piper `en_US-amy-low` and returned a valid MP3 TTS artifact.
-- Physical spoken input and Graham speaker output: not yet verified.
+- Physical path passed with synthetic speech played through Graham's real speaker: `what time is it` was transcribed and answered with `2:46 PM`.
+- This proves the device's acoustic wake, microphone, Speech-to-Phrase, intent, and Piper return path; it is not a substitute for a person speaking in Graham's room.
 
 ### Timer
 
 - Initial text-only parsing test passed but did not prove a native timer existed.
 - A later `HouseVoice` Assist pipeline run was attributed to Graham's registered device ID and created native timer `01M55HG2QB6QYZQWNV2PGDMZ23` for 60 seconds.
 - Three independent timer-status intents returned the same timer ID with 55 seconds, 23 seconds, and 1 second remaining. A post-expiry query returned `No timers.` This verifies native Home Assistant timer creation, countdown persistence, expiry cleanup, and Graham device association.
-- VACA registers Graham's device as a native timer-capable endpoint. Its Assist satellite forwards `started`, `updated`, `cancelled`, and `finished` timer events over Wyoming; VACA handles the expiry alarm onboard.
+- VACA registers Graham's device as a native timer-capable endpoint and is expected to handle expiry audio onboard.
 - The separate `switch.vaca_96ed4d2c4_alarm` entity is not the native timer state and is not expected to toggle during the countdown.
-- Physical expiry audibility, stop behavior, and persistence across app/device recovery: not yet verified.
+- A physical wake/STT request, `set a timer for 1 minute`, was transcribed, acknowledged as `Timer set for 1 minute`, and allowed to expire on Graham.
+- The calibrated physical microphone trace remained at baseline through expiry and the onboard alarm switch never activated. Native timer expiry audio therefore failed.
+- The alarm hardware and acoustic measurement were independently validated by explicitly enabling the onboard alarm: mean microphone RMS rose from approximately `0.001` to `0.05–0.08`, with peaks above `0.5`, and returned to baseline after alarm-off.
+- Upstream VACA issue #264 describes the same acknowledged-but-silent timer behavior and directs users to the View Assist Alarms/Reminders/Timers blueprint. That blueprint exists locally at `blueprints/automation/dinki/blueprint-alarmsreminderstimers.yaml` but no instantiated automation was found. No automation was added during this test.
+- Physical expiry audio remains failed; restart persistence remains unverified.
 
 ### Lighting
 
@@ -143,6 +148,7 @@ During discovery, `Hey Jarvis` was selected briefly to verify that Graham's VACA
 - Registry read-back confirmed `conversation.should_expose: true`.
 - A Graham-device-context intent then returned `53 °F and sunny` and identified `weather.forecast_housevoice_weather` as the successful source.
 - A full server-side `HouseVoice` intent-to-TTS run synthesized that response through Piper `en_US-amy-low` and produced a valid MP3 TTS artifact.
+- A physical Graham wake/STT run transcribed `what is the weather`, returned `55 °F and sunny`, and produced strong microphone evidence of the returned Piper response: mean RMS approximately `0.09–0.10` versus baseline near `0.001`.
 - No new weather provider or duplicate entity was created.
 
 ## Test evidence
@@ -161,32 +167,35 @@ During discovery, `Hey Jarvis` was selected briefly to verify that Graham's VACA
 - Home Assistant Core resource snapshot was healthy: approximately 2.1% CPU and 13.7% of its memory limit.
 - Parents and Cora VACA settings were not changed.
 - Walkie files and configuration were not changed.
+- Dedicated SSH forwarding to Windows `127.0.0.1:9225` was established without altering the Parents tunnel. Local `/json/list` positively identified `Graham's Room – Home Assistant` at `/kids-rooms/grahams-room` on an Echo Show 5 (2nd Generation) WebView.
+- Graham's physical WebView microphone produced a live 48 kHz mono track, non-zero waveform energy, and 81,785 bytes of recorded audio during a bounded five-second capture; every track was stopped afterward.
+- The built-in `Hey Jarvis` wake word activated from measured physical speaker playback.
+- Speech-to-Phrase transcribed `what time is it`, `what is the weather`, and `set a timer for 1 minute` from Graham's physical microphone path.
+- Home Assistant processed the time, weather, and timer requests locally.
+- Piper response playback was physically measured on Graham; the weather response rose to mean microphone RMS around `0.09–0.10` from a baseline near `0.001`.
+- Graham → Parents Walkie connected while `Hey Jarvis` was configured. Graham sent 40,454 bytes/909 RTP packets and received 62,286 bytes/912 packets before clean teardown.
+- Parents → Graham Walkie connected while `Hey Jarvis` was configured. Graham sent 34,507 bytes/654 RTP packets and received 48,529 bytes/652 packets before clean teardown.
+- Both Walkie directions ended with no call, peer, local stream, or remote stream retained; Graham's microphone track reached `ended` and neither card reported an error.
+- Explicit Graham onboard-alarm playback was physically measured and alarm-off was verified.
+- Temporary test settings were restored: wake word `None`, music volume `0`, voice volume `1`, diagnostics off, and alarm off. Graham's assistant remains `HouseVoice`.
 
 ### Not verified
 
-- Whether the announcement was physically audible from Graham's speaker.
-- Physical wake-word detection.
-- Physical speech transcription.
-- Physical spoken response quality.
-- Android microphone arbitration between VACA and WebView WebRTC.
-- Timer alert audibility and persistence across sleep/restart.
+- Human-spoken wake-word and command quality in Graham's actual room; the completed acoustic tests used Piper-generated speech through the physical speaker.
+- Wake-word recognition during an active Walkie call. Concurrent configuration plus WebRTC microphone/transport passed, but recognition itself was not invoked mid-call.
+- Native timer alert audio currently fails despite successful creation and acknowledgement.
+- Timer persistence across app/device recovery.
 - Recovery after Graham app restart, device reboot, or network interruption.
-- Physical playback of the generated time and weather TTS artifacts.
+- Custom HOUSEVOICE wake-word accuracy and false-activation rate.
 
-## Debugging access blocker
+## Debugging access
 
-The available Chrome DevTools tunnel currently exposes only the physical Parents dashboard. It does not expose Graham's WebView. The OpenCode container also does not have a usable ADB client or a dedicated Graham ADB bridge.
-
-Historical test artifacts show the intended Windows endpoints were Parents `9224`, Graham `9225`, and Cora `9226`. Separate SSH local forwards were tested without touching the live Parents endpoint, but all three historical Windows ports currently reset connections. The restricted SSH key permits forwarding only; it cannot run Windows commands to inspect or recreate ADB/CDP forwards.
-
-Physical Graham testing requires one of the following without disturbing the Parents tunnel:
-
-1. A separate authenticated DevTools tunnel to Graham's WebView, or
-2. A safe ADB forwarding mechanism to Graham's existing Windows ADB connection.
-
-The minimum external recovery action is to reconnect Windows ADB to Graham serial `G6G1MK06139602GH`, recreate Graham's WebView forward on Windows port `9225`, and leave the Parents forward unchanged. Once `http://127.0.0.1:9225/json/list` answers on Windows, the existing restricted SSH transport can carry it to a separate local port.
-
-The existing Parents debugging session must not be repointed as a substitute.
+- Graham ADB serial: `G6G1MK06139602GH`.
+- Graham WebView socket on Windows: `webview_devtools_remote_1247`.
+- Windows CDP endpoint: `127.0.0.1:9225`.
+- A dedicated restricted SSH forward maps local `127.0.0.1:9225` to Windows `127.0.0.1:9225`.
+- Local `/json/list` was verified before interaction and returned only Graham's actual dashboard, `https://housevoice.duckdns.org/kids-rooms/grahams-room`.
+- The existing Parents DevTools manager was not repointed or modified; Cora was not accessed.
 
 ## Files modified
 
@@ -219,17 +228,16 @@ No restart or reload is required for these selector changes.
 - Replacing all entity-registry options in one weather update: rejected by Home Assistant with `invalid_format`; the supported domain-scoped `options_domain: conversation` update then succeeded and preserved weather unit options.
 - Using `assist_satellite.start_conversation` for the no-wake test: rejected for this pipeline because Home Assistant explicitly does not support that service with its built-in conversation agent.
 - Installing a full ML training stack into the live Home Assistant/OpenCode runtime: rejected because production model training needs an external GPU-capable environment and device-specific evaluation data.
+- Treating a successful state transition as timer audibility: rejected. A calibrated microphone capture proved the onboard alarm can be measured, then showed the real native timer expiry remained silent.
+- Using seconds-based synthetic Speech-to-Phrase timer commands: rejected after two phrases activated listening but produced no transcript. The supported `set a timer for one minute` phrase succeeded.
+- Adding audio-ownership hooks after successful bidirectional coexistence tests: rejected because current physical evidence does not show Android microphone arbitration failure.
 
 ## Next actions
 
-1. Establish dedicated, safe debugging access to Graham's Echo.
-2. Run a physical no-wake pipeline test from VACA's own manual voice action on Graham.
-3. Verify Speech-to-Phrase transcription and Piper playback for time and weather.
+1. Decide whether to instantiate the existing View Assist Alarms/Reminders/Timers blueprint for Graham and physically validate its expiry/stop path; native VACA timer expiry is currently silent.
+2. Perform a human-spoken Graham room test for wake accuracy, transcription quality, and response audibility.
+3. Test wake recognition during an active Walkie call only if that behavior is required; do not add audio-ownership hooks without failure evidence.
 4. Identify the real dimmable Living Room light target and verify its area/name exposure.
-5. Physically verify native Assist timer acknowledgement, VACA onboard expiration audio, and alarm stop behavior.
-6. Test a built-in wake word on Graham while Walkie is idle.
-7. Test incoming/outgoing Walkie behavior with wake-word listening active.
-8. Implement explicit audio ownership only if Android does not arbitrate the two microphone clients safely.
-9. Train externally, install, and tune a custom HOUSEVOICE wake-word model.
-10. Test restart, sleep, reboot, network recovery, duplicate-command protection, and resource use.
-11. Continue local milestone checkpoints on `housevoice/graham-voice-poc`; do not push or commit this work to `main` without explicit permission.
+5. Train externally, install, and tune a custom HOUSEVOICE wake-word model.
+6. Test VACA app restart, display sleep/wake, device reboot, network interruption, duplicate-command protection, and resource use.
+7. Continue local milestone checkpoints on `housevoice/graham-voice-poc`; do not push or commit this work to `main` without explicit permission.
