@@ -1,0 +1,7 @@
+models/
+results/
+samples/**/*.wav
+samples/**/*.flac
+samples/**/*.mp3
+__pycache__/
+*.pyc

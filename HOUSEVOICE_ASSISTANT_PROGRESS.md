@@ -1,6 +1,6 @@
 # HOUSEVOICE Assistant — Graham Echo Proof of Concept
 
-Last updated: 2026-10-17
+Last updated: 2026-10-18
 
 ## Scope and safety boundaries
 
@@ -102,6 +102,8 @@ The verified VACA 0.13.5 deployment location is `/homeassistant/vaca/custom/open
 
 No existing HOUSEVOICE ONNX model was found locally or in a public model search. The supported free training paths are the official openWakeWord training notebook/Training Center or another compatible local ONNX trainer. This Home Assistant host has 8 CPU cores and about 8 GB RAM but no GPU and none of the required PyTorch, TensorFlow, ONNX, ONNX Runtime, or openWakeWord training packages. Production training should not be installed into the live Home Assistant/OpenCode runtime. A real model therefore requires an external training run, followed by Graham-specific positive and false-activation recordings for tuning.
 
+A reproducible external-GPU package now exists at `housevoice-wakeword/`. It includes a Colab notebook preconfigured for target phrase `house voice`, model name `housevoice`, and `en_US`; the trainer source is pinned to `pafernanr/openwakeword-colab-2026` commit `393d06d1beeddf8cff370e79ed8c209d4e803319`, and OpenWakeWord is pinned to commit `368c03716d1e92591906a84949bc477f3a834455`. The package also includes a model card, offline threshold evaluator, and a consent-gated Graham CDP recorder that verifies the `/kids-rooms/grahams-room` target, displays a recording countdown, stops every microphone track, and writes 16 kHz mono PCM WAV files. No ML packages or model were installed on Home Assistant, and no recording was made while preparing the package.
+
 `Hey Jarvis` was used only as a development wake word during physical testing. At Graham's temporary music volume of 6, Piper playback of the wake phrase through the physical Echo speaker activated VACA. A separated command clip was transcribed as `what is the weather`, handled locally, and answered with `55 °F and sunny`. The selector was restored to `None` after the tests because the production wake word remains HOUSEVOICE.
 
 ## Command acceptance status
@@ -178,6 +180,8 @@ No existing HOUSEVOICE ONNX model was found locally or in a public model search.
 - Both Walkie directions ended with no call, peer, local stream, or remote stream retained; Graham's microphone track reached `ended` and neither card reported an error.
 - Explicit Graham onboard-alarm playback was physically measured and alarm-off was verified.
 - A non-destructive Graham WebView page reload recovered without intervention: the Graham route, HA connection, and idle `room=graham` Walkie card returned with no retained streams or error. At nine seconds the document briefly reported `Cora's Room` and had not rendered the Walkie card; by approximately 19 seconds it corrected to `Graham's Room`. This is page-reload evidence only, not an app restart or device reboot test.
+- The transient Cora title is explained by the shared storage-mode dashboard: dashboard `kids-rooms` is titled `Cora's Room`, while view path `grahams-room` is titled `Graham's Room`. Home Assistant briefly renders the dashboard title before resolving the Graham view. No routing error was observed, and the shared dashboard was not renamed because that would affect Cora.
+- Graham-only screen-control and WebView recovery passed at runtime using `switch.vaca_96ed4d2c4_screen`: turning the screen entity off left the Graham CDP target present; after restoring it on, the Graham route, live HA connection, `HouseVoice` selection, wake word `None`, and idle Walkie card were all intact with no retained streams or error. This does not claim visual proof that the physical panel extinguished because no camera or in-room observer was used.
 - Temporary test settings were restored: wake word `None`, music volume `0`, voice volume `1`, diagnostics off, and alarm off. Graham's assistant remains `HouseVoice`.
 
 ### Not verified
@@ -186,7 +190,7 @@ No existing HOUSEVOICE ONNX model was found locally or in a public model search.
 - Wake-word recognition during an active Walkie call. Concurrent configuration plus WebRTC microphone/transport passed, but recognition itself was not invoked mid-call.
 - Native timer alert audio currently fails despite successful creation and acknowledgement.
 - Timer persistence across app/device recovery.
-- Recovery after Graham app restart, device reboot, or network interruption.
+- Recovery after Graham app restart, device reboot, or a real network interruption. CDP WebView network emulation was restored successfully but did not force the existing HA WebSocket to report disconnected, so it is not accepted as network-recovery evidence.
 - Custom HOUSEVOICE wake-word accuracy and false-activation rate.
 
 ## Debugging access
@@ -201,8 +205,15 @@ No existing HOUSEVOICE ONNX model was found locally or in a public model search.
 ## Files modified
 
 - `HOUSEVOICE_ASSISTANT_PROGRESS.md` — this progress and recovery record.
+- `housevoice-wakeword/train_housevoice_colab.ipynb` — pinned external-GPU HOUSEVOICE trainer.
+- `housevoice-wakeword/README.md` — training, evaluation, deployment, and rollback procedure.
+- `housevoice-wakeword/MODEL_CARD.md` — per-candidate evidence template.
+- `housevoice-wakeword/evaluate_openwakeword.py` — external offline recall/false-activation evaluator.
+- `housevoice-wakeword/capture_graham_sample.js` — consent-gated Graham physical microphone sample collector.
+- `housevoice-wakeword/.gitignore` — excludes recordings, models, results, and Python cache files.
+- `housevoice-wakeword/LICENSE.upstream` — retained MIT license for the customized upstream notebook.
 
-No Home Assistant YAML, custom integration code, dashboard, Walkie file, or internal registry file has been modified for this project yet.
+No Home Assistant YAML, custom integration code, dashboard, Walkie file, or internal registry file was modified by this milestone.
 
 ## Runtime changes and rollback
 
@@ -229,6 +240,7 @@ No restart or reload is required for these selector changes.
 - Replacing all entity-registry options in one weather update: rejected by Home Assistant with `invalid_format`; the supported domain-scoped `options_domain: conversation` update then succeeded and preserved weather unit options.
 - Using `assist_satellite.start_conversation` for the no-wake test: rejected for this pipeline because Home Assistant explicitly does not support that service with its built-in conversation agent.
 - Installing a full ML training stack into the live Home Assistant/OpenCode runtime: rejected because production model training needs an external GPU-capable environment and device-specific evaluation data.
+- Treating CDP WebView network emulation as a successful network-recovery test: rejected because even a 40-second emulated outage did not make the already-open HA WebSocket report disconnected. A real device-network interruption remains required.
 - Treating a successful state transition as timer audibility: rejected. A calibrated microphone capture proved the onboard alarm can be measured, then showed the real native timer expiry remained silent.
 - Using seconds-based synthetic Speech-to-Phrase timer commands: rejected after two phrases activated listening but produced no transcript. The supported `set a timer for one minute` phrase succeeded.
 - Adding audio-ownership hooks after successful bidirectional coexistence tests: rejected because current physical evidence does not show Android microphone arbitration failure.
@@ -239,6 +251,6 @@ No restart or reload is required for these selector changes.
 2. Perform a human-spoken Graham room test for wake accuracy, transcription quality, and response audibility.
 3. Test wake recognition during an active Walkie call only if that behavior is required; do not add audio-ownership hooks without failure evidence.
 4. Identify the real dimmable Living Room light target and verify its area/name exposure.
-5. Train externally, install, and tune a custom HOUSEVOICE wake-word model.
-6. Test VACA app restart, display sleep/wake, device reboot, network interruption, duplicate-command protection, and resource use.
+5. Run the prepared external-GPU notebook, evaluate the resulting `housevoice.onnx` with Graham-specific recordings, then install and tune it on Graham only.
+6. Test VACA app restart, device reboot, real network interruption, duplicate-command protection, resource use, and visually confirm physical panel sleep/wake. The VACA screen-control and WebView recovery path has passed.
 7. Continue local milestone checkpoints on `housevoice/graham-voice-poc`; do not push or commit this work to `main` without explicit permission.
