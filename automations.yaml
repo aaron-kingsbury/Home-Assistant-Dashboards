@@ -86,8 +86,8 @@
         - conditions:
             - condition: template
               value_template:
-                "{{ trigger.to_state.state == 'Cooling' and state_attr('climate.t6_pro_z_wave_programmable_thermostat',
-                'hvac_mode') != 'cool' }}"
+                "{{ trigger.to_state.state == 'Cooling' and states('climate.t6_pro_z_wave_programmable_thermostat')
+                != 'cool' }}"
           sequence:
             - action: climate.set_hvac_mode
               target:
@@ -97,8 +97,8 @@
         - conditions:
             - condition: template
               value_template:
-                "{{ trigger.to_state.state == 'Heating' and state_attr('climate.t6_pro_z_wave_programmable_thermostat',
-                'hvac_mode') != 'heat' }}"
+                "{{ trigger.to_state.state == 'Heating' and states('climate.t6_pro_z_wave_programmable_thermostat')
+                != 'heat' }}"
           sequence:
             - action: climate.set_hvac_mode
               target:
@@ -108,14 +108,14 @@
         - conditions:
             - condition: template
               value_template:
-                "{{ trigger.to_state.state == 'Idle' and state_attr('climate.t6_pro_z_wave_programmable_thermostat',
-                'hvac_mode') != 'off' }}"
+                "{{ trigger.to_state.state == 'Idle' and states('climate.t6_pro_z_wave_programmable_thermostat')
+                != 'off' }}"
           sequence:
             - action: climate.set_hvac_mode
               target:
                 entity_id: climate.t6_pro_z_wave_programmable_thermostat
               data:
-                hvac_mode: false
+                hvac_mode: "off"
 - id: thermostat_hvac_real_to_dashboard
   alias: Thermostat HVAC Mode - Real to Dashboard
   description: Sync real Honeywell thermostat HVAC mode changes back to the dashboard
@@ -123,7 +123,6 @@
   triggers:
     - trigger: state
       entity_id: climate.t6_pro_z_wave_programmable_thermostat
-      attribute: hvac_mode
   actions:
     - choose:
         - conditions:

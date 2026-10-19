@@ -2313,7 +2313,7 @@
                   },
                   {
                     "card_mod": {
-                      "style": ":host{display:block!important;width:100%!important;min-width:0!important;max-width:none!important;height:100%!important;min-height:0!important;margin:0!important;box-sizing:border-box!important;justify-self:stretch!important;align-self:stretch!important}\n.hv-title-block{margin-top:-8px;margin-left:8px;display:flex;flex-direction:column;justify-content:center;width:100%;height:100%}.hv-title{color:rgba(255,255,255,0.97);font-size:22px;line-height:1;font-weight:700;letter-spacing:2.1px}.hv-subtitle{margin-top:7px;color:rgba(115,158,194,0.68);font-size:10px;line-height:1;font-weight:600;letter-spacing:2.2px}"
+                      "style": ":host{display:block!important;width:100%!important;min-width:0!important;max-width:none!important;height:100%!important;min-height:0!important;margin:0!important;box-sizing:border-box!important;justify-self:stretch!important;align-self:stretch!important}\n.hv-title-block{margin-top:0;margin-left:clamp(28px,4vw,48px);display:flex;flex-direction:column;justify-content:center;width:100%;height:100%}.hv-title{color:rgba(255,255,255,0.97);font-size:22px;line-height:1;font-weight:700;letter-spacing:2.1px}.hv-subtitle{margin-top:7px;color:rgba(115,158,194,0.68);font-size:10px;line-height:1;font-weight:600;letter-spacing:2.2px}"
                     },
                     "custom_fields": {
                       "title": "<div class=\"hv-title-block\"><div class=\"hv-title\">THERMOSTAT</div><div class=\"hv-subtitle\">HOUSEVOICE COMMAND</div></div>"
@@ -2386,7 +2386,7 @@
                   },
                   {
                     "card_mod": {
-                      "style": ":host {\n  display: block !important;\n  width: 100% !important;\n  height: 100% !important;\n  min-width: 0 !important;\n  min-height: 0 !important;\n  margin: 0 !important;\n  background: transparent !important;\n  border: none !important;\n  box-shadow: none !important;\n  filter: none !important;\n  backdrop-filter: none !important;\n}\n\nha-card,\nha-card:hover,\nha-card:focus,\nha-card:active {\n  background: transparent !important;\n  background-color: transparent !important;\n  border: none !important;\n  outline: none !important;\n  box-shadow: none !important;\n  filter: none !important;\n  backdrop-filter: none !important;\n  --ha-card-background: transparent;\n  --card-background-color: transparent;\n  --ha-card-box-shadow: none;\n  --ha-card-border-width: 0;\n  --mdc-ripple-color: transparent;\n  --mdc-ripple-hover-opacity: 0;\n  --mdc-ripple-press-opacity: 0;\n}\n\nha-card::before,\nha-card::after {\n  display: none !important;\n  content: none !important;\n}\n\n.button-card-main,\n#container {\n  background: transparent !important;\n  box-shadow: none !important;\n}\n\n.hv-dial-wrap {\n  width: 100%;\n  height: 100%;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: transparent !important;\n}\n\n.hv-dial {\n  display: block;\n  width: 285px;\n  height: 285px;\n  overflow: visible;\n  background: transparent !important;\n}"
+                      "style": ":host {\n  display: block !important;\n  width: 100% !important;\n  height: 100% !important;\n  min-width: 0 !important;\n  min-height: 0 !important;\n  margin: 0 !important;\n  background: transparent !important;\n  border: none !important;\n  box-shadow: none !important;\n  filter: none !important;\n  backdrop-filter: none !important;\n}\n\nha-card,\nha-card:hover,\nha-card:focus,\nha-card:active {\n  background: transparent !important;\n  background-color: transparent !important;\n  border: none !important;\n  outline: none !important;\n  box-shadow: none !important;\n  filter: none !important;\n  backdrop-filter: none !important;\n  --ha-card-background: transparent;\n  --card-background-color: transparent;\n  --ha-card-box-shadow: none;\n  --ha-card-border-width: 0;\n  --mdc-ripple-color: transparent;\n  --mdc-ripple-hover-opacity: 0;\n  --mdc-ripple-press-opacity: 0;\n}\n\nha-card::before,\nha-card::after {\n  display: none !important;\n  content: none !important;\n}\n\n.button-card-main,\n#container {\n  background: transparent !important;\n  box-shadow: none !important;\n}\n\n.hv-dial-wrap {\n  width: 100%;\n  height: 100%;\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  background: transparent !important;\n}\n\n.hv-dial {\n  display: block;\n  width: min(270px, max(240px, 40vh));\n  height: min(270px, max(240px, 40vh));\n  overflow: visible;\n  background: transparent !important;\n}"
                     },
                     "custom_fields": {
                       "dial": "[[[\nconst thermostat = states['climate.t6_pro_z_wave_programmable_thermostat']; const temp = Number(thermostat?.attributes?.current_temperature);\nconst shown = Number.isFinite(temp) ? `${Math.round(temp)}°` : '--°';\nconst mode = thermostat?.state === 'heat' ? 'Heating' : thermostat?.state === 'cool' ? 'Cooling' : 'Idle';\nconst displayMode = mode === 'Heating' ? 'Heating' : mode === 'Cooling' ? 'Cooling' : 'Idle';\nconst accent = mode === 'Heating' ? '#FF922D' : mode === 'Cooling' ? '#38AFFF' : 'rgba(210,221,231,0.72)';\nconst dash = mode === 'Idle' ? '310 792' : '405 792';\nreturn `\n  <div class=\"hv-dial-wrap\">\n    <svg viewBox=\"0 0 320 320\" class=\"hv-dial\">\n      <circle cx=\"160\" cy=\"160\" r=\"126\" fill=\"transparent\" stroke=\"rgba(57,83,105,0.46)\" stroke-width=\"20\" stroke-linecap=\"round\" stroke-dasharray=\"610 792\" transform=\"rotate(132 160 160)\"/>\n      <circle cx=\"160\" cy=\"160\" r=\"126\" fill=\"none\" stroke=\"${accent}\" stroke-width=\"20\" stroke-linecap=\"round\" stroke-dasharray=\"${dash}\" transform=\"rotate(132 160 160)\"/>\n      <text x=\"160\" y=\"158\" text-anchor=\"middle\" dominant-baseline=\"middle\" fill=\"rgba(255,255,255,0.98)\" font-size=\"76\" font-weight=\"500\">${shown}</text>\n      <text x=\"160\" y=\"208\" text-anchor=\"middle\" fill=\"${accent}\" font-size=\"28\" font-weight=\"500\">${displayMode}</text>\n    </svg>\n  </div>\n`;\n]]]"
@@ -2799,11 +2799,11 @@
                   "column-gap": "18px",
                   "grid-template-areas": "\"back title title\" \"dial dial dial\" \"dial dial dial\" \"dial dial dial\" \"dial dial dial\" \"sp-minus sp-value sp-plus\" \". . .\" \". . .\"",
                   "grid-template-columns": "38px minmax(0, 0.6fr) minmax(0, 0.6fr)",
-                  "grid-template-rows": "58px 52px 118px 22px 96px 88px 44px 46px",
+                  "grid-template-rows": "50px 12px 124px 12px 124px 96px 0 0",
                   "margin": 0,
                   "overflow": "visible",
                   "padding": 0,
-                  "row-gap": "18px"
+                  "row-gap": "6px"
                 },
                 "layout_type": "custom:grid-layout",
                 "type": "custom:layout-card",
@@ -3029,7 +3029,7 @@
                           "margin": 0
                         },
                         {
-                          "height": "20px"
+                          "height": "18px"
                         },
                         {
                           "padding-left": "15px"
@@ -3037,7 +3037,8 @@
                       ],
                       "name": [
                         {
-                          "justify-self": "center"
+                          "justify-self": "center",
+                          "align-self": "center"
                         },
                         {
                           "color": "rgba(115,158,194,0.70)"
@@ -3051,6 +3052,17 @@
                         {
                           "letter-spacing": "2.4px"
                         }
+                      ],
+                      "grid": [
+                        {
+                          "grid-template-areas": "\"n\""
+                        },
+                        {
+                          "grid-template-columns": "1fr"
+                        },
+                        {
+                          "grid-template-rows": "1fr"
+                        }
                       ]
                     },
                     "tap_action": {
@@ -3058,7 +3070,7 @@
                     },
                     "type": "custom:button-card",
                     "view_layout": {
-                      "align-self": "end",
+                      "align-self": "start",
                       "grid-area": "system-label",
                       "justify-self": "start"
                     }
@@ -3175,7 +3187,7 @@
                               "box-sizing": "border-box"
                             },
                             {
-                              "height": "104px"
+                              "height": "78px"
                             },
                             {
                               "border-radius": "17px"
@@ -3340,7 +3352,7 @@
                               "box-sizing": "border-box"
                             },
                             {
-                              "height": "104px"
+                              "height": "78px"
                             },
                             {
                               "border-radius": "17px"
@@ -3508,7 +3520,7 @@
                               "box-sizing": "border-box"
                             },
                             {
-                              "height": "104px"
+                              "height": "78px"
                             },
                             {
                               "border-radius": "17px"
@@ -3630,7 +3642,7 @@
                           "margin": 0
                         },
                         {
-                          "height": "20px"
+                          "height": "18px"
                         },
                         {
                           "padding-left": "15px"
@@ -3638,7 +3650,8 @@
                       ],
                       "name": [
                         {
-                          "justify-self": "center"
+                          "justify-self": "center",
+                          "align-self": "center"
                         },
                         {
                           "color": "rgba(115,158,194,0.70)"
@@ -3652,6 +3665,17 @@
                         {
                           "letter-spacing": "2.4px"
                         }
+                      ],
+                      "grid": [
+                        {
+                          "grid-template-areas": "\"n\""
+                        },
+                        {
+                          "grid-template-columns": "1fr"
+                        },
+                        {
+                          "grid-template-rows": "1fr"
+                        }
                       ]
                     },
                     "tap_action": {
@@ -3659,7 +3683,7 @@
                     },
                     "type": "custom:button-card",
                     "view_layout": {
-                      "align-self": "end",
+                      "align-self": "start",
                       "grid-area": "fan-label",
                       "justify-self": "start"
                     }
@@ -3776,7 +3800,7 @@
                               "box-sizing": "border-box"
                             },
                             {
-                              "height": "92px"
+                              "height": "72px"
                             },
                             {
                               "border-radius": "17px"
@@ -3941,7 +3965,7 @@
                               "box-sizing": "border-box"
                             },
                             {
-                              "height": "92px"
+                              "height": "72px"
                             },
                             {
                               "border-radius": "17px"
@@ -4106,7 +4130,7 @@
                               "box-sizing": "border-box"
                             },
                             {
-                              "height": "92px"
+                              "height": "72px"
                             },
                             {
                               "border-radius": "17px"
@@ -4370,7 +4394,7 @@
                       "style": ":host{display:block!important;width:100%!important;min-width:0!important;max-width:none!important;height:100%!important;min-height:0!important;margin:0!important;box-sizing:border-box!important;justify-self:stretch!important;align-self:stretch!important}"
                     },
                     "icon": "mdi:home-thermometer-outline",
-                    "name": "[[[\nconst temp = Number(states['input_number.indoor_temperature']?.state);\nconst shown = Number.isFinite(temp) ? `${Math.round(temp)}°` : '--°';\nconst mode = states['input_select.hvac_mode']?.state || 'Idle';\nconst eco = states['input_boolean.eco_mode']?.state === 'on';\nlet message;\nif (mode === 'Cooling') {\n  message = `Cooling the house to ${shown}`;\n} else if (mode === 'Heating') {\n  message = `Heating the house to ${shown}`;\n} else {\n  message = 'The house is comfortable';\n}\nif (eco) {\n  message += ' · Eco active';\n}\nreturn message;\n]]]",
+                    "name": "[[[\nconst thermostat = states['climate.t6_pro_z_wave_programmable_thermostat'];\nconst room = Number(thermostat?.attributes?.current_temperature);\nconst target = Number(thermostat?.attributes?.temperature);\nconst roomText = Number.isFinite(room) ? `${Math.round(room)}°` : '--°';\nconst targetText = Number.isFinite(target) ? `${Math.round(target)}°` : '--°';\nconst selected = { heat: 'Heat', cool: 'Cool', off: 'Off' }[thermostat?.state] || 'Unknown';\nconst activity = { heating: 'Heating now', cooling: 'Cooling now', idle: 'Equipment idle', fan: 'Fan running', drying: 'Drying' }[thermostat?.attributes?.hvac_action] || 'Activity unknown';\nconst eco = ['Energy heat', 'Energy cool'].includes(thermostat?.attributes?.preset_mode);\nreturn `Room ${roomText} · Set ${targetText} · ${selected} selected · ${activity}${eco ? ' · Eco active' : ''}`;\n]]]",
                     "show_icon": true,
                     "show_label": false,
                     "show_name": true,
@@ -4461,9 +4485,7 @@
                       "action": "none"
                     },
                     "triggers_update": [
-                      "input_number.indoor_temperature",
-                      "input_select.hvac_mode",
-                      "input_boolean.eco_mode"
+                      "climate.t6_pro_z_wave_programmable_thermostat"
                     ],
                     "type": "custom:button-card",
                     "view_layout": {
@@ -4591,12 +4613,13 @@
                   "column-gap": "0",
                   "grid-template-areas": "\"badge\" \".\" \"system-label\" \".\" \"system-buttons\" \"fan-label\" \".\" \"fan-buttons\" \".\" \"eco\" \".\" \"status\" \".\" \"return\"",
                   "grid-template-columns": "1fr",
-                  "grid-template-rows": "44px 15px 20px 20px 104px 20px 20px 92px 20px 62px 5px 50px 16px 58px",
+                  "grid-template-rows": "44px 1fr 18px 1fr 78px 18px 1fr 72px 1fr 62px 1fr 50px 1fr 58px",
                   "margin": 0,
                   "overflow": "visible",
                   "padding": 0,
-                  "row-gap": "10px",
-                  "width": "min(100%, 650px)"
+                  "row-gap": "2px",
+                  "width": "min(100%, 650px)",
+                  "height": "100%"
                 },
                 "layout_type": "custom:grid-layout",
                 "type": "custom:layout-card",
@@ -4610,7 +4633,7 @@
             "layout": {
               "column-gap": "0",
               "grid-template-areas": "\"left divider . right\"",
-              "grid-template-columns": "minmax(0, 340px) 1px 35px min(100%, 650px)",
+              "grid-template-columns": "minmax(0, 320px) 1px 18px minmax(0,1fr)",
               "grid-template-rows": "1fr",
               "height": "100%",
               "margin": 0,
@@ -4623,7 +4646,7 @@
             "type": "custom:layout-card"
           },
           "card_mod": {
-            "style": "ha-card { width: 1080px; max-width: calc(100vw - 40px); height: 590px; max-height: calc(100vh - 34px); margin: 16px auto; padding: 18px 0 18px 0; box-sizing: border-box; overflow: hidden; border-radius: 30px; border: 1px solid rgba(56, 175, 255, 0.36); background: linear-gradient(145deg, rgba(8, 25, 43, 0.99), rgba(3, 13, 25, 0.99)); box-shadow: 0 28px 80px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.045); }"
+            "style": "ha-card { width: 1080px; max-width: calc(100vw - 40px); height: min(590px, calc(100vh - 24px)); max-height: calc(100vh - 24px); margin: 12px auto; padding: 12px 0; box-sizing: border-box; overflow: hidden; border-radius: 30px; border: 1px solid rgba(56, 175, 255, 0.36); background: linear-gradient(145deg, rgba(8, 25, 43, 0.99), rgba(3, 13, 25, 0.99)); box-shadow: 0 28px 80px rgba(0, 0, 0, 0.52), inset 0 1px 0 rgba(255, 255, 255, 0.045); }"
           },
           "type": "custom:mod-card"
         }

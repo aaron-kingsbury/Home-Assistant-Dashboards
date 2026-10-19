@@ -330,3 +330,14 @@ memories:
       /config/www/floorplan/panel_dev_card.yaml (NOT on any dashboard). Future
       swaps: mock_presence helper -> real binary_sensor; housevoice-hall-panel ->
       real browser_id; screen scripts -> real hardware.
+
+  - date: "2026-10-19"
+    session: "smart-climate-phase-1a"
+    summary: >
+      Repaired Honeywell T6 HVAC mode synchronization without commanding the
+      thermostat. Dashboard-to-real comparisons now read the climate entity state,
+      the OFF mapping sends the string "off", and real-to-dashboard synchronization
+      triggers on climate state changes. Temperature, fan, and Eco synchronization
+      remain unchanged. Updated the Climate Control status card to distinguish real
+      room temperature, requested target, selected HVAC mode, and hvac_action while
+      preserving the existing HouseVoice layout, styling, controls, and navigation.
