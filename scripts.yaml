@@ -497,3 +497,208 @@ housevoice_quick_add_calendar_event:
       data:
         browser_id:
           - housevoice-hall-panel
+
+housevoice_climate_simulation_evaluate:
+  alias: "HouseVoice Climate: Evaluate Simulation"
+  description: >
+    Calculate a schedule or manual-hold recommendation and update diagnostic
+    helpers only. This script never commands the physical thermostat.
+  mode: restart
+  sequence:
+    - variables:
+        thermostat_entity: climate.t6_pro_z_wave_programmable_thermostat
+        schedule_entity: schedule.housevoice_climate_weekly_schedule
+        thermostat_mode: >-
+          {{ states('climate.t6_pro_z_wave_programmable_thermostat') }}
+        thermostat_available: >-
+          {{ states('climate.t6_pro_z_wave_programmable_thermostat') not in
+          ['unknown', 'unavailable'] }}
+        real_target: >-
+          {{ state_attr('climate.t6_pro_z_wave_programmable_thermostat',
+          'temperature') | float(none) }}
+        schedule_enabled: >-
+          {{ is_state('input_boolean.housevoice_climate_schedule_enabled', 'on') }}
+        period: >-
+          {{ state_attr('schedule.housevoice_climate_weekly_schedule', 'period')
+          | default('', true) }}
+        period_key: >-
+          {{ state_attr('schedule.housevoice_climate_weekly_schedule', 'period')
+          | default('', true) | lower }}
+        hold_active: >-
+          {{ is_state('input_boolean.housevoice_climate_manual_hold', 'on') }}
+        held_target: >-
+          {{ states('input_number.housevoice_climate_hold_target') | float(none) }}
+        hold_expires: >-
+          {{ as_datetime(states('input_datetime.housevoice_climate_hold_expires'),
+          none) }}
+    - variables:
+        period_valid: >-
+          {{ period in ['Morning', 'Day', 'Evening', 'Sleep'] }}
+        heat_target: >-
+          {% if period in ['Morning', 'Day', 'Evening', 'Sleep'] %}
+            {{ states('input_number.housevoice_climate_' ~ period_key ~ '_heat')
+            | float(none) }}
+          {% else %}
+            {{ none }}
+          {% endif %}
+        cool_target: >-
+          {% if period in ['Morning', 'Day', 'Evening', 'Sleep'] %}
+            {{ states('input_number.housevoice_climate_' ~ period_key ~ '_cool')
+            | float(none) }}
+          {% else %}
+            {{ none }}
+          {% endif %}
+        hold_valid: >-
+          {{ hold_active and held_target is not none and 50 <= held_target <= 90
+          and hold_expires is not none and hold_expires > now() }}
+    - variables:
+        targets_valid: >-
+          {{ period_valid and heat_target is not none and cool_target is not none
+          and 50 <= heat_target <= 90 and 50 <= cool_target <= 90
+          and cool_target >= heat_target + 2 }}
+        scheduled_target: >-
+          {% if targets_valid and thermostat_mode == 'heat' %}
+            {{ heat_target }}
+          {% elif targets_valid and thermostat_mode == 'cool' %}
+            {{ cool_target }}
+          {% else %}
+            {{ none }}
+          {% endif %}
+    - variables:
+        recommendation: >-
+          {% if not thermostat_available or not schedule_enabled or
+          thermostat_mode == 'off' or not targets_valid %}
+            {{ none }}
+          {% elif hold_valid %}
+            {{ held_target }}
+          {% else %}
+            {{ scheduled_target }}
+          {% endif %}
+        effective_reason: >-
+          {% if not thermostat_available %}
+            Unavailable
+          {% elif not schedule_enabled or thermostat_mode == 'off' %}
+            Disabled
+          {% elif not targets_valid %}
+            Unavailable
+          {% elif hold_valid %}
+            Manual Hold
+          {% else %}
+            Schedule
+          {% endif %}
+    - variables:
+        would_change: >-
+          {{ recommendation is not none and real_target is not none and
+          (recommendation - real_target) | abs >= 0.5 }}
+        active_period_text: >-
+          {{ period if period_valid else 'Unavailable' }}
+        scheduled_target_text: >-
+          {{ (scheduled_target | round(0) | int | string) ~ ' °F'
+          if scheduled_target is not none else '—' }}
+        recommendation_text: >-
+          {{ (recommendation | round(0) | int | string) ~ ' °F'
+          if recommendation is not none else '—' }}
+        explanation: >-
+          {% if not thermostat_available %}
+            Thermostat is unavailable; simulation makes no recommendation.
+          {% elif not schedule_enabled %}
+            Smart Schedule is disabled; ordinary manual controls remain active.
+          {% elif thermostat_mode == 'off' %}
+            Thermostat mode is off; simulation will not recommend activation.
+          {% elif not period_valid %}
+            No valid named schedule period is active.
+          {% elif not targets_valid %}
+            {{ period }} targets are invalid; cooling must be at least 2 °F above heating.
+          {% elif hold_valid %}
+            Manual hold recommends {{ recommendation_text }} until {{ hold_expires | as_local }}.
+          {% elif would_change %}
+            {{ period }} schedule recommends {{ recommendation_text }}; thermostat remains unchanged.
+          {% else %}
+            {{ period }} schedule already matches the real {{ real_target | round(0) | int }} °F target.
+          {% endif %}
+    - if:
+        - condition: template
+          value_template: >-
+            {{ states('input_text.housevoice_climate_active_period') !=
+            active_period_text }}
+      then:
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.housevoice_climate_active_period
+          data:
+            value: "{{ active_period_text }}"
+    - if:
+        - condition: template
+          value_template: >-
+            {{ states('input_text.housevoice_climate_scheduled_target') !=
+            scheduled_target_text }}
+      then:
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.housevoice_climate_scheduled_target
+          data:
+            value: "{{ scheduled_target_text }}"
+    - if:
+        - condition: template
+          value_template: >-
+            {{ states('input_text.housevoice_climate_recommended_target') !=
+            recommendation_text }}
+      then:
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.housevoice_climate_recommended_target
+          data:
+            value: "{{ recommendation_text }}"
+    - if:
+        - condition: template
+          value_template: >-
+            {{ states('input_text.housevoice_climate_effective_reason') !=
+            effective_reason | trim }}
+      then:
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.housevoice_climate_effective_reason
+          data:
+            value: "{{ effective_reason | trim }}"
+    - if:
+        - condition: template
+          value_template: >-
+            {{ states('input_text.housevoice_climate_explanation') !=
+            explanation | trim }}
+      then:
+        - action: input_text.set_value
+          target:
+            entity_id: input_text.housevoice_climate_explanation
+          data:
+            value: "{{ explanation | trim }}"
+    - choose:
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{ would_change and
+                is_state('input_boolean.housevoice_climate_would_change', 'off') }}
+          sequence:
+            - action: input_boolean.turn_on
+              target:
+                entity_id: input_boolean.housevoice_climate_would_change
+        - conditions:
+            - condition: template
+              value_template: >-
+                {{ not would_change and
+                is_state('input_boolean.housevoice_climate_would_change', 'on') }}
+          sequence:
+            - action: input_boolean.turn_off
+              target:
+                entity_id: input_boolean.housevoice_climate_would_change
+
+housevoice_climate_resume_schedule:
+  alias: "HouseVoice Climate: Resume Schedule"
+  description: Clear the simulation-only manual hold and recalculate diagnostics.
+  mode: restart
+  sequence:
+    - action: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.housevoice_climate_manual_hold
+    - action: script.turn_on
+      target:
+        entity_id: script.housevoice_climate_simulation_evaluate

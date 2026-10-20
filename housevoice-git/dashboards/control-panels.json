@@ -4396,7 +4396,7 @@
                     "icon": "mdi:home-thermometer-outline",
                     "name": "[[[\nconst thermostat = states['climate.t6_pro_z_wave_programmable_thermostat'];\nconst room = Number(thermostat?.attributes?.current_temperature);\nconst target = Number(thermostat?.attributes?.temperature);\nconst roomText = Number.isFinite(room) ? `${Math.round(room)}°` : '--°';\nconst targetText = Number.isFinite(target) ? `${Math.round(target)}°` : '--°';\nconst selected = { heat: 'Heat', cool: 'Cool', off: 'Off' }[thermostat?.state] || 'Unknown';\nconst activity = { heating: 'Heating now', cooling: 'Cooling now', idle: 'Equipment idle', fan: 'Fan running', drying: 'Drying' }[thermostat?.attributes?.hvac_action] || 'Activity unknown';\nconst eco = ['Energy heat', 'Energy cool'].includes(thermostat?.attributes?.preset_mode);\nreturn `Room ${roomText} · Set ${targetText} · ${selected} selected · ${activity}${eco ? ' · Eco active' : ''}`;\n]]]",
                     "show_icon": true,
-                    "show_label": false,
+                    "show_label": true,
                     "show_name": true,
                     "show_state": false,
                     "styles": {
@@ -4446,13 +4446,13 @@
                       ],
                       "grid": [
                         {
-                          "grid-template-areas": "\"i n\""
+                          "grid-template-areas": "\"i n\" \"i l\""
                         },
                         {
                           "grid-template-columns": "52px 1fr"
                         },
                         {
-                          "grid-template-rows": "1fr"
+                          "grid-template-rows": "1fr 1fr"
                         },
                         {
                           "align-items": "center"
@@ -4471,18 +4471,97 @@
                           "justify-self": "start"
                         },
                         {
+                          "align-self": "end"
+                        },
+                        {
                           "color": "rgba(225,235,244,0.78)"
                         },
                         {
-                          "font-size": "13px"
+                          "font-size": "12px"
                         },
                         {
                           "font-weight": "400"
                         }
+                      ],
+                      "label": [
+                        {
+                          "justify-self": "start"
+                        },
+                        {
+                          "align-self": "start"
+                        },
+                        {
+                          "color": "#38AFFF"
+                        },
+                        {
+                          "font-size": "8px"
+                        },
+                        {
+                          "font-weight": "700"
+                        },
+                        {
+                          "letter-spacing": "0.5px"
+                        }
                       ]
                     },
                     "tap_action": {
-                      "action": "none"
+                      "action": "fire-dom-event",
+                      "browser_mod": {
+                        "service": "browser_mod.popup",
+                        "data": {
+                          "title": "Smart Climate Simulation",
+                          "dismissable": true,
+                          "content": {
+                            "type": "vertical-stack",
+                            "cards": [
+                              {
+                                "type": "markdown",
+                                "content": "## SIMULATION — NOT CONTROLLING HVAC\n\n**Schedule:** {{ states('input_boolean.housevoice_climate_schedule_enabled') | title }}  \n**Current period:** {{ states('input_text.housevoice_climate_active_period') }}  \n**Scheduled target:** {{ states('input_text.housevoice_climate_scheduled_target') }}  \n**Hold:** {{ states('input_boolean.housevoice_climate_manual_hold') | title }}{% if is_state('input_boolean.housevoice_climate_manual_hold', 'on') %} until {{ states('input_datetime.housevoice_climate_hold_expires') }}{% endif %}  \n**Recommendation:** {{ states('input_text.housevoice_climate_recommended_target') }} — {{ states('input_text.housevoice_climate_effective_reason') }}  \n\n{{ states('input_text.housevoice_climate_explanation') }}"
+                              },
+                              {
+                                "type": "entities",
+                                "title": "Simulation Controls",
+                                "show_header_toggle": false,
+                                "entities": [
+                                  "input_boolean.housevoice_climate_schedule_enabled",
+                                  "schedule.housevoice_climate_weekly_schedule",
+                                  "input_boolean.housevoice_climate_manual_hold",
+                                  "input_datetime.housevoice_climate_hold_expires",
+                                  "input_number.housevoice_climate_hold_target",
+                                  "input_boolean.housevoice_climate_would_change"
+                                ]
+                              },
+                              {
+                                "type": "button",
+                                "name": "RESUME SCHEDULE",
+                                "icon": "mdi:calendar-refresh",
+                                "tap_action": {
+                                  "action": "call-service",
+                                  "service": "script.turn_on",
+                                  "target": {
+                                    "entity_id": "script.housevoice_climate_resume_schedule"
+                                  }
+                                }
+                              },
+                              {
+                                "type": "entities",
+                                "title": "Editable Period Targets",
+                                "show_header_toggle": false,
+                                "entities": [
+                                  "input_number.housevoice_climate_morning_heat",
+                                  "input_number.housevoice_climate_morning_cool",
+                                  "input_number.housevoice_climate_day_heat",
+                                  "input_number.housevoice_climate_day_cool",
+                                  "input_number.housevoice_climate_evening_heat",
+                                  "input_number.housevoice_climate_evening_cool",
+                                  "input_number.housevoice_climate_sleep_heat",
+                                  "input_number.housevoice_climate_sleep_cool"
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      }
                     },
                     "triggers_update": [
                       "climate.t6_pro_z_wave_programmable_thermostat"
@@ -4492,7 +4571,8 @@
                       "align-self": "stretch",
                       "grid-area": "status",
                       "justify-self": "stretch"
-                    }
+                    },
+                    "label": "[[[ return 'SMART SCHEDULE · SIMULATION — NOT CONTROLLING HVAC'; ]]]"
                   },
                   {
                     "card_mod": {

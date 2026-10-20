@@ -341,3 +341,27 @@ memories:
       remain unchanged. Updated the Climate Control status card to distinguish real
       room temperature, requested target, selected HVAC mode, and hvac_action while
       preserving the existing HouseVoice layout, styling, controls, and navigation.
+
+  - date: "2026-10-20"
+    session: "smart-climate-phase-1b-simulation"
+    summary: >
+      Added the simulation-only HouseVoice Climate Intelligence controller on the
+      Phase 1A baseline commit 86d42d0. One editable storage schedule named
+      HouseVoice Climate Weekly Schedule covers all seven days with Morning, Day,
+      Evening, and Sleep block data; weekday starts are 06:00/08:30/17:00/22:00
+      and weekend starts are 07:30/10:00/17:00/23:00. Sleep is split at midnight.
+      YAML-backed helpers store schedule enablement, eight editable heat/cool
+      targets, manual hold state/target/expiry, synchronization guard, and five
+      diagnostic outputs. The authoritative evaluation script writes diagnostics
+      only; no new climate action exists. Manual dashboard or physical target
+      changes create a hold until the next named-period transition. The existing
+      real-to-dashboard temperature sync uses a short guard so its helper copy is
+      ignored, while genuine thermostat changes remain eligible. Resume Schedule
+      clears the hold. A Browser Mod popup is opened from the existing status row
+      and is labeled SIMULATION — NOT CONTROLLING HVAC. The offline Phase 1B suite
+      passed 26 tests, including full weekly coverage, midnight and week boundaries,
+      restart/expiry behavior, physical versus dashboard echo handling, disabled,
+      unavailable, invalid-target, and duplicate-output cases. Storage schedule
+      block edits remain UI-managed and are documented by the test constants;
+      physical-origin inference is intentionally limited to state sequencing and
+      the explicit synchronization guard. Live HVAC control remains disabled.

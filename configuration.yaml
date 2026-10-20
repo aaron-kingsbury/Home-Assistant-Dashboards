@@ -92,6 +92,18 @@ input_boolean:
   housevoice_panel_manual_hold:
     name: "HouseVoice Panel Manual Hold"
     icon: mdi:hand-back-right-outline
+  housevoice_climate_schedule_enabled:
+    name: "HouseVoice Climate Schedule Enabled"
+    icon: mdi:calendar-clock
+  housevoice_climate_manual_hold:
+    name: "HouseVoice Climate Manual Hold"
+    icon: mdi:hand-back-right-outline
+  housevoice_climate_sync_guard:
+    name: "HouseVoice Climate Synchronization Guard"
+    icon: mdi:sync-lock
+  housevoice_climate_would_change:
+    name: "HouseVoice Climate Would Change Thermostat"
+    icon: mdi:thermostat-alert
 
 input_select:
   housevoice_clock_brightness:
@@ -139,6 +151,98 @@ input_number:
     max: 100
     step: 1
     mode: slider
+  housevoice_climate_morning_heat:
+    name: "HouseVoice Climate Morning Heat"
+    min: 50
+    max: 90
+    step: 1
+    mode: box
+    unit_of_measurement: "°F"
+  housevoice_climate_morning_cool:
+    name: "HouseVoice Climate Morning Cool"
+    min: 50
+    max: 90
+    step: 1
+    mode: box
+    unit_of_measurement: "°F"
+  housevoice_climate_day_heat:
+    name: "HouseVoice Climate Day Heat"
+    min: 50
+    max: 90
+    step: 1
+    mode: box
+    unit_of_measurement: "°F"
+  housevoice_climate_day_cool:
+    name: "HouseVoice Climate Day Cool"
+    min: 50
+    max: 90
+    step: 1
+    mode: box
+    unit_of_measurement: "°F"
+  housevoice_climate_evening_heat:
+    name: "HouseVoice Climate Evening Heat"
+    min: 50
+    max: 90
+    step: 1
+    mode: box
+    unit_of_measurement: "°F"
+  housevoice_climate_evening_cool:
+    name: "HouseVoice Climate Evening Cool"
+    min: 50
+    max: 90
+    step: 1
+    mode: box
+    unit_of_measurement: "°F"
+  housevoice_climate_sleep_heat:
+    name: "HouseVoice Climate Sleep Heat"
+    min: 50
+    max: 90
+    step: 1
+    mode: box
+    unit_of_measurement: "°F"
+  housevoice_climate_sleep_cool:
+    name: "HouseVoice Climate Sleep Cool"
+    min: 50
+    max: 90
+    step: 1
+    mode: box
+    unit_of_measurement: "°F"
+  housevoice_climate_hold_target:
+    name: "HouseVoice Climate Held Target"
+    min: 50
+    max: 90
+    step: 1
+    mode: box
+    unit_of_measurement: "°F"
+
+input_datetime:
+  housevoice_climate_hold_expires:
+    name: "HouseVoice Climate Hold Expires"
+    has_date: true
+    has_time: true
+    icon: mdi:timer-sand-complete
+
+input_text:
+  housevoice_climate_active_period:
+    name: "HouseVoice Climate Active Period"
+    max: 32
+    icon: mdi:calendar-range
+  housevoice_climate_scheduled_target:
+    name: "HouseVoice Climate Scheduled Target"
+    max: 32
+    icon: mdi:thermometer-check
+  housevoice_climate_recommended_target:
+    name: "HouseVoice Climate Recommended Target"
+    max: 32
+    icon: mdi:thermometer-chevron-up
+  housevoice_climate_effective_reason:
+    name: "HouseVoice Climate Effective Reason"
+    max: 32
+    icon: mdi:information-outline
+  housevoice_climate_explanation:
+    name: "HouseVoice Climate Explanation"
+    max: 255
+    icon: mdi:text-box-outline
 
 timer:
   housevoice_panel_standby:

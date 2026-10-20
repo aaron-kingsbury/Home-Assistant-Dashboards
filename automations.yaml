@@ -185,12 +185,19 @@
       value_template: "{{ state_attr('climate.t6_pro_z_wave_programmable_thermostat',
         'temperature') | float(0) != states('input_number.indoor_temperature') |
         float(0) }}"
+    - action: input_boolean.turn_on
+      target:
+        entity_id: input_boolean.housevoice_climate_sync_guard
     - action: input_number.set_value
+      continue_on_error: true
       target:
         entity_id: input_number.indoor_temperature
       data:
         value: "{{ state_attr('climate.t6_pro_z_wave_programmable_thermostat', 'temperature')
           | int }}"
+    - action: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.housevoice_climate_sync_guard
 - id: housevoice_panel_presence_manager
   alias: HouseVoice Panel Presence Manager
   description: Wake the panel on presence, start the standby countdown when presence
@@ -1047,3 +1054,166 @@
       target:
         entity_id: switch.vaca_96ed4d2c4_alarm
   mode: single
+- id: housevoice_climate_manual_hold_capture
+  alias: "HouseVoice Climate: Capture Manual Hold"
+  description: >
+    Capture genuine dashboard or thermostat target changes as simulation-only
+    holds while suppressing real-to-dashboard synchronization echoes.
+  triggers:
+  - trigger: state
+    entity_id: input_number.indoor_temperature
+    id: dashboard_target
+  - trigger: state
+    entity_id: climate.t6_pro_z_wave_programmable_thermostat
+    attribute: temperature
+    id: thermostat_target
+  conditions:
+  - condition: state
+    entity_id: input_boolean.housevoice_climate_schedule_enabled
+    state: 'on'
+  - condition: template
+    value_template: >-
+      {{ trigger.from_state is not none and trigger.to_state is not none and
+      trigger.from_state.state not in ['unknown', 'unavailable'] and
+      trigger.to_state.state not in ['unknown', 'unavailable'] }}
+  - condition: template
+    value_template: >-
+      {{ trigger.id != 'dashboard_target' or
+      is_state('input_boolean.housevoice_climate_sync_guard', 'off') }}
+  actions:
+  - action: schedule.get_schedule
+    target:
+      entity_id: schedule.housevoice_climate_weekly_schedule
+    response_variable: weekly_schedule
+  - variables:
+      candidate_target: >-
+        {% if trigger.id == 'dashboard_target' %}
+          {{ trigger.to_state.state | float(none) }}
+        {% else %}
+          {{ trigger.to_state.attributes.temperature | float(none) }}
+        {% endif %}
+      previous_target: >-
+        {% if trigger.id == 'dashboard_target' %}
+          {{ trigger.from_state.state | float(none) }}
+        {% else %}
+          {{ trigger.from_state.attributes.temperature | float(none) }}
+        {% endif %}
+      next_transition_timestamp: >-
+        {% set day_names = ['monday', 'tuesday', 'wednesday', 'thursday',
+        'friday', 'saturday', 'sunday'] %}
+        {% set current_period =
+        state_attr('schedule.housevoice_climate_weekly_schedule', 'period') %}
+        {% set schedule_data =
+        weekly_schedule['schedule.housevoice_climate_weekly_schedule'] %}
+        {% set ns = namespace(next=none) %}
+        {% for offset in range(0, 8) %}
+          {% set day_name = day_names[(now().weekday() + offset) % 7] %}
+          {% for block in schedule_data[day_name] | default([]) %}
+            {% set block_start = today_at(block['from']) + timedelta(days=offset) %}
+            {% if block_start > now() and
+            block.data.period | default('') != current_period and
+            (ns.next is none or block_start < ns.next) %}
+              {% set ns.next = block_start %}
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+        {{ as_timestamp(ns.next) if ns.next is not none else 0 }}
+      synchronization_echo: >-
+        {{ trigger.id == 'thermostat_target' and
+        is_state('input_boolean.housevoice_climate_manual_hold', 'on') and
+        candidate_target is not none and
+        states('input_number.housevoice_climate_hold_target') | float(none) ==
+        candidate_target }}
+  - condition: template
+    value_template: >-
+      {{ candidate_target is not none and previous_target is not none and
+      candidate_target != previous_target and 50 <= candidate_target <= 90 and
+      next_transition_timestamp | float(0) > as_timestamp(now()) and
+      not synchronization_echo }}
+  - action: input_number.set_value
+    target:
+      entity_id: input_number.housevoice_climate_hold_target
+    data:
+      value: "{{ candidate_target }}"
+  - action: input_datetime.set_datetime
+    target:
+      entity_id: input_datetime.housevoice_climate_hold_expires
+    data:
+      timestamp: "{{ next_transition_timestamp }}"
+  - action: input_boolean.turn_on
+    target:
+      entity_id: input_boolean.housevoice_climate_manual_hold
+  - action: script.turn_on
+    target:
+      entity_id: script.housevoice_climate_simulation_evaluate
+  mode: queued
+  max: 10
+- id: housevoice_climate_simulation_orchestrator
+  alias: "HouseVoice Climate: Simulation Orchestrator"
+  description: >
+    Recalculate simulation diagnostics on schedule, settings, hold, and
+    thermostat-state events without commanding HVAC equipment.
+  triggers:
+  - trigger: state
+    entity_id: schedule.housevoice_climate_weekly_schedule
+    attribute: period
+    id: schedule_period
+  - trigger: state
+    entity_id:
+    - input_boolean.housevoice_climate_schedule_enabled
+    - input_boolean.housevoice_climate_manual_hold
+    - input_number.housevoice_climate_hold_target
+    - input_number.housevoice_climate_morning_heat
+    - input_number.housevoice_climate_morning_cool
+    - input_number.housevoice_climate_day_heat
+    - input_number.housevoice_climate_day_cool
+    - input_number.housevoice_climate_evening_heat
+    - input_number.housevoice_climate_evening_cool
+    - input_number.housevoice_climate_sleep_heat
+    - input_number.housevoice_climate_sleep_cool
+    id: simulation_input
+  - trigger: state
+    entity_id: climate.t6_pro_z_wave_programmable_thermostat
+    id: thermostat_mode
+  - trigger: state
+    entity_id: climate.t6_pro_z_wave_programmable_thermostat
+    attribute: temperature
+    id: thermostat_target
+  - trigger: time
+    at: input_datetime.housevoice_climate_hold_expires
+    id: hold_expired
+  - trigger: homeassistant
+    event: start
+    id: startup
+  actions:
+  - if:
+    - condition: trigger
+      id: startup
+    then:
+    - action: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.housevoice_climate_sync_guard
+    - wait_template: >-
+        {{ states('schedule.housevoice_climate_weekly_schedule') not in
+        ['unknown', 'unavailable'] }}
+      timeout: 00:00:30
+      continue_on_timeout: true
+  - if:
+    - condition: template
+      value_template: >-
+        {{ is_state('input_boolean.housevoice_climate_manual_hold', 'on') and
+        (trigger.id == 'schedule_period' or
+        (trigger.id in ['hold_expired', 'startup'] and
+        as_datetime(states('input_datetime.housevoice_climate_hold_expires'),
+        none) is not none and
+        as_datetime(states('input_datetime.housevoice_climate_hold_expires')) <=
+        now())) }}
+    then:
+    - action: input_boolean.turn_off
+      target:
+        entity_id: input_boolean.housevoice_climate_manual_hold
+  - action: script.turn_on
+    target:
+      entity_id: script.housevoice_climate_simulation_evaluate
+  mode: queued
+  max: 10
