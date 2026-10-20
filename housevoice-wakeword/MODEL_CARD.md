@@ -7,9 +7,11 @@ Fill this in for every candidate. Do not overwrite prior results; copy this file
 - Model filename: `housevoice.onnx`
 - Model SHA-256:
 - Training date:
-- Trainer notebook SHA-256: `b6adcdde2fe19a145bcc8628b304b662c5c2c8070aa84fbaa21a307eda53cb7a`
+- Trainer notebook SHA-256: `ac567ee3e96a145795afcab19dfc33132d95bfaa695777eae0ad80a07da7f433`
 - Trainer upstream commit: `393d06d1beeddf8cff370e79ed8c209d4e803319`
 - OpenWakeWord commit: `368c03716d1e92591906a84949bc477f3a834455`
+- Piper sample generator commit: `2971426a55072f7d22fec416ca7800df8bd23207`
+- Colab runtime: `2026.07` / Python `3.12.13`
 - Target phrase: `house voice`
 - Language: `en_US`
 

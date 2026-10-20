@@ -23,21 +23,63 @@ LANGUAGE = "en_US"
 Notebook SHA-256:
 
 ```text
-b6adcdde2fe19a145bcc8628b304b662c5c2c8070aa84fbaa21a307eda53cb7a
+ac567ee3e96a145795afcab19dfc33132d95bfaa695777eae0ad80a07da7f433
 ```
 
-The notebook also pins OpenWakeWord itself to commit `368c03716d1e92591906a84949bc477f3a834455` instead of following a changing `master` branch.
+The notebook pins:
 
-The current official OpenWakeWord notebook is not the recommended route because its older dependency pins fail on modern Colab images. The hosted OpenWakeWord Training Center is simpler, but it requires an account and is less reproducible. The packaged notebook can use a free Colab T4; Colab Pro is optional.
+- Colab runtime `2026.07`: Python `3.12.13`, NumPy `2.0.2`, PyTorch/Torchaudio `2.11.0`.
+- `piper-tts==1.3.0`, which embeds eSpeak phonemization.
+- Piper sample generator source commit `2971426a55072f7d22fec416ca7800df8bd23207`.
+- OpenWakeWord commit `368c03716d1e92591906a84949bc477f3a834455`.
+
+The Piper sample generator is cloned from its tagged source rather than installed from PyPI. Its `3.2.0` wheel omits the bundled `piper_train` package, as documented by upstream issue #20. The notebook does not install `piper-phonemize-cross`, Torch, Torchvision, or CUDA packages.
+
+The official OpenWakeWord notebook that attempted `torchvision==0.20.0` and CUDA 12.1 packages is not compatible with a Python 3.13 Colab runtime. Do not try to repair that environment in place.
 
 ## Train externally
 
-1. Download `train_housevoice_colab.ipynb` from this directory.
-2. Upload it to Google Colab.
-3. Select **Runtime → Change runtime type → T4 GPU**. High RAM/L4 can reduce runtime but is not required.
-4. Run all cells without changing the preconfigured phrase, model name, or language.
-5. Download the generated `housevoice.onnx`. Keep the generated metrics and `housevoice.tflite` as training artifacts.
-6. Record the notebook commit, notebook SHA-256, model SHA-256, training metrics, and date in `MODEL_CARD.md`.
+1. Download `train_housevoice_colab.ipynb` from this directory and upload it to Google Colab.
+2. Before connecting, choose **Runtime → Change runtime type**.
+3. Set **Runtime Version** to **2026.07** and select a **T4 GPU**. L4 is also compatible.
+4. Connect and run the Configure, Install, Clone, and Pre-flight cells in order.
+5. Confirm the pre-flight reports Python 3.12, NumPy 2.0.2, Torch/Torchaudio 2.11.0, CUDA available, and both pinned Git commits.
+6. Run the **HOUSEVOICE speech smoke test**. Play the generated WAV. If it clearly says HOUSEVOICE, type `HOUSEVOICE` at the prompt. Do not continue if it is silent, corrupted, or pronounces the wrong phrase.
+7. Continue with the large downloads and full training only after the speech gate passes.
+8. Download the generated `housevoice.onnx`. Keep the metrics and `housevoice.tflite` as training artifacts.
+9. Record the notebook SHA-256, model SHA-256, training metrics, and date in `MODEL_CARD.md`.
+
+This revision has been statically checked but has **not** been executed in Google Colab by the Home Assistant agent. A passing speech gate proves dependency setup and Piper synthesis, not full model training.
+
+## Colab troubleshooting
+
+### Python 3.13 or `No matching distribution for piper-phonemize-cross`
+
+You are in the wrong runtime or running the obsolete official notebook. Disconnect, select runtime version **2026.07**, reconnect, and start this packaged notebook from the first cell. Do not install `piper-phonemize-cross`; it has no CPython 3.13 wheel and is not used by Piper 1.3.0.
+
+### `No matching distribution for torchvision==0.20.0` or CUDA 12.1 downloads
+
+Stop the run and factory-reset the Colab runtime. This notebook never requests Torchvision, Torch, or CUDA wheels. Seeing those packages means cells from the obsolete notebook are still running or the runtime was contaminated.
+
+### Base-version validation fails
+
+Use **Runtime → Disconnect and delete runtime**, then reselect runtime version **2026.07** and a GPU. Do not use `pip install --upgrade torch`, NumPy, or Torchaudio.
+
+### `ModuleNotFoundError: piper_train`
+
+Rerun the Clone cell. It must report Piper sample generator commit `2971426a55072f7d22fec416ca7800df8bd23207`. If a prior partial checkout remains, delete only `/content/piper-sample-generator` in the disposable Colab runtime and rerun that cell. Do not install the `piper-sample-generator==3.2.0` wheel as a workaround; that wheel is the source of the missing module.
+
+### `ModuleNotFoundError: piper_phonemize`
+
+The obsolete generator code is being imported. The pinned source uses `piper.phonemize_espeak` from `piper-tts==1.3.0`. Factory-reset the runtime and rerun this notebook from the top.
+
+### Speech smoke test fails or sounds wrong
+
+Do not start the large downloads. Save the complete Install, Clone, Pre-flight, and speech-cell output. Confirm that `/content/piper-sample-generator/models/en_US-libritts_r-medium.pt` is larger than 100 MB and that its adjacent `.json` file exists. Rerun the Clone cell once; if it still fails, report the exact traceback and the displayed version/commit lines.
+
+### Runtime version 2026.07 is unavailable
+
+Stop rather than substituting the latest Python 3.13 image. Colab currently lists past runtimes under **Runtime → Change runtime type**; this workflow has not been validated against another image.
 
 Do not treat notebook validation metrics as deployment proof. Graham's room, microphone, television, music, and family speech are the acceptance environment.
 

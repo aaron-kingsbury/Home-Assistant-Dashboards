@@ -1,6 +1,6 @@
 # HOUSEVOICE Assistant — Graham Echo Proof of Concept
 
-Last updated: 2026-10-18
+Last updated: 2026-10-20
 
 ## Scope and safety boundaries
 
@@ -102,7 +102,7 @@ The verified VACA 0.13.5 deployment location is `/homeassistant/vaca/custom/open
 
 No existing HOUSEVOICE ONNX model was found locally or in a public model search. The supported free training paths are the official openWakeWord training notebook/Training Center or another compatible local ONNX trainer. This Home Assistant host has 8 CPU cores and about 8 GB RAM but no GPU and none of the required PyTorch, TensorFlow, ONNX, ONNX Runtime, or openWakeWord training packages. Production training should not be installed into the live Home Assistant/OpenCode runtime. A real model therefore requires an external training run, followed by Graham-specific positive and false-activation recordings for tuning.
 
-A reproducible external-GPU package now exists at `housevoice-wakeword/`. It includes a Colab notebook preconfigured for target phrase `house voice`, model name `housevoice`, and `en_US`; the trainer source is pinned to `pafernanr/openwakeword-colab-2026` commit `393d06d1beeddf8cff370e79ed8c209d4e803319`, and OpenWakeWord is pinned to commit `368c03716d1e92591906a84949bc477f3a834455`. The package also includes a model card, offline threshold evaluator, and a consent-gated Graham CDP recorder that verifies the `/kids-rooms/grahams-room` target, displays a recording countdown, stops every microphone track, and writes 16 kHz mono PCM WAV files. No ML packages or model were installed on Home Assistant, and no recording was made while preparing the package.
+A reproducible external-GPU package exists at `housevoice-wakeword/`. Its Colab notebook is preconfigured for target phrase `house voice`, model name `housevoice`, and `en_US`. After Python 3.13 failures in the obsolete official notebook, the package was updated on 2026-10-20 to require Colab runtime `2026.07` (Python 3.12.13, NumPy 2.0.2, Torch/Torchaudio 2.11.0), `piper-tts==1.3.0`, Piper sample generator source commit `2971426a55072f7d22fec416ca7800df8bd23207`, and OpenWakeWord commit `368c03716d1e92591906a84949bc477f3a834455`. It does not install the incompatible `piper-phonemize-cross`, Torchvision, Torch, or CUDA packages. A blocking pre-training cell must generate a valid non-silent `house voice` WAV and receive explicit listening confirmation before large downloads begin. The package also includes a model card, offline threshold evaluator, and consent-gated Graham CDP recorder. No ML packages, model, Home Assistant runtime setting, VACA setting, or Walkie file was changed locally. The revised notebook has not yet been executed in Colab, so successful training is not claimed.
 
 `Hey Jarvis` was used only as a development wake word during physical testing. At Graham's temporary music volume of 6, Piper playback of the wake phrase through the physical Echo speaker activated VACA. A separated command clip was transcribed as `what is the weather`, handled locally, and answered with `55 °F and sunny`. The selector was restored to `None` after the tests because the production wake word remains HOUSEVOICE.
 
