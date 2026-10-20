@@ -23,13 +23,16 @@ LANGUAGE = "en_US"
 Notebook SHA-256:
 
 ```text
-ac567ee3e96a145795afcab19dfc33132d95bfaa695777eae0ad80a07da7f433
+54f85dead02e639605a7adca78713b8347cf2b62b212c1eec5e4665004c2696f
 ```
 
 The notebook pins:
 
 - Colab runtime `2026.07`: Python `3.12.13`, NumPy `2.0.2`, PyTorch/Torchaudio `2.11.0`.
 - `piper-tts==1.3.0`, which embeds eSpeak phonemization.
+- `transformers==4.57.6` with `huggingface-hub==0.34.4`.
+- `speechbrain==1.1.2`, which supports Torchaudio 2.9+ without `list_audio_backends()`.
+- `torch-audiomentations==0.12.0`, which removed the obsolete backend setter.
 - Piper sample generator source commit `2971426a55072f7d22fec416ca7800df8bd23207`.
 - OpenWakeWord commit `368c03716d1e92591906a84949bc477f3a834455`.
 
@@ -51,6 +54,110 @@ The official OpenWakeWord notebook that attempted `torchvision==0.20.0` and CUDA
 
 This revision has been statically checked but has **not** been executed in Google Colab by the Home Assistant agent. A passing speech gate proves dependency setup and Piper synthesis, not full model training.
 
+## Repair an existing 2026.07 Colab session
+
+If Configure, Install, and Clone from the previous notebook revision already completed, retain the current runtime and `/content` downloads. Run this small package correction in a new cell:
+
+```python
+import subprocess, sys
+
+subprocess.run([
+    sys.executable, "-m", "pip", "install",
+    "--disable-pip-version-check",
+    "--constraint", "/content/housevoice-constraints.txt",
+    "huggingface-hub==0.34.4",
+    "transformers==4.57.6",
+    "speechbrain==1.1.2",
+    "torch-audiomentations==0.12.0",
+], check=True)
+```
+
+Then run this compatibility and regression cell. It updates only the disposable OpenWakeWord checkout, removes the earlier notebook's Torchaudio shim if present, and reuses the downloaded Piper model:
+
+```python
+import importlib
+import inspect
+import sys
+import tempfile
+from pathlib import Path
+
+import numpy as np
+import soundfile as sf
+import torch
+import torchaudio
+
+for prefix in ("transformers", "torchmetrics", "speechbrain", "openwakeword", "torch_audiomentations"):
+    for module_name in list(sys.modules):
+        if module_name == prefix or module_name.startswith(prefix + "."):
+            del sys.modules[module_name]
+importlib.invalidate_caches()
+
+# Remove the previous notebook's installed-package shim. OpenWakeWord is
+# adapted below instead of changing Torchaudio globally.
+torchaudio_init = Path(torchaudio.__file__)
+old_marker = "# -- PATCH: info() shim for torchaudio 2.x --"
+torchaudio_text = torchaudio_init.read_text()
+if old_marker in torchaudio_text:
+    torchaudio_init.write_text(torchaudio_text.split(old_marker, 1)[0].rstrip() + "\n")
+    if hasattr(torchaudio, "info"):
+        delattr(torchaudio, "info")
+
+data_path = Path("/content/openwakeword/openwakeword/data.py")
+data_text = data_path.read_text()
+marker = "# -- HOUSEVOICE SoundFile compatibility for Torchaudio 2.11 --"
+if marker not in data_text:
+    helper = r'''
+# -- HOUSEVOICE SoundFile compatibility for Torchaudio 2.11 --
+import types as _types
+import soundfile as _soundfile
+
+def _housevoice_audio_info(file_path, *args, **kwargs):
+    info = _soundfile.info(str(file_path))
+    return _types.SimpleNamespace(
+        num_frames=info.frames, sample_rate=info.samplerate,
+        num_channels=info.channels, bits_per_sample=16, encoding="PCM_S")
+
+def _housevoice_load_audio(file_path, frame_offset=0, num_frames=-1, *args, **kwargs):
+    frames = -1 if num_frames is None or num_frames < 0 else num_frames
+    audio, sample_rate = _soundfile.read(
+        str(file_path), start=frame_offset, frames=frames,
+        dtype="float32", always_2d=True)
+    return torch.from_numpy(audio.T.copy()), sample_rate
+'''
+    data_text = data_text.replace("import torchaudio\n", "import torchaudio\n" + helper + "\n", 1)
+data_text = data_text.replace("torchaudio.info(", "_housevoice_audio_info(")
+data_text = data_text.replace("torchaudio.load(", "_housevoice_load_audio(")
+data_path.write_text(data_text)
+
+for prefix in ("transformers", "torchmetrics", "speechbrain", "openwakeword", "torch_audiomentations"):
+    for module_name in list(sys.modules):
+        if module_name == prefix or module_name.startswith(prefix + "."):
+            del sys.modules[module_name]
+importlib.invalidate_caches()
+
+from transformers.utils.hub import is_offline_mode
+import torchmetrics
+from speechbrain.dataio.dataio import read_audio
+from speechbrain.utils.torch_audio_backend import check_torchaudio_backend
+
+assert callable(is_offline_mode)
+check_torchaudio_backend()
+with tempfile.NamedTemporaryFile(suffix=".wav") as test_wav:
+    sf.write(test_wav.name, np.zeros(1600, dtype=np.float32), 16000)
+    assert tuple(read_audio(test_wav.name).shape) == (1600,)
+
+from openwakeword.data import generate_adversarial_texts, augment_clips, mmap_batch_generator
+from openwakeword.utils import compute_features_from_generator, AudioFeatures
+assert "torchaudio.info(" not in data_path.read_text()
+assert "torchaudio.load(" not in data_path.read_text()
+
+print("PASS: Transformers/TorchMetrics, SpeechBrain/Torchaudio, and OpenWakeWord imports")
+_STEP_2_OK = True
+_STEP_3_OK = True
+```
+
+If both cells pass, run the existing **HOUSEVOICE speech smoke test** next. Do not rerun Configure or download the Piper model again. A runtime restart should not be necessary. If Python reports that newly installed code cannot replace an already imported module, clear the failed modules as shown above and rerun the regression cell once; restart only if that still fails.
+
 ## Colab troubleshooting
 
 ### Python 3.13 or `No matching distribution for piper-phonemize-cross`
@@ -64,6 +171,14 @@ Stop the run and factory-reset the Colab runtime. This notebook never requests T
 ### Base-version validation fails
 
 Use **Runtime → Disconnect and delete runtime**, then reselect runtime version **2026.07** and a GPU. Do not use `pip install --upgrade torch`, NumPy, or Torchaudio.
+
+### TorchMetrics fails importing `is_offline_mode`
+
+This means Transformers 5.x from the Colab image is still paired with `huggingface-hub==0.34.4`. Use the current-session repair above or rerun the updated Install cell. The supported resolution is `transformers==4.57.6` with Hub 0.34.4; do not add `is_offline_mode` to Hugging Face Hub manually.
+
+### SpeechBrain calls `torchaudio.list_audio_backends()`
+
+SpeechBrain 1.0.3 is still loaded. Upgrade to the pinned `speechbrain==1.1.2`, clear failed SpeechBrain modules, and rerun Pre-flight. Version 1.1.2 contains the released Torchaudio 2.9+ guard and SoundFile audio adapter; do not add a fake `list_audio_backends` function.
 
 ### `ModuleNotFoundError: piper_train`
 
