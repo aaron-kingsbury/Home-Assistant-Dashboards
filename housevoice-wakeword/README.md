@@ -4,7 +4,7 @@ This package prepares a reproducible `HOUSEVOICE` OpenWakeWord model for Graham'
 
 ## Chosen path
 
-Use `train_housevoice_colab.ipynb` on an external Google Colab GPU. It is a HOUSEVOICE-customized copy of the MIT-licensed `pafernanr/openwakeword-colab-2026` notebook pinned to commit:
+Use `train_housevoice_colab.ipynb` in separate Google Colab CPU and GPU runtimes. It is a HOUSEVOICE-customized copy of the MIT-licensed `pafernanr/openwakeword-colab-2026` notebook pinned to commit:
 
 ```text
 393d06d1beeddf8cff370e79ed8c209d4e803319
@@ -23,7 +23,7 @@ LANGUAGE = "en_US"
 Notebook SHA-256:
 
 ```text
-af4f1533a862c1f5fb4b52e7cf54a3285087c9357d369fe9dd6b459eb5db8658
+205778ad85d279669ed45f87d08c8b619cdd357fcea18e7f862bff9a4cbd63fa
 ```
 
 The notebook pins:
@@ -40,20 +40,62 @@ The Piper sample generator is restored from its exact commit archive rather than
 
 The official OpenWakeWord notebook that attempted `torchvision==0.20.0` and CUDA 12.1 packages is not compatible with a Python 3.13 Colab runtime. Do not try to repair that environment in place.
 
-## Train externally
+## Runtime audit
 
-1. Upload `train_housevoice_colab.ipynb` to Google Colab.
-2. Before connecting, choose **Runtime → Change runtime type**.
-3. Select runtime **2026.07** and a **T4 GPU**. L4 is also compatible.
-4. Confirm that Google Drive has at least **35 GB free**. Step 0 mounts Drive and creates `MyDrive/HOUSEVOICE_Wakeword/`.
-5. Run Steps 0–3. Approve the Google Drive mount when prompted.
-6. Confirm Pre-flight reports Python 3.12, NumPy 2.0.2, Torch/Torchaudio 2.11.0, CUDA available, both pinned source commits, and all dependency regression checks passing.
-7. Run Step 4, play the generated WAV, and type `HOUSEVOICE` only if it clearly says “house voice.” This required smoke test still runs after every new runtime.
-8. Run Step 5. Large downloads write to Drive as `.part` files, resume with HTTP Range requests, and are renamed only after exact-size and format checks pass.
-9. Continue through Steps 6–9. The final `housevoice.onnx`, `housevoice.tflite`, metrics, and hashes remain in the run directory in Drive even if browser download fails.
-10. Record the notebook SHA-256, model SHA-256, training metrics, and date in `MODEL_CARD.md`.
+| Step | Runtime | Why |
+|---|---|---|
+| 0 | CPU, GPU bootstrap | Mounts Drive, defines paths/helpers, and verifies the selected phase. |
+| 1 | CPU, GPU bootstrap | CPU installs the full pinned stack; GPU installs only pinned YAML support and verifies the base Torch/CUDA stack. |
+| 2 | CPU | Restores source archives and persistent Piper voices. |
+| 3 | CPU | Runs dependency and source pre-flight checks. |
+| 4 | CPU | Generates and validates the HOUSEVOICE speech sample. Piper has a CPU path. |
+| 5 | CPU | Downloads, resumes, extracts, and verifies datasets/models. |
+| 6 | CPU | Converts FMA audio and creates persistent ACAV subsets. |
+| 7 | CPU | Generates/resamples persistent Piper TTS clips. |
+| 8A | CPU | Runs OpenWakeWord augmentation and embedding extraction using its supported CPU provider. |
+| 8B | **T4/L4 GPU required** | Stages prepared arrays into local scratch, then performs three-stage neural-network training and validation. |
+| 9 | CPU | Reloads the completed checkpoint, ensembles candidates, exports ONNX/TFLite, and verifies numerical equivalence. |
 
-This revision has been statically checked but has **not** been executed in Google Colab by the Home Assistant agent. Drive mounting, downloading, training resume, and export still require user-side Colab validation.
+Only Step 8B requires CUDA.
+
+## Exact Colab procedure
+
+### CPU preparation
+
+1. Upload `train_housevoice_colab.ipynb` to Colab.
+2. Choose **Runtime → Change runtime type**.
+3. Select runtime **2026.07** and **Hardware accelerator: None**.
+4. Leave `RUNTIME_PHASE = "CPU"` in Step 0.
+5. Confirm Google Drive has at least **35 GB free**.
+6. Run Steps **0 through 8A** in order.
+7. In Step 4, play the WAV and type `HOUSEVOICE` only if it clearly says “house voice.”
+8. Do not request a GPU until Step 8A reports all four feature files verified and says CPU feature preparation is complete.
+
+### GPU training
+
+1. Disconnect the CPU runtime.
+2. Change the runtime to **2026.07** with a **T4 or L4 GPU**.
+3. Change Step 0 to `RUNTIME_PHASE = "GPU"`.
+4. Run Steps **0 and 1 only**.
+5. Jump directly to **Step 8B**. Do not rerun Steps 2–8A.
+6. Confirm Step 8B identifies the GPU and prints the persistent feature fingerprint.
+7. Allow its one-time sequential copy of prepared arrays from Drive to `/content/housevoice-gpu-cache`; this avoids slow random Drive reads during training and does not regenerate or redownload data.
+8. If a checkpoint exists, confirm it prints `RESUME checkpoint: stage=..., next_step=...`.
+9. Wait for Step 8B to report training complete and save the stage-4 checkpoint.
+
+### CPU export
+
+1. Disconnect the GPU runtime immediately after Step 8B completes.
+2. Change the runtime back to **2026.07**, **Hardware accelerator: None**.
+3. Change Step 0 back to `RUNTIME_PHASE = "CPU"`.
+4. Run Steps **0 and 1 only**.
+5. Jump directly to **Step 9**.
+6. Step 9 reloads the completed Drive checkpoint and exports/verifies `housevoice.onnx` and `housevoice.tflite` entirely on CPU.
+7. Record the model SHA-256, metrics, notebook SHA-256, and date in `MODEL_CARD.md`.
+
+You do **not** rerun downloads, audio preparation, TTS generation, or augmentation after switching to GPU. You do **not** rerun those steps before CPU export either.
+
+This revision has been statically checked but has **not** been executed in Google Colab by the Home Assistant agent. CPU feature extraction time and end-to-end phase switching still require user-side validation.
 
 ## What persists in Google Drive
 
@@ -68,27 +110,31 @@ The notebook stores durable state under `MyDrive/HOUSEVOICE_Wakeword/`:
 
 The FMA ZIP is removed only after every member has been CRC-checked, atomically extracted, and recorded in a persistent size manifest. The extracted dataset remains. The original ACAV file is retained after subset creation so corrupt or missing subsets can be rebuilt without another 17.28 GB download.
 
-## Reconnect after Colab terminates the runtime
+## Recovery after runtime termination
 
-Do not use the old disconnected tab as proof that the runtime can be recovered. Start or reconnect a runtime with the required image, then:
+### Interrupted during Steps 0–8A
 
-1. Select runtime **2026.07** and a **T4 or L4 GPU**.
-2. Run Step **0** and authorize the same Google Drive account. Confirm it prints `MyDrive/HOUSEVOICE_Wakeword`.
-3. Run Step **1**. Apt packages are reinstalled because the VM is new; pip reuses its Drive cache and verifies that Torch/Torchaudio remain 2.11.0.
-4. Run Step **2**. It restores clean disposable source trees from Drive and reuses the persistent Piper voice.
-5. Run Step **3** and require a complete Pre-flight pass.
-6. Run Step **4**, listen again, and type `HOUSEVOICE`.
-7. Run Step **5**. Complete files print `cached + verified`; interrupted files resume from their Drive `.part` byte count. FMA and MIT extraction skip valid completed members.
-8. Run Step **6**. Existing valid FMA WAVs and ACAV subsets are reused.
-9. Run Step **7**. Existing generated clips are validated and reused.
-10. Run Step **8**. It prints `RESUME checkpoint: stage=..., next_step=...` when a compatible checkpoint exists, then continues from that stage and step.
-11. Run Step **9** after training completes. Exports and metrics are already in Drive before browser downloads start.
+Reconnect to runtime 2026.07 with **Hardware accelerator: None**, leave `RUNTIME_PHASE = "CPU"`, and rerun from Step 0 through the interrupted step. Drive-backed `.part` files, manifests, clips, subsets, and features are validated and reused.
 
-A normal runtime termination does not require deleting the Drive workspace. Use **Disconnect and delete runtime** only when the base image or installed environment is contaminated; deleting the runtime still does not delete Drive data.
+### Interrupted during Step 8B
 
-If a `.part` file fails validation, leave it in place and rerun the same step. The downloader retries six times and retains the verified byte prefix. If the server ignores Range requests, the notebook restarts only that one file rather than appending incompatible data.
+Reconnect to runtime 2026.07 with a T4/L4, set `RUNTIME_PHASE = "GPU"`, rerun Steps 0 and 1, then jump to Step 8B. It restores the model, optimizer, stage, next step, metrics, best candidates, and random-number state from the last atomic checkpoint.
+
+### Interrupted during Step 9
+
+Reconnect on CPU, set `RUNTIME_PHASE = "CPU"`, rerun Steps 0 and 1, then Step 9. The completed training checkpoint remains in Drive and does not require retraining.
+
+If a `.part` download fails validation, leave it in place and rerun the same CPU step. The downloader retains the verified prefix when the server supports Range and restarts only that file when it does not.
 
 ## Colab troubleshooting
+
+### CPU step says a GPU is attached
+
+The notebook intentionally blocks CPU preparation/export on a GPU runtime. Change the hardware accelerator to **None**, keep `RUNTIME_PHASE = "CPU"`, and rerun Steps 0 and 1.
+
+### Step 8B says CUDA is unavailable
+
+Attach a T4 or L4, set `RUNTIME_PHASE = "GPU"`, then rerun Steps 0 and 1 before Step 8B. Do not install a replacement Torch or CUDA wheel.
 
 ### Google Drive is full
 
@@ -108,7 +154,7 @@ Stop the run and factory-reset the Colab runtime. This notebook never requests T
 
 ### Base-version validation fails
 
-Use **Runtime → Disconnect and delete runtime**, then reselect runtime version **2026.07** and a GPU. Do not use `pip install --upgrade torch`, NumPy, or Torchaudio.
+Use **Runtime → Disconnect and delete runtime**, then reselect runtime version **2026.07** with the hardware required by the current phase. Do not use `pip install --upgrade torch`, NumPy, or Torchaudio.
 
 ### TorchMetrics fails importing `is_offline_mode`
 
