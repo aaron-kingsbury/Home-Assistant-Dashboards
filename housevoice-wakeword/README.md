@@ -23,7 +23,7 @@ LANGUAGE = "en_US"
 Notebook SHA-256:
 
 ```text
-205778ad85d279669ed45f87d08c8b619cdd357fcea18e7f862bff9a4cbd63fa
+f5aa827b3ad08a669f4503ed365ca426056c4264ffd7db8d619d778187430c79
 ```
 
 The notebook pins:
@@ -40,6 +40,26 @@ The Piper sample generator is restored from its exact commit archive rather than
 
 The official OpenWakeWord notebook that attempted `torchvision==0.20.0` and CUDA 12.1 packages is not compatible with a Python 3.13 Colab runtime. Do not try to repair that environment in place.
 
+## Storage architecture and budget
+
+Large raw datasets are disposable Colab-local scratch. Google Drive contains only prepared assets needed after a runtime switch.
+
+Estimated Drive use with the current training configuration:
+
+| Persistent item | Estimated size |
+|---|---:|
+| ACAV 10% training subset | 1.728 GB |
+| ACAV 1% validation subset | 0.173 GB |
+| 1,500 FMA 16-kHz mono WAVs | Up to 1.44 GB |
+| Piper/OpenWakeWord models and source archives | About 0.3 GB |
+| MIT RIRs, TTS clips, augmented features, checkpoints, exports | About 2.5–4.5 GB |
+| Atomic-write/headroom allowance | About 1–1.5 GB |
+| **Expected peak Drive use** | **About 7–9 GB** |
+
+Normal CPU preparation needs approximately **10–12 GB** of incremental local scratch, dominated by the 7.68 GB FMA ZIP. GPU training stages approximately **2–4 GB** of prepared arrays locally. The one-time migration needs approximately **2.5 GB local free** because it stages only the required 1.9008 GB ACAV subsets, not the 17.28 GB source.
+
+Actual TTS/feature sizes vary with generated clip duration, but the design remains below the free 15 GB Drive limit with several gigabytes of margin. Pip, Hugging Face caches, full ACAV, the FMA ZIP, and extracted MP3s are not persistent Drive assets.
+
 ## Runtime audit
 
 | Step | Runtime | Why |
@@ -49,8 +69,8 @@ The official OpenWakeWord notebook that attempted `torchvision==0.20.0` and CUDA
 | 2 | CPU | Restores source archives and persistent Piper voices. |
 | 3 | CPU | Runs dependency and source pre-flight checks. |
 | 4 | CPU | Generates and validates the HOUSEVOICE speech sample. Piper has a CPU path. |
-| 5 | CPU | Downloads, resumes, extracts, and verifies datasets/models. |
-| 6 | CPU | Converts FMA audio and creates persistent ACAV subsets. |
+| 5 | CPU | Uses local raw scratch to create/verify persistent ACAV subsets, FMA WAVs, MIT RIRs, and shared models. |
+| 6 | CPU | Revalidates the compact persistent ACAV/FMA outputs; no raw download occurs. |
 | 7 | CPU | Generates/resamples persistent Piper TTS clips. |
 | 8A | CPU | Runs OpenWakeWord augmentation and embedding extraction using its supported CPU provider. |
 | 8B | **T4/L4 GPU required** | Stages prepared arrays into local scratch, then performs three-stage neural-network training and validation. |
@@ -66,10 +86,11 @@ Only Step 8B requires CUDA.
 2. Choose **Runtime → Change runtime type**.
 3. Select runtime **2026.07** and **Hardware accelerator: None**.
 4. Leave `RUNTIME_PHASE = "CPU"` in Step 0.
-5. Confirm Google Drive has at least **35 GB free**.
-6. Run Steps **0 through 8A** in order.
-7. In Step 4, play the WAV and type `HOUSEVOICE` only if it clearly says “house voice.”
-8. Do not request a GPU until Step 8A reports all four feature files verified and says CPU feature preparation is complete.
+5. For a normal run, confirm Google Drive has at least **9 GB free** and Colab local storage has at least **12 GB free**.
+6. For the current over-quota workspace, use the Step 0M migration procedure below first; it needs about **2.5 GB local free** and reclaims Drive space before Step 5 writes prepared data.
+7. Run the remaining CPU Steps **1 through 8A** in order.
+8. In Step 4, play the WAV and type `HOUSEVOICE` only if it clearly says “house voice.”
+9. Do not request a GPU until Step 8A reports all four feature files verified and says CPU feature preparation is complete.
 
 ### GPU training
 
@@ -99,22 +120,59 @@ This revision has been statically checked but has **not** been executed in Googl
 
 ## What persists in Google Drive
 
-The notebook stores durable state under `MyDrive/HOUSEVOICE_Wakeword/`:
+The notebook keeps these durable assets under `MyDrive/HOUSEVOICE_Wakeword/`:
 
-- `cache/`: pip and Hugging Face caches, including MIT impulse-response source data.
-- `sources/`: exact pinned source archives.
+- `sources/`: small exact pinned source archives.
 - `models/`: Piper voices and shared OpenWakeWord embedding/mel models.
-- `datasets/`: ACAV, extracted FMA, converted 16-kHz audio, MIT RIR WAVs, and ACAV subsets.
-- `runs/housevoice-<run-id>/`: config, generated clips, augmented features, exports, metrics, and hashes.
-- `checkpoints/`: an atomic rolling training checkpoint saved every 250 steps and at stage boundaries.
+- `datasets/acav_train_subset.npy` and `datasets/acav_val_subset.npy`.
+- `datasets/fma_wav_16khz_1500/`: only the 1,500 converted WAVs used for training.
+- `datasets/mit_rirs_16khz/`: converted impulse responses.
+- `runs/housevoice-<run-id>/`: config, TTS clips, augmented features, exports, metrics, and hashes.
+- `checkpoints/`: atomic rolling training checkpoints.
 
-The FMA ZIP is removed only after every member has been CRC-checked, atomically extracted, and recorded in a persistent size manifest. The extracted dataset remains. The original ACAV file is retained after subset creation so corrupt or missing subsets can be rebuilt without another 17.28 GB download.
+These are local and disappear with the Colab VM:
+
+- Pip and Hugging Face caches.
+- ACAV row-range payloads.
+- The full FMA ZIP and temporary extracted MP3.
+- GPU scratch copies.
+
+## One-time migration from the current Step 5 state
+
+Use the updated notebook before manually deleting the verified ACAV file:
+
+1. Start runtime **2026.07**, **Hardware accelerator: None**, with at least **2.5 GB local free**. The normal 12 GB CPU scratch recommendation already exceeds this.
+2. Run Step **0** and mount the same Google Drive account.
+3. Run optional Step **0M**. It validates the existing 17,280,000,128-byte ACAV file, reads only the required first 11% of its rows, and creates exact local train/validation subsets totaling 1.9008 GB. The Drive original remains untouched until both subsets pass shape, dtype, and size checks.
+4. When Step 0M pauses, keep that Colab runtime connected and open `drive.google.com`.
+5. Under `My Drive/HOUSEVOICE_Wakeword/`, delete these legacy raw items if present:
+   - `datasets/openwakeword_features_ACAV100M_2000_hrs_16bit.npy`
+   - `datasets/openwakeword_features_ACAV100M_2000_hrs_16bit.npy.part`
+   - `datasets/openwakeword_features_ACAV100M_2000_hrs_16bit.npy.download.json`
+   - `datasets/fma_small.zip`
+   - `datasets/fma_small.zip.part`
+   - `datasets/fma_small.zip.download.json`
+   - `datasets/fma/` (legacy extracted MP3 tree)
+   - `cache/` (legacy persistent pip/Hugging Face cache)
+6. **Empty Google Drive Trash.** Moving files to Trash does not reclaim quota.
+7. Return to the still-connected Step 0M prompt and type `DRIVE RAW DELETED`.
+8. Continue with CPU Steps **1 through 8A**. Step 5 atomically copies the validated local ACAV subsets to Drive, removes the local copies only after persistent verification, downloads FMA to local scratch, and persists only converted WAVs.
+
+Do **not** delete any existing valid items under:
+
+- `datasets/acav_train_subset.npy`
+- `datasets/acav_val_subset.npy`
+- `datasets/fma_wav_16khz_1500/`
+- `datasets/mit_rirs_16khz/`
+- `models/`, `sources/`, `runs/`, or `checkpoints/`
+
+If the old ACAV file was already deleted, skip Step 0M. Step 5 downloads only the required ACAV row ranges—about 1.9008 GB total—not the full 17.28 GB dataset.
 
 ## Recovery after runtime termination
 
 ### Interrupted during Steps 0–8A
 
-Reconnect to runtime 2026.07 with **Hardware accelerator: None**, leave `RUNTIME_PHASE = "CPU"`, and rerun from Step 0 through the interrupted step. Drive-backed `.part` files, manifests, clips, subsets, and features are validated and reused.
+Reconnect to runtime 2026.07 with **Hardware accelerator: None**, leave `RUNTIME_PHASE = "CPU"`, and rerun from Step 0 through the interrupted step. Prepared Drive subsets, WAVs, clips, and features are validated and reused. Local raw scratch does not survive: an incomplete ACAV range or FMA ZIP download restarts in the new VM.
 
 ### Interrupted during Step 8B
 
@@ -124,7 +182,7 @@ Reconnect to runtime 2026.07 with a T4/L4, set `RUNTIME_PHASE = "GPU"`, rerun St
 
 Reconnect on CPU, set `RUNTIME_PHASE = "CPU"`, rerun Steps 0 and 1, then Step 9. The completed training checkpoint remains in Drive and does not require retraining.
 
-If a `.part` download fails validation, leave it in place and rerun the same CPU step. The downloader retains the verified prefix when the server supports Range and restarts only that file when it does not.
+Within the same CPU runtime, local `.part` downloads retry and resume. After a runtime termination, local `.part` files are gone. ACAV then downloads only whichever compact subset range is still missing; FMA must redownload its 7.68 GB local ZIP if fewer than 1,500 persistent WAVs were completed.
 
 ## Colab troubleshooting
 
@@ -138,7 +196,7 @@ Attach a T4 or L4, set `RUNTIME_PHASE = "GPU"`, then rerun Steps 0 and 1 before 
 
 ### Google Drive is full
 
-Stop before Step 5. This workflow needs approximately 35 GB free because it retains the 17.28 GB ACAV source, extracted FMA data, prepared subsets, clips, features, and checkpoints. Do not redirect only part of the workspace back to `/content`; that would make recovery incomplete.
+Stop before Step 5. The revised workflow targets about 7–9 GB peak Drive use. Delete the legacy raw assets listed in the migration section and empty Trash. Do not delete prepared subsets, WAVs, run data, models, or checkpoints.
 
 ### A checkpoint is renamed `invalid-<timestamp>.pt`
 
