@@ -702,3 +702,55 @@ housevoice_climate_resume_schedule:
     - action: script.turn_on
       target:
         entity_id: script.housevoice_climate_simulation_evaluate
+housevoice_graham_bedtime:
+  alias: 'HouseVoice Graham: Bedtime'
+  description: Set Graham's bedroom light to 10% and loop Brown noise on his Echo
+  mode: restart
+  sequence:
+  - action: light.turn_on
+    target:
+      entity_id: light.graham_s_room_toggle_dimmer_office_test
+    data:
+      brightness_pct: 5
+  - action: media_player.volume_set
+    target:
+      entity_id: media_player.vaca_96ed4d2c4_media_player
+    data:
+      volume_level: 0.4
+  - action: music_assistant.play_media
+    target:
+      entity_id: media_player.grahams_echo_media_player
+    data:
+      media_id: ambient_sounds://sound_effect/brown_noise
+      enqueue: replace
+  - wait_template: '{{ is_state(''media_player.grahams_echo_media_player'', ''playing'')
+      and state_attr(''media_player.grahams_echo_media_player'', ''media_content_id'')
+      == ''ambient_sounds://sound_effect/brown_noise'' }}'
+    timeout: 00:00:10
+    continue_on_timeout: false
+  - action: media_player.repeat_set
+    target:
+      entity_id: media_player.grahams_echo_media_player
+    data:
+      repeat: one
+housevoice_graham_morning:
+  alias: 'HouseVoice Graham: Good Morning'
+  description: Stop Graham's bedtime audio and set his bedroom light to 80%
+  mode: restart
+  sequence:
+  - action: media_player.repeat_set
+    target:
+      entity_id: media_player.grahams_echo_media_player
+    data:
+      repeat: 'off'
+  - action: media_player.media_stop
+    target:
+      entity_id: media_player.grahams_echo_media_player
+  - action: media_player.clear_playlist
+    target:
+      entity_id: media_player.grahams_echo_media_player
+  - action: light.turn_on
+    target:
+      entity_id: light.graham_s_room_toggle_dimmer_office_test
+    data:
+      brightness_pct: 80

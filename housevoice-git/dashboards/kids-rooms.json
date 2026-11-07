@@ -3209,7 +3209,7 @@
                 "action": "call-service",
                 "service": "script.turn_on",
                 "service_data": {
-                  "entity_id": "script.housevoice_kids_bedtime"
+                  "entity_id": "script.housevoice_graham_bedtime"
                 }
               },
               "type": "custom:button-card"
@@ -3267,7 +3267,7 @@
                 "action": "call-service",
                 "service": "script.turn_on",
                 "service_data": {
-                  "entity_id": "script.housevoice_kids_morning"
+                  "entity_id": "script.housevoice_graham_morning"
                 }
               },
               "type": "custom:button-card"
