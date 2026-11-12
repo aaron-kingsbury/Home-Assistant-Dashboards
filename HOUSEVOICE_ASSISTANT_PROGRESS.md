@@ -209,6 +209,7 @@ The free Google Drive 15 GB quota was then confirmed to be incompatible with per
 - A dedicated restricted SSH forward maps local `127.0.0.1:9225` to Windows `127.0.0.1:9225`.
 - Local `/json/list` was verified before interaction and returned only Graham's actual dashboard, `https://housevoice.duckdns.org/kids-rooms/grahams-room`.
 - The existing Parents DevTools manager was not repointed or modified; Cora was not accessed.
+- Parents Echo DevTools currently uses Mac host `192.168.50.34` (DHCP changed from `192.168.50.23`), SSH user `aaronkingsbury`, and the dedicated key `/data/.config/opencode/ssh/housevoice_devtools_ed25519`. The restricted forward maps local `127.0.0.1:9224` to Mac `127.0.0.1:9222`; retain `HostKeyAlias=192.168.50.23` so the verified Mac identity remains pinned. The expected Parents target is package `com.msp1974.vacompanion` at `/parents-room/parents-room` or `/parents-room/music`.
 
 ## Files modified
 

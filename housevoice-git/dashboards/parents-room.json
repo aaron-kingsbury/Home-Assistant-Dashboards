@@ -21,6 +21,10 @@
     {
       "type": "module",
       "url": "/local/housevoice/walkie.js?v=19&build=7"
+    },
+    {
+      "type": "module",
+      "url": "/local/housevoice/music-panel.js?v=7"
     }
   ],
   "views": [
@@ -481,6 +485,59 @@
               "feature_label": "INTERCOM",
               "room_id": "parents",
               "type": "custom:housevoice-walkie-v19"
+            },
+            {
+              "show_icon": false,
+              "show_name": false,
+              "show_state": false,
+              "styles": {
+                "card": [
+                  {
+                    "position": "fixed"
+                  },
+                  {
+                    "left": "69.6vw"
+                  },
+                  {
+                    "top": "45.5vh"
+                  },
+                  {
+                    "width": "23.9vw"
+                  },
+                  {
+                    "height": "10.6vh"
+                  },
+                  {
+                    "padding": 0
+                  },
+                  {
+                    "margin": 0
+                  },
+                  {
+                    "background": "transparent"
+                  },
+                  {
+                    "border": 0
+                  },
+                  {
+                    "box-shadow": "none"
+                  },
+                  {
+                    "border-radius": "16px"
+                  },
+                  {
+                    "z-index": 110
+                  },
+                  {
+                    "pointer-events": "auto"
+                  }
+                ]
+              },
+              "tap_action": {
+                "action": "navigate",
+                "navigation_path": "/parents-room/music"
+              },
+              "type": "custom:button-card"
             }
           ],
           "columns": 1,
@@ -490,6 +547,36 @@
       ],
       "path": "parents-room",
       "title": "Parent's Room",
+      "type": "panel"
+    },
+    {
+      "cards": [
+        {
+          "card_mod": {
+            "style": ":host { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100dvh !important; overflow: hidden !important; }"
+          },
+          "cards": [
+            {
+              "entity": "media_player.parents_room_media_player",
+              "type": "custom:housevoice-music-panel",
+              "volume_entity": "number.vaca_a2fc97a76_music_volume",
+              "weather_entity": "weather.forecast_housevoice_weather"
+            },
+            {
+              "always_visible": false,
+              "feature_label": "INTERCOM",
+              "room_id": "parents",
+              "type": "custom:housevoice-walkie-v19"
+            }
+          ],
+          "columns": 1,
+          "square": false,
+          "type": "grid"
+        }
+      ],
+      "icon": "mdi:music",
+      "path": "music",
+      "title": "Music",
       "type": "panel"
     }
   ]
