@@ -11,7 +11,7 @@
           {
             "cards": [
               {
-                "content": "Monitor battery health, device availability, and the HouseVoice E-Ink status.\n\n**Guidance:** warn below 30%; critical below 15%. An unavailable entity indicates a device or connectivity issue.",
+                "content": "Monitor battery health, device availability, and the HouseVoice E-Ink status.\n\n**Guidance:** warn below 30%; critical below 15%. Ring contact sensors use a dedicated low-battery warning below 20%. An unavailable entity indicates a device or connectivity issue.",
                 "title": "Battery \u0026 Warnings",
                 "type": "markdown"
               },
@@ -46,10 +46,79 @@
                   "sensor.ring_keypad_battery_level",
                   "sensor.t6_pro_z_wave_programmable_thermostat_battery_level",
                   "sensor.reterminal_e1002_battery_level",
-                  "sensor.grahams_door_battery"
+                  "sensor.grahams_door_battery",
+                  {
+                    "entity": "sensor.hallway_garage_entry_contact_sensor_battery_level",
+                    "name": "Garage Entry Door"
+                  }
                 ],
                 "show_header_toggle": false,
                 "title": "Battery Levels",
+                "type": "entities"
+              },
+              {
+                "conditions": [
+                  {
+                    "condition": "numeric_state",
+                    "entity": "sensor.hallway_garage_entry_contact_sensor_battery_level",
+                    "below": 20
+                  }
+                ],
+                "card": {
+                  "type": "markdown",
+                  "title": "Garage Entry Door — Low Battery",
+                  "content": "The Ring contact sensor battery is below **20%**. Replace it before relying on the sensor for alarm protection."
+                },
+                "type": "conditional"
+              },
+              {
+                "conditions": [
+                  {
+                    "condition": "state",
+                    "entity": "sensor.hallway_garage_entry_contact_sensor_battery_level",
+                    "state": "unavailable"
+                  }
+                ],
+                "card": {
+                  "type": "markdown",
+                  "title": "Garage Entry Door — Battery Unknown",
+                  "content": "Battery reporting is unavailable. Check recent contact activity and Z-Wave communication before treating the sensor as healthy."
+                },
+                "type": "conditional"
+              },
+              {
+                "entities": [
+                  {
+                    "entity": "sensor.hallway_garage_entry_contact_sensor_battery_level",
+                    "name": "Battery"
+                  },
+                  {
+                    "entity": "sensor.hallway_garage_entry_contact_sensor_node_status",
+                    "name": "Z-Wave status (asleep is normal)"
+                  },
+                  {
+                    "entity": "binary_sensor.hallway_garage_entry_contact_sensor_tampering_product_cover_removed",
+                    "name": "Cover tamper"
+                  },
+                  {
+                    "entity": "binary_sensor.hallway_garage_entry_contact_sensor_magnetic_field_interference_detected",
+                    "name": "Magnetic interference"
+                  },
+                  {
+                    "entity": "binary_sensor.hallway_garage_entry_contact_sensor_battery_temperature_is_low",
+                    "name": "Battery temperature low"
+                  },
+                  {
+                    "entity": "binary_sensor.hallway_garage_entry_contact_sensor_system_software_failure_with_failure_code",
+                    "name": "System software notification"
+                  },
+                  {
+                    "entity": "update.hallway_garage_entry_contact_sensor_firmware",
+                    "name": "Firmware"
+                  }
+                ],
+                "show_header_toggle": false,
+                "title": "Garage Entry Door Health",
                 "type": "entities"
               }
             ],
