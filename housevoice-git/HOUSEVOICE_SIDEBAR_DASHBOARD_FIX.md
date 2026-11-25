@@ -21,6 +21,20 @@ dashboard were not changed.
 - Disabling kiosk mode changes shell visibility but does not change which
   viewport the fixed dashboard elements use.
 
+### Brave acceptance failure and resolution
+
+The initial implementation changed the contents of
+`sidebar-non-kiosk-links.js` without changing its registered `?v=1` URL. Home
+Assistant serves `/local/` resources with a 31-day browser cache
+(`Cache-Control: public, max-age=2678400`). Brave therefore retained the older
+v1 script, which added `disable_km` but kept the original dashboard path. The
+DevTools Chromium profile had no cached copy and fetched the newer file, causing
+the initial false-positive validation.
+
+The persistent fix changed both frontend resource URLs to `?v=2` and restarted
+Home Assistant Core so the `frontend` integration would publish the new module
+URL. No browser cache clearing was required.
+
 ## Routes
 
 | Dashboard | Original device route | Browser sidebar route |
@@ -46,7 +60,7 @@ The original routes remain active and unchanged.
   - Clips the scaling stage so no horizontal browser overflow is introduced.
 - `configuration.yaml`
   - Loads the existing sidebar routing module through
-    `frontend.extra_module_url`.
+    `frontend.extra_module_url` with an explicit cache-busting version.
 - Hidden storage dashboards:
   - `parents_room_browser`: panel view containing
     `/parents-room/parents-room` at a virtual size of `961 × 601`.
@@ -83,7 +97,17 @@ Verified:
 - No console errors occur on either browser dashboard.
 - Parent's Room still renders correctly at `961 × 601` on its original route.
 - Cora's Room still renders correctly at `1280 × 640` on its original route.
-- No Home Assistant restart was performed.
+- No Home Assistant restart was performed during the initial implementation.
+
+Follow-up validation after the cache fix verified:
+
+- `sidebar-non-kiosk-links.js?v=2` and
+  `browser-dashboard-frame.js?v=2` returned HTTP 200.
+- Real Parent's Room and Cora's Room sidebar clicks selected the wrapper URLs.
+- Routing survived a normal cache-enabled refresh and a new authenticated tab.
+- A Home Assistant Core restart activated the changed frontend registration.
+- Final user acceptance passed in Brave after a completely fresh browser
+  session.
 
 The existing unrelated Card-Mod Studio warning can appear when loading some
 Home Assistant resources; it is not caused by these wrappers and does not

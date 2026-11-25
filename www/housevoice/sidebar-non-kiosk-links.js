@@ -1,4 +1,4 @@
-import("/local/housevoice/browser-dashboard-frame.js?v=1");
+import("/local/housevoice/browser-dashboard-frame.js?v=2");
 
 const nonKioskSidebarPaths = new Set([
   "/calendar",
