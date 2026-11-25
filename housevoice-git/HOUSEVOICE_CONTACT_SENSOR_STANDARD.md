@@ -1,8 +1,9 @@
 # HouseVoice Contact Sensor Standard
 
 Use this procedure to onboard Ring Z-Wave contact sensors into HouseVoice and
-Alarmo. Complete one sensor at a time. Do not invent a location or production
-entity for an uninstalled sensor.
+Alarmo. HouseVoice uses only Disarmed, Armed Home, and Armed Away; Armed Home
+also serves as overnight security. Complete one sensor at a time. Do not invent
+a location or production entity for an uninstalled sensor.
 
 ## 1. Safety and baseline
 
@@ -80,25 +81,29 @@ Configure the primary contact as **Door** with these rules:
 - entry-delay handling enabled;
 - exit-delay handling enabled unless the existing alarm design explicitly
   requires otherwise; and
-- active modes selected explicitly for Away, Home, and Night as required.
+- active modes selected explicitly for Away and Home.
 
 Expected behavior:
 
 - Disarmed: contact state remains visible; no alarm trigger.
-- Armed Home: use the existing area entry delay.
+- Armed Home: use the existing area entry delay. This is also the overnight
+  security mode.
 - Armed Away: use the existing area entry delay.
-- Armed Night: use an area entry time of 0 for immediate triggering when the
-  installed Alarmo version supports per-mode entry time.
 - Open or unavailable: normal arming is blocked. Bypass must be an explicit user
   action; never silently or automatically bypass a security sensor.
 
-Preserve existing global Home/Away entry and exit durations. Do not add a
-competing alarm automation if Alarmo cannot express the desired policy.
+Preserve the HouseVoice mode timing:
+
+- Home: exit delay disabled, 30-second entry delay, and 2-minute trigger time.
+- Away: 15-second exit delay, 30-second entry delay, and 5-minute trigger time.
+
+Do not add a competing alarm automation if Alarmo cannot express the desired
+policy.
 
 ### Other sensor types
 
-- Windows and non-entry perimeter contacts normally trigger immediately in each
-  selected armed mode; do not enable entry delay without a documented reason.
+- Windows and non-entry perimeter contacts trigger immediately in Home and Away;
+  do not enable entry delay without a documented reason.
 - Interior sensors require a separate mode review and must not inherit entry-door
   settings automatically.
 - Tamper and device-health entities are monitored separately and are not added as
@@ -179,8 +184,9 @@ Before timed Alarmo testing:
 - [ ] Unknown/unavailable is never shown as closed or secure.
 - [ ] Aggregate open-sensor helper updates correctly.
 - [ ] Disarmed opening does not trigger Alarmo.
-- [ ] Home and Away use the existing entry/exit delays.
-- [ ] Night triggers immediately when configured and supported.
+- [ ] Home and Away use the documented entry/exit delays.
+- [ ] Entry doors receive entry delay in both Home and Away.
+- [ ] Windows trigger immediately in both Home and Away.
 - [ ] Open and unavailable states block normal arming unless explicitly bypassed.
 - [ ] Battery and device-health dashboard integration verified.
 - [ ] Tamper behavior verified separately from intrusion.
@@ -200,7 +206,8 @@ The Garage Entry Door pilot completed coordinated acceptance on 2026-11-19:
 - non-forced arming with the door open was blocked without bypass;
 - Home verified no exit delay and 30-second entry delay;
 - Away verified 15-second exit delay and 30-second entry delay;
-- Night verified no exit delay and immediate triggering;
+- Night was verified historically during the pilot, before HouseVoice adopted
+  the three-mode Disarmed/Home/Away strategy;
 - no siren or emergency-notification action ran;
 - temporary keypad automation and logger changes were restored; and
 - Home Assistant configuration validated with no warnings.

@@ -1173,34 +1173,396 @@
       entity_id: number.vaca_a2fc97a76_music_volume
   mode: restart
 - id: cora_light_scene_buttons
-  alias: "Cora Light Scene Buttons - Morning and Bedtime"
-  description: "Run Cora's Morning and Bedtime scenes from double-taps on the physical light switch"
+  alias: Cora Light Scene Buttons - Morning and Bedtime
+  description: Run Cora's Morning and Bedtime scenes from double-taps on the physical
+    light switch
   mode: restart
   triggers:
-    - trigger: state
-      entity_id: event.cora_s_room_coras_room_light_scene_001
-      id: morning
-    - trigger: state
-      entity_id: event.cora_s_room_coras_room_light_scene_002
-      id: bedtime
+  - trigger: state
+    entity_id: event.cora_s_room_coras_room_light_scene_001
+    id: morning
+  - trigger: state
+    entity_id: event.cora_s_room_coras_room_light_scene_002
+    id: bedtime
   conditions:
-    - condition: template
-      value_template: >-
-        {{ trigger.to_state is not none
-           and trigger.to_state.attributes.get('event_type') == 'KeyPressed2x' }}
+  - condition: template
+    value_template: "{{ trigger.to_state is not none\n   and trigger.to_state.attributes.get('event_type')
+      == 'KeyPressed2x' }}"
   actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: morning
+      sequence:
+      - action: script.turn_on
+        target:
+          entity_id: script.housevoice_kids_morning
+    - conditions:
+      - condition: trigger
+        id: bedtime
+      sequence:
+      - action: script.turn_on
+        target:
+          entity_id: script.housevoice_kids_bedtime
+- id: graham_light_scene_buttons
+  alias: Graham Light Scene Buttons - Morning and Bedtime
+  description: Run Graham's Morning and Bedtime scenes from double-taps on the physical
+    light switch
+  mode: restart
+  triggers:
+  - trigger: state
+    entity_id: event.graham_s_room_toggle_dimmer_office_test_scene_001
+    id: morning
+  - trigger: state
+    entity_id: event.graham_s_room_toggle_dimmer_office_test_scene_002
+    id: bedtime
+  conditions:
+  - condition: template
+    value_template: "{{ trigger.to_state is not none\n   and trigger.to_state.attributes.get('event_type')
+      == 'KeyPressed2x' }}"
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: morning
+      sequence:
+      - action: script.turn_on
+        target:
+          entity_id: script.housevoice_graham_morning
+    - conditions:
+      - condition: trigger
+        id: bedtime
+      sequence:
+      - action: script.turn_on
+        target:
+          entity_id: script.housevoice_graham_bedtime
+- id: kitchen_above_cabinets_scene_buttons
+  alias: Kitchen Above Cabinets Switch Controls
+  description: Control the Kitchen Above Cabinets light and kitchen lighting modes
+    from physical switch gestures
+  triggers:
+  - entity_id: event.in_wall_toggle_dimmer_qfsw_500s_scene_001
+    id: up
+    trigger: state
+  - entity_id: event.in_wall_toggle_dimmer_qfsw_500s_scene_002
+    id: down
+    trigger: state
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: up
+      - condition: template
+        value_template: '{{ trigger.to_state is not none and trigger.to_state.attributes.get(''event_type'')
+          == ''KeyPressed'' }}'
+      sequence:
+      - action: light.turn_on
+        data:
+          brightness_pct: '{{ states(''input_number.kitchen_above_cabinets_default_brightness'')
+            | int(80) }}'
+        target:
+          entity_id: light.in_wall_toggle_dimmer_qfsw_500s
+    - conditions:
+      - condition: trigger
+        id: up
+      - condition: template
+        value_template: '{{ trigger.to_state is not none and trigger.to_state.attributes.get(''event_type'')
+          == ''KeyPressed2x'' }}'
+      sequence:
+      - action: script.turn_on
+        target:
+          entity_id: script.housevoice_lights_day_mode
+    - conditions:
+      - condition: trigger
+        id: down
+      - condition: template
+        value_template: '{{ trigger.to_state is not none and trigger.to_state.attributes.get(''event_type'')
+          == ''KeyPressed2x'' }}'
+      sequence:
+      - action: script.turn_on
+        target:
+          entity_id: script.housevoice_lights_night_mode
+    - conditions:
+      - condition: trigger
+        id: up
+      - condition: template
+        value_template: '{{ trigger.to_state is not none and trigger.to_state.attributes.get(''event_type'')
+          == ''KeyPressed3x'' }}'
+      sequence:
+      - action: light.turn_on
+        data:
+          brightness_pct: 100
+        target:
+          entity_id:
+          - light.in_wall_toggle_dimmer_qfsw_500s
+          - light.kitchen_island_and_sink_light
+    - conditions:
+      - condition: trigger
+        id: down
+      - condition: template
+        value_template: '{{ trigger.to_state is not none and trigger.to_state.attributes.get(''event_type'')
+          == ''KeyPressed3x'' }}'
+      sequence:
+      - action: light.turn_off
+        target:
+          entity_id:
+          - light.in_wall_toggle_dimmer_qfsw_500s
+          - light.kitchen_island_and_sink_light
+  mode: restart
+- id: '1794975983143'
+  alias: Ring Keypad Automations
+  description: ''
+  use_blueprint:
+    path: ufans123/ring_keypad_sounds.yaml
+    input:
+      keypad_device: 1f850216354ed6c00d80cf479ba18c6b
+      trigger_events:
+      - type: unsafe
+        device_id: fd2830ab2cf0fd59ec7543ffeb29ee15
+        entity_id: ab9aced25af6d1af8568d95aef55f771
+        domain: binary_sensor
+        trigger: device
+      sound_selection: '96'
+      sound_volume: 56
+- id: '1794976493806'
+  alias: Ring Keypad Automations
+  description: ''
+  use_blueprint:
+    path: ImSorryButWho/synchronize-ring-alarm-keypad-v2-with-alarmo.yaml
+    input:
+      keypad: 1f850216354ed6c00d80cf479ba18c6b
+      alarm: alarm_control_panel.alarmo
+- id: '1795140306764'
+  alias: Ring Keypad - Authoritative Alarmo Control and Synchronization
+  description: Authoritative Ring Keypad control, Alarmo indication, recovery synchronization,
+    countdown feedback, invalid-code feedback, and open-sensor blocking feedback.
+    Proximity illumination and contact chimes remain separate.
+  triggers:
+  - trigger: event
+    event_type: zwave_js_notification
+    event_data:
+      device_id: 1f850216354ed6c00d80cf479ba18c6b
+      command_class: 111
+      event_type: 3
+    id: keypad_disarm
+  - trigger: event
+    event_type: zwave_js_notification
+    event_data:
+      device_id: 1f850216354ed6c00d80cf479ba18c6b
+      command_class: 111
+      event_type: 5
+    id: keypad_arm_away
+  - trigger: event
+    event_type: zwave_js_notification
+    event_data:
+      device_id: 1f850216354ed6c00d80cf479ba18c6b
+      command_class: 111
+      event_type: 6
+    id: keypad_arm_home
+  - trigger: event
+    event_type: alarmo_failed_to_arm
+    event_data:
+      entity_id: alarm_control_panel.alarmo
+      command: disarm
+      reason: invalid_code
+    id: invalid_disarm
+  - trigger: event
+    event_type: alarmo_failed_to_arm
+    event_data:
+      entity_id: alarm_control_panel.alarmo
+      reason: open_sensors
+    id: open_sensors
+  - trigger: state
+    entity_id: alarm_control_panel.alarmo
+    to:
+    - disarmed
+    - arming
+    - armed_home
+    - armed_away
+    - pending
+    - triggered
+    id: alarm_state_changed
+  - trigger: homeassistant
+    event: start
+    id: home_assistant_start
+  - trigger: event
+    event_type: automation_reloaded
+    id: automation_reloaded
+  - trigger: state
+    entity_id: sensor.ring_keypad_node_status
+    to: alive
+    id: keypad_reconnected
+  conditions: []
+  actions:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: keypad_disarm
+      - condition: template
+        value_template: "{{ states('alarm_control_panel.alarmo') not in\n   ['disarmed',
+          'unknown', 'unavailable'] }}"
+      sequence:
+      - action: alarm_control_panel.alarm_disarm
+        target:
+          entity_id: alarm_control_panel.alarmo
+        data:
+          code: "{% if trigger.event.data.event_data is not none %}\n  {{ trigger.event.data.event_data
+            }}\n{% endif %}"
+    - conditions:
+      - condition: trigger
+        id: keypad_arm_away
+      - condition: state
+        entity_id: alarm_control_panel.alarmo
+        state: disarmed
+      sequence:
+      - action: alarm_control_panel.alarm_arm_away
+        target:
+          entity_id: alarm_control_panel.alarmo
+        data:
+          code: "{% if trigger.event.data.event_data is not none %}\n  {{ trigger.event.data.event_data
+            }}\n{% endif %}"
+    - conditions:
+      - condition: trigger
+        id: keypad_arm_home
+      - condition: state
+        entity_id: alarm_control_panel.alarmo
+        state: disarmed
+      sequence:
+      - action: alarm_control_panel.alarm_arm_home
+        target:
+          entity_id: alarm_control_panel.alarmo
+        data:
+          code: "{% if trigger.event.data.event_data is not none %}\n  {{ trigger.event.data.event_data
+            }}\n{% endif %}"
+    - conditions:
+      - condition: trigger
+        id: invalid_disarm
+      sequence:
+      - action: zwave_js.set_value
+        target:
+          device_id: 1f850216354ed6c00d80cf479ba18c6b
+        data:
+          command_class: '135'
+          endpoint: '0'
+          property: '9'
+          property_key: '1'
+          value: 99
+    - conditions:
+      - condition: trigger
+        id: open_sensors
+      sequence:
+      - action: zwave_js.set_value
+        target:
+          device_id: 1f850216354ed6c00d80cf479ba18c6b
+        data:
+          command_class: '135'
+          endpoint: '0'
+          property: '16'
+          property_key: '1'
+          value: 99
+    default:
+    - delay:
+        milliseconds: 250
+    - variables:
+        alarm_state: '{{ states(''alarm_control_panel.alarmo'') }}'
+        delay_total: '{{ state_attr(''alarm_control_panel.alarmo'', ''delay'') | int(0)
+          }}'
+        delay_elapsed: "{{ (as_timestamp(now()) -\n    as_timestamp(states.alarm_control_panel.alarmo.last_changed))\n
+          \   | round(0, 'ceil') | int(0) }}"
+    - variables:
+        remaining_delay: '{{ [delay_total | int(0) - delay_elapsed | int(0), 0] |
+          max }}'
+    - variables:
+        formatted_delay: '{{ remaining_delay | int(0) // 60 }}m{{ remaining_delay
+          | int(0) % 60 }}s'
     - choose:
-        - conditions:
-            - condition: trigger
-              id: morning
-          sequence:
-            - action: script.turn_on
-              target:
-                entity_id: script.housevoice_kids_morning
-        - conditions:
-            - condition: trigger
-              id: bedtime
-          sequence:
-            - action: script.turn_on
-              target:
-                entity_id: script.housevoice_kids_bedtime
+      - conditions:
+        - condition: trigger
+          id: alarm_state_changed
+        - condition: template
+          value_template: "{{ trigger.from_state is not none and\n   trigger.from_state.state
+            not in ['unknown', 'unavailable'] and\n   trigger.to_state is not none
+            and\n   trigger.to_state.state == 'triggered' and\n   alarm_state == 'triggered'
+            }}"
+        sequence:
+        - action: zwave_js.set_value
+          target:
+            device_id: 1f850216354ed6c00d80cf479ba18c6b
+          data:
+            command_class: '135'
+            endpoint: '0'
+            property: '13'
+            property_key: '9'
+            value: 99
+      - conditions:
+        - condition: template
+          value_template: '{{ alarm_state == ''disarmed'' }}'
+        sequence:
+        - action: zwave_js.set_value
+          target:
+            device_id: 1f850216354ed6c00d80cf479ba18c6b
+          data:
+            command_class: '135'
+            endpoint: '0'
+            property: '2'
+            property_key: '1'
+            value: 99
+      - conditions:
+        - condition: template
+          value_template: '{{ alarm_state == ''armed_home'' }}'
+        sequence:
+        - action: zwave_js.set_value
+          target:
+            device_id: 1f850216354ed6c00d80cf479ba18c6b
+          data:
+            command_class: '135'
+            endpoint: '0'
+            property: '10'
+            property_key: '1'
+            value: 99
+      - conditions:
+        - condition: template
+          value_template: '{{ alarm_state == ''armed_away'' }}'
+        sequence:
+        - action: zwave_js.set_value
+          target:
+            device_id: 1f850216354ed6c00d80cf479ba18c6b
+          data:
+            command_class: '135'
+            endpoint: '0'
+            property: '11'
+            property_key: '1'
+            value: 99
+      - conditions:
+        - condition: template
+          value_template: "{{ alarm_state == 'arming' and\n   remaining_delay | int(0)
+            > 0 }}"
+        sequence:
+        - action: zwave_js.set_value
+          target:
+            device_id: 1f850216354ed6c00d80cf479ba18c6b
+          data:
+            command_class: '135'
+            endpoint: '0'
+            property: '18'
+            property_key: timeout
+            value: '{{ formatted_delay }}'
+      - conditions:
+        - condition: template
+          value_template: "{{ alarm_state == 'pending' and\n   remaining_delay | int(0)
+            > 0 }}"
+        sequence:
+        - action: zwave_js.set_value
+          target:
+            device_id: 1f850216354ed6c00d80cf479ba18c6b
+          data:
+            command_class: '135'
+            endpoint: '0'
+            property: '17'
+            property_key: timeout
+            value: '{{ formatted_delay }}'
+  mode: parallel
+  max: 20
+  trace:
+    stored_traces: 0

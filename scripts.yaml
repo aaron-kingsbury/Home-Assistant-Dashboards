@@ -167,22 +167,26 @@ housevoice_lights_evening_mode:
       value: 25
 housevoice_lights_night_mode:
   alias: 'HouseVoice Lights: Night Mode'
-  description: Set Kitchen to 5% and turn Island and Living Room off
+  description: Set Kitchen to 15% and turn Island and Living Room off
   sequence:
   - action: light.turn_on
     target:
-      entity_id: light.in_wall_toggle_dimmer_qfsw_500s
+      entity_id:
+      - light.kitchen_island_and_sink_light
     data:
-      brightness_pct: 5
+      brightness_pct: 8
   - action: light.turn_off
     target:
-      entity_id: light.kitchen_island_and_sink_light
+      entity_id:
+      - light.in_wall_toggle_dimmer_qfsw_500s
+    data: {}
   - action: input_boolean.turn_off
     target:
       entity_id: input_boolean.living_room_light_mock
 housevoice_lights_all_off:
   alias: 'HouseVoice Lights: All Off'
-  description: Turn off all house and exterior lights while leaving dashboard screens on
+  description: Turn off all house and exterior lights while leaving dashboard screens
+    on
   sequence:
   - action: light.turn_off
     target:
@@ -360,58 +364,58 @@ housevoice_timer_start_selected:
         | int(0)) }}:{{ "%02d" | format(states("input_number.housevoice_timer_seconds")
         | int(0)) }}
 housevoice_kids_morning:
-  alias: "HouseVoice Kids: Morning"
-  description: "Stop Cora's bedtime audio and set her physical bedroom light to 80%"
+  alias: 'HouseVoice Kids: Morning'
+  description: Stop Cora's bedtime audio and set her physical bedroom light to 80%
   mode: restart
   sequence:
-    - action: media_player.repeat_set
-      target:
-        entity_id: media_player.cora_s_room_display_media_player
-      data:
-        repeat: "off"
-    - action: media_player.media_stop
-      target:
-        entity_id: media_player.cora_s_room_display_media_player
-    - action: media_player.clear_playlist
-      target:
-        entity_id: media_player.cora_s_room_display_media_player
-    - action: light.turn_on
-      target:
-        entity_id: light.cora_s_room_coras_room_light
-      data:
-        brightness_pct: 80
+  - action: media_player.repeat_set
+    target:
+      entity_id: media_player.cora_s_room_display_media_player
+    data:
+      repeat: 'off'
+  - action: media_player.media_stop
+    target:
+      entity_id: media_player.cora_s_room_display_media_player
+  - action: media_player.clear_playlist
+    target:
+      entity_id: media_player.cora_s_room_display_media_player
+  - action: light.turn_on
+    target:
+      entity_id: light.cora_s_room_coras_room_light
+    data:
+      brightness_pct: 80
 housevoice_kids_bedtime:
-  alias: "HouseVoice Kids: Bedtime"
-  description: "Set Cora's physical bedroom light to 5% and loop brown noise on her display"
+  alias: 'HouseVoice Kids: Bedtime'
+  description: Set Cora's physical bedroom light to 5% and loop brown noise on her
+    display
   mode: restart
   sequence:
-    - action: light.turn_on
-      target:
-        entity_id: light.cora_s_room_coras_room_light
-      data:
-        brightness_pct: 5
-    - action: media_player.volume_set
-      target:
-        entity_id: media_player.vaca_c958413a0_media_player
-      data:
-        volume_level: 0.4
-    - action: music_assistant.play_media
-      target:
-        entity_id: media_player.cora_s_room_display_media_player
-      data:
-        media_id: ambient_sounds://sound_effect/brown_noise
-        enqueue: replace
-    - wait_template: >-
-        {{ is_state('media_player.cora_s_room_display_media_player', 'playing')
-           and state_attr('media_player.cora_s_room_display_media_player', 'media_content_id')
-           == 'ambient_sounds://sound_effect/brown_noise' }}
-      timeout: "00:00:10"
-      continue_on_timeout: false
-    - action: media_player.repeat_set
-      target:
-        entity_id: media_player.cora_s_room_display_media_player
-      data:
-        repeat: one
+  - action: light.turn_on
+    target:
+      entity_id: light.cora_s_room_coras_room_light
+    data:
+      brightness_pct: 5
+  - action: media_player.volume_set
+    target:
+      entity_id: media_player.vaca_c958413a0_media_player
+    data:
+      volume_level: 0.4
+  - action: music_assistant.play_media
+    target:
+      entity_id: media_player.cora_s_room_display_media_player
+    data:
+      media_id: ambient_sounds://sound_effect/brown_noise
+      enqueue: replace
+  - wait_template: "{{ is_state('media_player.cora_s_room_display_media_player', 'playing')\n
+      \  and state_attr('media_player.cora_s_room_display_media_player', 'media_content_id')\n
+      \  == 'ambient_sounds://sound_effect/brown_noise' }}"
+    timeout: 00:00:10
+    continue_on_timeout: false
+  - action: media_player.repeat_set
+    target:
+      entity_id: media_player.cora_s_room_display_media_player
+    data:
+      repeat: one
 housevoice_walkie_graham:
   alias: 'HouseVoice Walkie: Graham'
   description: Placeholder for future Drop-In routing to Graham's room

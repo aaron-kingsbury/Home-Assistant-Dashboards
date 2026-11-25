@@ -197,8 +197,8 @@
                   "hold_action": {
                     "action": "none"
                   },
-                  "icon": "[[[return {'disarmed':'mdi:shield-off-outline','armed_away':'mdi:shield-lock-outline','armed_home':'mdi:shield-home-outline','armed_night':'mdi:shield-moon-outline','triggered':'mdi:shield-alert-outline','pending':'mdi:shield-sync-outline','arming':'mdi:shield-sync-outline'}[entity.state]||'mdi:shield-outline';]]]",
-                  "name": "[[[return {'disarmed':'DISARMED','armed_away':'ARMED AWAY','armed_home':'ARMED HOME','armed_night':'ARMED NIGHT','triggered':'TRIGGERED','pending':'PENDING','arming':'ARMING'}[entity.state]||entity.state.toUpperCase();]]]",
+                  "icon": "[[[return {'disarmed':'mdi:shield-off-outline','armed_away':'mdi:shield-lock-outline','armed_home':'mdi:shield-home-outline','triggered':'mdi:shield-alert-outline','pending':'mdi:shield-sync-outline','arming':'mdi:shield-sync-outline'}[entity.state]||'mdi:shield-outline';]]]",
+                  "name": "[[[return {'disarmed':'DISARMED','armed_away':'ARMED AWAY','armed_home':'ARMED HOME','triggered':'TRIGGERED','pending':'PENDING','arming':'ARMING'}[entity.state]||entity.state.toUpperCase();]]]",
                   "show_icon": true,
                   "show_label": false,
                   "show_name": true,
@@ -224,7 +224,7 @@
                         "border": "1px solid rgba(146, 180, 207, 0.24)"
                       },
                       {
-                        "background": "[[[return {'disarmed':'linear-gradient(145deg, rgba(30,80,30,0.20), rgba(10,20,10,0.88))','armed_away':'linear-gradient(145deg, rgba(128,38,38,0.20), rgba(36,10,10,0.88))','armed_home':'linear-gradient(145deg, rgba(128,80,38,0.20), rgba(36,20,10,0.88))','armed_night':'linear-gradient(145deg, rgba(82,38,128,0.20), rgba(19,10,36,0.88))','triggered':'linear-gradient(145deg, rgba(128,20,20,0.20), rgba(36,5,5,0.88))','pending':'linear-gradient(145deg, rgba(128,100,20,0.20), rgba(36,25,5,0.88))','arming':'linear-gradient(145deg, rgba(128,100,20,0.20), rgba(36,25,5,0.88))'}[entity.state]||'linear-gradient(145deg, rgba(82,38,128,0.20), rgba(19,10,36,0.88))';]]]"
+                        "background": "[[[return {'disarmed':'linear-gradient(145deg, rgba(30,80,30,0.20), rgba(10,20,10,0.88))','armed_away':'linear-gradient(145deg, rgba(128,38,38,0.20), rgba(36,10,10,0.88))','armed_home':'linear-gradient(145deg, rgba(128,80,38,0.20), rgba(36,20,10,0.88))','triggered':'linear-gradient(145deg, rgba(128,20,20,0.20), rgba(36,5,5,0.88))','pending':'linear-gradient(145deg, rgba(128,100,20,0.20), rgba(36,25,5,0.88))','arming':'linear-gradient(145deg, rgba(128,100,20,0.20), rgba(36,25,5,0.88))'}[entity.state]||'linear-gradient(145deg, rgba(20,35,50,0.20), rgba(5,15,25,0.88))';]]]"
                       },
                       {
                         "margin-left": "-75px"
@@ -255,7 +255,7 @@
                         "width": "30px"
                       },
                       {
-                        "color": "[[[return {'disarmed':'#44FF44','armed_away':'#FF4444','armed_home':'#FF8C00','armed_night':'#B966FF','triggered':'#FF0000','pending':'#FFAA00','arming':'#FFAA00'}[entity.state]||'#B966FF';]]]"
+                        "color": "[[[return {'disarmed':'#44FF44','armed_away':'#FF4444','armed_home':'#FF8C00','triggered':'#FF0000','pending':'#FFAA00','arming':'#FFAA00'}[entity.state]||'#94A3B8';]]]"
                       }
                     ],
                     "name": [
@@ -263,7 +263,7 @@
                         "justify-self": "start"
                       },
                       {
-                        "color": "[[[return {'disarmed':'#44FF44','armed_away':'#FF4444','armed_home':'#FF8C00','armed_night':'#B966FF','triggered':'#FF0000','pending':'#FFAA00','arming':'#FFAA00'}[entity.state]||'#B966FF';]]]"
+                        "color": "[[[return {'disarmed':'#44FF44','armed_away':'#FF4444','armed_home':'#FF8C00','triggered':'#FF0000','pending':'#FFAA00','arming':'#FFAA00'}[entity.state]||'#94A3B8';]]]"
                       },
                       {
                         "font-size": "15px"
@@ -297,7 +297,7 @@
                         "style": ":host { overflow: visible !important; margin-left: 10px !important; } :host(*) { overflow: visible !important; }"
                       },
                       "custom_fields": {
-                        "status": "[[[\nvar colors = {\n  'disarmed': '#44FF44',\n  'armed_away': '#FF4444',\n  'armed_home': '#FF8C00',\n  'armed_night': '#B966FF',\n  'triggered': '#FF0000',\n  'pending': '#FFAA00',\n  'arming': '#FFAA00'\n};\nvar icons = {\n  'disarmed': 'mdi:shield-off-outline',\n  'armed_away': 'mdi:shield-lock-outline',\n  'armed_home': 'mdi:shield-home-outline',\n  'armed_night': 'mdi:shield-moon-outline',\n  'triggered': 'mdi:shield-alert-outline',\n  'pending': 'mdi:shield-sync-outline',\n  'arming': 'mdi:shield-sync-outline'\n};\nvar texts = {\n  'disarmed': 'DISARMED',\n  'armed_away': 'ARMED AWAY',\n  'armed_home': 'ARMED HOME',\n  'armed_night': 'ARMED NIGHT',\n  'triggered': 'TRIGGERED',\n  'pending': 'PENDING',\n  'arming': 'ARMING'\n};\nvar msgs = {\n  'disarmed': 'System off',\n  'armed_away': 'All sensors active',\n  'armed_home': 'Interior monitoring active',\n  'armed_night': 'Night mode active',\n  'triggered': 'Alarm activated',\n  'pending': 'Awaiting confirmation',\n  'arming': 'Arming system...'\n};\nvar c = colors[entity.state] || '#B966FF';\nvar icon = icons[entity.state] || 'mdi:shield-outline';\nvar text = texts[entity.state] || entity.state.toUpperCase();\nvar msg = msgs[entity.state] || '';\nreturn '<div style=\"width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:translateX(20px);box-sizing:border-box;padding-bottom:8px;\"><div style=\"width:190px;height:190px;flex:0 0 190px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;border-radius:50%;background:radial-gradient(circle,rgba(60,60,80,0.15),rgba(14,8,29,0.48) 61%,transparent 63%);border:10px solid ' + c + ';color:' + c + '\"><ha-icon icon=\"' + icon + '\" style=\"--mdc-icon-size:150px;width:150px;height:150px;\"></ha-icon></div><div style=\"margin-top:29px;font-size:29px;line-height:1;font-weight:700;letter-spacing:2px;text-align:center;white-space:nowrap;color:' + c + '\">' + text + '</div><div style=\"margin-top:15px;color:rgba(232,236,242,0.82);font-size:14px;line-height:1.15;font-weight:400;text-align:center;white-space:nowrap\">' + msg + '</div></div>';\n]]]"
+                        "status": "[[[\nvar colors = {\n  'disarmed': '#44FF44',\n  'armed_away': '#FF4444',\n  'armed_home': '#FF8C00',\n  'triggered': '#FF0000',\n  'pending': '#FFAA00',\n  'arming': '#FFAA00'\n};\nvar icons = {\n  'disarmed': 'mdi:shield-off-outline',\n  'armed_away': 'mdi:shield-lock-outline',\n  'armed_home': 'mdi:shield-home-outline',\n  'triggered': 'mdi:shield-alert-outline',\n  'pending': 'mdi:shield-sync-outline',\n  'arming': 'mdi:shield-sync-outline'\n};\nvar texts = {\n  'disarmed': 'DISARMED',\n  'armed_away': 'ARMED AWAY',\n  'armed_home': 'ARMED HOME',\n  'triggered': 'TRIGGERED',\n  'pending': 'PENDING',\n  'arming': 'ARMING'\n};\nvar msgs = {\n  'disarmed': 'System off',\n  'armed_away': 'All sensors active',\n  'armed_home': 'Interior monitoring active',\n  'triggered': 'Alarm activated',\n  'pending': 'Awaiting confirmation',\n  'arming': 'Arming system...'\n};\nvar c = colors[entity.state] || '#B966FF';\nvar icon = icons[entity.state] || 'mdi:shield-outline';\nvar text = texts[entity.state] || entity.state.toUpperCase();\nvar msg = msgs[entity.state] || '';\nreturn '<div style=\"width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:translateX(20px);box-sizing:border-box;padding-bottom:8px;\"><div style=\"width:190px;height:190px;flex:0 0 190px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;border-radius:50%;background:radial-gradient(circle,rgba(60,60,80,0.15),rgba(14,8,29,0.48) 61%,transparent 63%);border:10px solid ' + c + ';color:' + c + '\"><ha-icon icon=\"' + icon + '\" style=\"--mdc-icon-size:150px;width:150px;height:150px;\"></ha-icon></div><div style=\"margin-top:29px;font-size:29px;line-height:1;font-weight:700;letter-spacing:2px;text-align:center;white-space:nowrap;color:' + c + '\">' + text + '</div><div style=\"margin-top:15px;color:rgba(232,236,242,0.82);font-size:14px;line-height:1.15;font-weight:400;text-align:center;white-space:nowrap\">' + msg + '</div></div>';\n]]]"
                       },
                       "entity": "alarm_control_panel.alarmo",
                       "hold_action": {
@@ -5294,8 +5294,8 @@
                         },
                         {
                           "type": "custom:housevoice-light-control",
-                          "entity": "light.reolink_duo_3_poe_floodlight",
-                          "name": "Cul-de-sac"
+                          "entity": "light.kitchen_island_and_sink_light",
+                          "name": "Island Light"
                         },
                         {
                           "type": "custom:housevoice-light-control",
@@ -5305,8 +5305,7 @@
                         },
                         {
                           "type": "custom:housevoice-light-control",
-                          "entity": "input_boolean.kitchen_light_mock",
-                          "brightness_entity": "input_number.kitchen_light_brightness",
+                          "entity": "light.in_wall_toggle_dimmer_qfsw_500s",
                           "name": "Kitchen"
                         }
                       ],

@@ -385,9 +385,50 @@
                 "browser_mod": {
                   "data": {
                     "content": {
-                      "entity": "light.cora_s_bedroom_light",
-                      "name": "Cora Bedroom Light",
-                      "type": "light"
+                      "cards": [
+                        {
+                          "card_mod": {
+                            "style": {
+                              ".": "ha-card { --state-light-active-color: #ffc107; --primary-color: #ffc107; --accent-color: #ffc107; }",
+                              "hui-toggle-entity-row $ ha-entity-toggle $": "ha-switch { transform: scale(1.7); transform-origin: right center; margin-right: 8px; }"
+                            }
+                          },
+                          "entities": [
+                            {
+                              "entity": "light.cora_s_bedroom_light",
+                              "icon": "mdi:power",
+                              "name": "Cora Light On / Off"
+                            }
+                          ],
+                          "show_header_toggle": false,
+                          "state_color": true,
+                          "type": "entities"
+                        },
+                        {
+                          "card_mod": {
+                            "style": {
+                              ".": "ha-card { --feature-height: 38px; }",
+                              "hui-card-features $ hui-card-feature $ hui-light-brightness-card-feature $": ":host { --feature-height: 36px !important; }"
+                            }
+                          },
+                          "color": "amber",
+                          "entity": "light.cora_s_bedroom_light",
+                          "features": [
+                            {
+                              "type": "light-brightness"
+                            }
+                          ],
+                          "features_position": "bottom",
+                          "hide_state": false,
+                          "icon": "mdi:brightness-6",
+                          "name": "Cora Brightness",
+                          "tap_action": {
+                            "action": "none"
+                          },
+                          "type": "tile"
+                        }
+                      ],
+                      "type": "vertical-stack"
                     },
                     "dismissable": true,
                     "initial_style": "classic",
@@ -3143,9 +3184,50 @@
                 "browser_mod": {
                   "data": {
                     "content": {
-                      "entity": "light.graham_s_room_toggle_dimmer_office_test",
-                      "name": "Graham Bedroom Light",
-                      "type": "light"
+                      "cards": [
+                        {
+                          "card_mod": {
+                            "style": {
+                              ".": "ha-card { --state-light-active-color: #ffc107; --primary-color: #ffc107; --accent-color: #ffc107; }",
+                              "hui-toggle-entity-row $ ha-entity-toggle $": "ha-switch { transform: scale(1.7); transform-origin: right center; margin-right: 8px; }"
+                            }
+                          },
+                          "entities": [
+                            {
+                              "entity": "light.graham_s_room_toggle_dimmer_office_test",
+                              "icon": "mdi:power",
+                              "name": "Light On / Off"
+                            }
+                          ],
+                          "show_header_toggle": false,
+                          "state_color": true,
+                          "type": "entities"
+                        },
+                        {
+                          "card_mod": {
+                            "style": {
+                              ".": "ha-card { --feature-height: 30px; }",
+                              "hui-card-features $ hui-card-feature $ hui-light-brightness-card-feature $": ":host { --feature-height: 24px !important; }"
+                            }
+                          },
+                          "color": "amber",
+                          "entity": "light.graham_s_room_toggle_dimmer_office_test",
+                          "features": [
+                            {
+                              "type": "light-brightness"
+                            }
+                          ],
+                          "features_position": "bottom",
+                          "hide_state": false,
+                          "icon": "mdi:brightness-6",
+                          "name": "Brightness",
+                          "tap_action": {
+                            "action": "none"
+                          },
+                          "type": "tile"
+                        }
+                      ],
+                      "type": "vertical-stack"
                     },
                     "dismissable": true,
                     "initial_style": "classic",

@@ -12,7 +12,7 @@
             "cards": [
               {
                 "content": "Monitor battery health, device availability, and the HouseVoice E-Ink status.\n\n**Guidance:** warn below 30%; critical below 15%. Ring contact sensors use a dedicated low-battery warning below 20%. An unavailable entity indicates a device or connectivity issue.",
-                "title": "Battery \u0026 Warnings",
+                "title": "Battery & Warnings",
                 "type": "markdown"
               },
               {
@@ -125,7 +125,7 @@
             "type": "grid"
           }
         ],
-        "title": "Battery \u0026 Warnings",
+        "title": "Battery & Warnings",
         "type": "sections"
       }
     ]

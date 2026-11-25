@@ -4,6 +4,25 @@ Prepared 2026-11-18 and updated 2026-11-19 after the coordinated acceptance
 session. This document records the accepted configuration, verified results,
 remaining diagnostic finding, and rollback.
 
+## Post-pilot three-mode strategy
+
+HouseVoice subsequently adopted a simplified security strategy:
+
+- supported operating states are Disarmed, Armed Home, and Armed Away;
+- Armed Home also serves as overnight security;
+- Home preserves no exit delay, a 30-second entry delay, and a 2-minute trigger
+  time;
+- Away preserves a 15-second exit delay, a 30-second entry delay, and a
+  5-minute trigger time;
+- exterior entry doors use entry delay in Home and Away; and
+- windows trigger immediately in Home and Away.
+
+Armed Night is to be disabled in Alarmo and removed from the Garage Entry Door's
+enabled modes. The original Night configuration and acceptance result below are
+retained as historical pilot evidence rather than current policy. The final
+three-mode UI and keypad acceptance is tracked separately from this completed
+pilot checkpoint.
+
 ## Safety state
 
 - Alarmo is currently **disarmed**.

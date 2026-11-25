@@ -1,6 +1,13 @@
 # Loads default set of integrations. Do not remove.
 default_config:
 
+# Do not persist raw Z-Wave notification payloads such as keypad PIN entries.
+# This affects history only; live event triggers continue to receive the events.
+recorder:
+  exclude:
+    event_types:
+      - zwave_js_notification
+
 # Load frontend themes from the themes folder
 frontend:
   themes: !include_dir_merge_named themes
