@@ -58,10 +58,14 @@ before the approved Core restart. Parents and Cora then followed their reserved
 address changes automatically without deleting or recreating their entries.
 
 After the restart, Parents and Cora each passed 60 five-second checks with zero
-ADB TCP failures, zero Wyoming failures, and the correct VACA identity. Graham
-initially appeared at its reserved address but later stopped answering ARP,
-ping, ADB, and Wyoming; that is a device Wi-Fi recovery failure, not a stale
-Home Assistant endpoint.
+ADB TCP failures, zero Wyoming failures, and the correct VACA identity. A later
+final check found Parents had again dropped ping, ADB, and Wyoming together.
+That simultaneous loss reproduces its previously documented whole-device Wi-Fi
+failure after a clean five-minute window; it does not invalidate the VACA
+endpoint reload fix. Graham initially appeared at its reserved address but later
+stopped answering ARP, ping, ADB, and Wyoming. Parents and Graham therefore
+still require device Wi-Fi recovery rather than another Home Assistant endpoint
+change.
 
 ### UniFi and ADB/DevTools management
 

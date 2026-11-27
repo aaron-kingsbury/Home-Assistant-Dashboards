@@ -130,6 +130,9 @@ Parents Music v7, and the Parents automatic day/night design.
   deleting entries, devices, entities, pairings, or dashboards.
 - Parents and Cora each passed a five-minute, 60-sample acceptance window with
   zero ADB TCP failures, zero Wyoming failures, and zero identity mismatches.
+- A later final check found Parents had again dropped ping, ADB, and Wyoming
+  together. This reproduces its whole-device Wi-Fi failure after the clean
+  acceptance window; the Parents gate is not considered permanently passed.
 - Graham was initially visible at `.31` with the correct MAC, then became absent
   from ARP and stopped answering ping, ADB, and Wyoming. This remains a device
   Wi-Fi recovery failure.
@@ -186,7 +189,7 @@ Parents Music v7, and the Parents automatic day/night design.
 
 Status: In progress
 
-Next action: Restore Graham Wi-Fi and add a bounded reconnect path to the
-existing Mac ADB infrastructure. Parents and Cora network/Wyoming stability is
-currently verified; physical audio and actual-device CDP validation remain
-deferred.
+Next action: Restore Parents and Graham Wi-Fi without resetting either device,
+then add a bounded reconnect path to the existing Mac ADB infrastructure. Cora
+network/Wyoming stability is currently verified; physical audio and
+actual-device CDP validation remain deferred.
