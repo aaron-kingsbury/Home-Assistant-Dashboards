@@ -1,7 +1,7 @@
 # HouseVoice VACA Network Migration and Recovery
 
-Last verified: October 26, 2026  
-Environment: Home Assistant 2026.10.1, VACA integration/application 0.13.5,
+Last verified: November 27, 2026
+Environment: Home Assistant 2026.11.0, VACA integration/application 0.13.5,
 TP-Link ER605 LAN `192.168.50.0/24`
 
 ## Purpose
@@ -12,6 +12,78 @@ integration, clearing VACA data, resetting a tablet, or pairing a device again.
 
 This incident was a stale endpoint problem, not a Home Assistant URL,
 DuckDNS/TLS, dashboard, authentication, or Walkie failure.
+
+## November 26–27, 2026 reliability incident
+
+After the restored ER605 configuration came online, the displays had no durable
+DHCP reservations. The UniFi/ADB Mac's old reservation referenced a retired
+private Wi-Fi address, so the Mac occupied the Parents address while VACA and
+ADB retained stale endpoints.
+
+The verified reservation map is:
+
+| Role | Fixed address | MAC address |
+|---|---|---|
+| UniFi/ADB Mac | `192.168.50.15` | `E6:CD:DB:C4:9C:65` |
+| Parents | `192.168.50.29` | `14:0A:C5:41:68:B4` |
+| Cora | `192.168.50.30` | `90:A8:22:EC:01:22` |
+| Graham | `192.168.50.31` | `80:6D:71:7C:0C:BF` |
+
+The Mac is `Aarons-MacBook-Air.local`. For the **HouseVoice** SSID only, macOS
+reports **Private Wi-Fi Address: Fixed** and the address above. It remained
+unchanged across the coordinated restart and repeatedly received
+`192.168.50.15`. Do not disable private addressing or change privacy settings
+for unrelated networks.
+
+### VACA endpoint reload fix
+
+Zeroconf already updated an existing VACA config entry's saved endpoint, but
+`custom_components/vaca/config_flow.py` passed `reload_on_update=False`.
+Consequently, the stored address changed while the loaded integration kept its
+old socket until a manual reload or Core restart.
+
+The durable correction is:
+
+```python
+self._abort_if_unique_id_configured(
+    updates={CONF_HOST: host, CONF_PORT: port},
+    reload_on_update=True,
+)
+```
+
+The original file is retained at
+`/homeassistant/backups/vaca-config-flow-before-zeroconf-reload-20261127T020825Z.py`.
+Python compilation and full Home Assistant configuration validation passed
+before the approved Core restart. Parents and Cora then followed their reserved
+address changes automatically without deleting or recreating their entries.
+
+After the restart, Parents and Cora each passed 60 five-second checks with zero
+ADB TCP failures, zero Wyoming failures, and the correct VACA identity. Graham
+initially appeared at its reserved address but later stopped answering ARP,
+ping, ADB, and Wyoming; that is a device Wi-Fi recovery failure, not a stale
+Home Assistant endpoint.
+
+### UniFi and ADB/DevTools management
+
+The UniFi Network application on the Mac recovered after a delayed launch and
+listened at `192.168.50.15:11443`. Home Assistant's existing UniFi entry still
+contained the retired `.34` host and requires local reconfiguration with the
+existing controller password; credentials are not recorded here.
+
+The persistent OpenCode SSH/CDP tunnel manager was also still targeting `.34`.
+Its target was corrected to `.15` while preserving the pinned SSH host identity,
+forced-command key, and loopback-only CDP ports. The Mac's restricted SSH key
+intentionally permits only the approved CDP destinations. It does not permit
+forwarding to the Mac ADB server on port 5037.
+
+The Mac ADB server retained three offline transports after restart. The
+restricted wrapper exposes diagnostics and device operations but no bounded
+`adb disconnect`/`adb connect` recovery operation. OpenCode's older direct ADB
+binary still exists, but its prior authorization key did not survive and the
+devices correctly reject its newly generated key. Permanent unattended ADB/CDP
+recovery therefore requires adding an audited reconnect operation to the
+existing Mac wrapper or an equivalent Mac launch agent; do not install a second
+parallel ADB service.
 
 ## October 26, 2026 incident
 
