@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -euo pipefail
+umask 077
+ADB="$HOME/.local/bin/housevoice-adb"
+PACKAGE='com.msp1974.vacompanion'
+STATE="$HOME/.local/state/housevoice-adb"
+mkdir -p "$STATE"
+
+transport_state() {
+  "$ADB" -s "$1" get-state 2>/dev/null || true
+}
+
+ensure_transport() {
+  local room="$1" serial="$2" state attempt delay
+  state="$(transport_state "$serial")"
+  [ "$state" = device ] && return 0
+  printf '%s room=%s transport=%s action=recover\n' "$(date -u +%FT%TZ)" "$room" "${state:-unavailable}"
+  "$ADB" disconnect "$serial" >/dev/null 2>&1 || true
+  attempt=1; delay=1
+  while [ "$attempt" -le 6 ]; do
+    "$ADB" connect "$serial" >/dev/null 2>&1 || true
+    [ "$(transport_state "$serial")" = device ] && {
+      printf '%s room=%s transport=device recovered_attempt=%s\n' "$(date -u +%FT%TZ)" "$room" "$attempt"
+      return 0
+    }
+    [ "$attempt" -eq 6 ] && break
+    sleep "$delay"; [ "$delay" -ge 8 ] || delay=$((delay * 2)); attempt=$((attempt + 1))
+  done
+  printf '%s room=%s transport=failed\n' "$(date -u +%FT%TZ)" "$room" >&2
+  return 1
+}
+
+cdp_ready() {
+  curl -fsS --max-time 4 "http://127.0.0.1:$1/json/list" |
+    python3 -c 'import json,sys; raise SystemExit(0 if any(x.get("type")=="page" for x in json.load(sys.stdin)) else 1)' \
+    >/dev/null 2>&1
+}
+
+ensure_cdp() {
+  local room="$1" serial="$2" port="$3" pid socket
+  cdp_ready "$port" && return 0
+  pid="$("$ADB" -s "$serial" shell pidof "$PACKAGE" 2>/dev/null | tr -d '\r' | awk 'NR==1{print $1}')"
+  case "$pid" in ''|*[!0-9]*) printf '%s room=%s cdp=no_vaca_pid\n' "$(date -u +%FT%TZ)" "$room" >&2; return 1;; esac
+  socket="$("$ADB" -s "$serial" shell cat /proc/net/unix 2>/dev/null | awk -v target="webview_devtools_remote_${pid}" '$0 ~ target "$" {print $8; exit}')"
+  socket="${socket#@}"
+  [ -n "$socket" ] || { printf '%s room=%s cdp=no_socket pid=%s\n' "$(date -u +%FT%TZ)" "$room" "$pid" >&2; return 1; }
+  "$ADB" -s "$serial" forward --remove "tcp:$port" >/dev/null 2>&1 || true
+  "$ADB" -s "$serial" forward "tcp:$port" "localabstract:$socket" >/dev/null
+  if cdp_ready "$port"; then
+    printf '%s room=%s cdp=ready port=%s pid=%s\n' "$(date -u +%FT%TZ)" "$room" "$port" "$pid"
+    return 0
+  fi
+  printf '%s room=%s cdp=failed port=%s\n' "$(date -u +%FT%TZ)" "$room" "$port" >&2
+  return 1
+}
+
+process_device() {
+  local room="$1" serial="$2" port="$3"
+  if ensure_transport "$room" "$serial"; then
+    ensure_cdp "$room" "$serial" "$port" || true
+  fi
+}
+
+"$ADB" start-server </dev/null >/dev/null
+while :; do
+  process_device parents 192.168.50.29:5555 9222
+  process_device cora 192.168.50.30:5555 9225
+  process_device graham 192.168.50.31:5555 9226
+  sleep 30
+done

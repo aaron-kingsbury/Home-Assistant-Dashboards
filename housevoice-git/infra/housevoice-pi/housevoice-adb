@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+export HOME='/home/pi'
+export ADB_VENDOR_KEYS="$HOME/.android/adbkey"
+root="$HOME/.local/opt/housevoice-adb-debian/root"
+export LD_LIBRARY_PATH="$root/usr/lib/aarch64-linux-gnu/android"
+exec "$root/usr/bin/adb" "$@"

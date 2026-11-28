@@ -1,0 +1,20 @@
+[Unit]
+Description=HouseVoice ADB and CDP recovery
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+Environment=HOME=/home/pi
+Environment=PATH=/home/pi/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/home/pi/.local/libexec/housevoice-adb-recovery
+Restart=always
+RestartSec=5
+KillMode=control-group
+TimeoutStopSec=15
+UMask=0077
+NoNewPrivileges=true
+PrivateDevices=true
+
+[Install]
+WantedBy=default.target

@@ -147,7 +147,7 @@ Parents Music v7, and the Parents automatic day/night design.
   policy correctly blocks access to ADB port 5037. No policy bypass or duplicate
   ADB installation was introduced.
 
-## Current Work Queue
+## Historical Work Queue (completed 2026-11-28)
 
 1. Restore Graham's saved HouseVoice Wi-Fi connection without a factory reset,
    application-data clear, or unnecessary reboot.
@@ -187,9 +187,28 @@ Parents Music v7, and the Parents automatic day/night design.
 
 ## Current Status
 
-Status: In progress
+Status: Phase 2 complete
 
-Next action: Restore Parents and Graham Wi-Fi without resetting either device,
-then add a bounded reconnect path to the existing Mac ADB infrastructure. Cora
-network/Wyoming stability is currently verified; physical audio and
-actual-device CDP validation remain deferred.
+ADB/CDP management now runs on the always-on Raspberry Pi at
+`192.168.50.20`. The Mac LaunchAgent is disabled and retained for rollback.
+OpenCode's startup hook tunnels the Pi's loopback-only CDP ports.
+
+Final results on 2026-11-28:
+
+- The ER605 DHCP DNS setting now directs clients to AdGuard at
+  `192.168.50.10`, restoring the established split-DNS path for
+  `housevoice.duckdns.org`.
+- Actual-device CDP screenshots confirmed the Parents, Cora, and Graham
+  dashboards rendered correctly.
+- A controlled Pi service restart restored all three CDP targets in 3.1
+  seconds.
+- A 30-minute Pi-only test ran with the Mac lid closed.
+- The Pi and all three Echoes passed 360 of 360 five-second samples.
+- Pi ping/SSH, Echo ping, ADB TCP, Wyoming, Wyoming identity, CDP, and expected
+  dashboard targets recorded zero failures and zero transitions.
+- VACA remained available for all three paired satellites.
+
+The credential-free Pi launcher, recovery script, and systemd user unit are
+versioned under `infra/housevoice-pi/`. Private ADB and SSH keys are excluded.
+Recovery and SD-card restoration are documented in
+`docs/housevoice-pi-adb-management.md`.

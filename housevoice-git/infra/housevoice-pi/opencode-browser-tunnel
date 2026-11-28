@@ -1,0 +1,73 @@
+#!/usr/bin/env sh
+set -eu
+
+local_port="${OPENCODE_BROWSER_LOCAL_PORT:-9223}"
+case "$local_port" in
+  ''|*[!0-9]*)
+    echo "Invalid OPENCODE_BROWSER_LOCAL_PORT: $local_port" >&2
+    exit 2
+    ;;
+esac
+
+key=/data/housevoice-ssh/housevoice_pi_ed25519
+known_hosts=/data/housevoice-ssh/known_hosts
+lock=/data/.config/opencode/ssh/browser-tunnel-${local_port}.lock
+child=
+
+exec 9>"$lock"
+if ! flock -n 9; then
+  echo "A browser tunnel manager already owns local port $local_port" >&2
+  exit 1
+fi
+
+stop_child() {
+  if [ -n "$child" ]; then
+    kill "$child" 2>/dev/null || true
+    wait "$child" 2>/dev/null || true
+    child=
+  fi
+}
+
+shutdown() {
+  stop_child
+  exit 0
+}
+
+trap shutdown INT TERM HUP
+trap stop_child EXIT
+
+while :; do
+  ssh -N -T \
+    -F /dev/null \
+    -o BatchMode=yes \
+    -o IdentitiesOnly=yes \
+    -o PreferredAuthentications=publickey \
+    -o PasswordAuthentication=no \
+    -o KbdInteractiveAuthentication=no \
+    -o StrictHostKeyChecking=yes \
+    -o UserKnownHostsFile="$known_hosts" \
+    -o HostKeyAlias=192.168.50.20 \
+    -o ExitOnForwardFailure=yes \
+    -o ServerAliveInterval=30 \
+    -o ServerAliveCountMax=3 \
+    -o ConnectTimeout=10 \
+    -o ConnectionAttempts=1 \
+    -o ForwardAgent=no \
+    -o ForwardX11=no \
+    -o RequestTTY=no \
+    -o LogLevel=ERROR \
+    -i "$key" \
+    -L "127.0.0.1:${local_port}:127.0.0.1:9222" \
+    -L "127.0.0.1:9224:127.0.0.1:9222" \
+    -L "127.0.0.1:9225:127.0.0.1:9225" \
+    -L "127.0.0.1:9226:127.0.0.1:9226" \
+    pi@192.168.50.20 &
+  child=$!
+  wait "$child" 2>/dev/null || true
+  child=
+
+  sleep 3 &
+  child=$!
+  wait "$child" 2>/dev/null || true
+  child=
+done
