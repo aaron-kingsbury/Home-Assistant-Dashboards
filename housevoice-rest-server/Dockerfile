@@ -18,5 +18,3 @@ COPY client-ca.crt /etc/housevoice/client-ca.crt
 COPY rootfs /
 
 RUN chmod 0755 /etc/services.d/housevoice-rest-server/run
-
-CMD ["/init"]
