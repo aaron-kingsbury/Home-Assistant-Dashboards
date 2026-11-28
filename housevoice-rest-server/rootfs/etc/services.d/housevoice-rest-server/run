@@ -117,7 +117,7 @@ update_status() {
 
   now="$(date -Iseconds)"
   repository_bytes="$(du -sb "${REPOSITORY}" 2>/dev/null | awk '{print $1}')"
-  available_bytes="$(df -B1 --output=avail /share | tail -n 1 | tr -d ' ')"
+  available_bytes="$(df -P -B 1 /share | awk 'NR == 2 {print $4}')"
   snapshot_count=0
   last_snapshot=""
 
