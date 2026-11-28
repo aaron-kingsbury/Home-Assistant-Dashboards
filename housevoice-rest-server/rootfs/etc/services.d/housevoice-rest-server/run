@@ -23,7 +23,8 @@ if [[ ! -s "${PASSPHRASE_FILE}" ]]; then
   umask 077
   openssl rand -base64 48 > "${PASSPHRASE_FILE}"
 fi
-chmod 0600 "${PASSPHRASE_FILE}"
+chown root:nginx "${PASSPHRASE_FILE}"
+chmod 0640 "${PASSPHRASE_FILE}"
 
 if [[ ! -s "${SERVER_CERT}" || ! -s "${SERVER_KEY}" ]]; then
   umask 077
