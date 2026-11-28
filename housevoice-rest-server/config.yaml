@@ -1,5 +1,5 @@
 name: "HouseVoice Restic Receiver"
-version: "1.0.1"
+version: "1.0.2"
 slug: "housevoice_rest_server"
 description: "Restricted append-only Restic receiver for Raspberry Pi disaster recovery"
 url: "https://github.com/aaron-kingsbury/Home-Assistant-Dashboards"

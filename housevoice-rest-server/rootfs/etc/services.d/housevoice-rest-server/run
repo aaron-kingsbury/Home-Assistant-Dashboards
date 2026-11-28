@@ -115,7 +115,7 @@ update_status() {
   local now repository_bytes available_bytes snapshot_count last_snapshot
   local integrity_status integrity_time backup_allowed
 
-  now="$(date --iso-8601=seconds)"
+  now="$(date -Iseconds)"
   repository_bytes="$(du -sb "${REPOSITORY}" 2>/dev/null | awk '{print $1}')"
   available_bytes="$(df -B1 --output=avail /share | tail -n 1 | tr -d ' ')"
   snapshot_count=0
@@ -178,7 +178,7 @@ run_maintenance() {
     else
       printf 'failed' > "${DATA_DIR}/last-integrity-status"
     fi
-    date --iso-8601=seconds > "${DATA_DIR}/last-integrity-time"
+    date -Iseconds > "${DATA_DIR}/last-integrity-time"
     touch "${DATA_DIR}/markers/week-${week}"
   fi
 
@@ -188,7 +188,7 @@ run_maintenance() {
     else
       printf 'failed-full' > "${DATA_DIR}/last-integrity-status"
     fi
-    date --iso-8601=seconds > "${DATA_DIR}/last-integrity-time"
+    date -Iseconds > "${DATA_DIR}/last-integrity-time"
     touch "${DATA_DIR}/markers/month-${month}"
   fi
 }
