@@ -170,6 +170,7 @@ run_maintenance() {
 
   if [[ "$(date +%u-%H)" == "7-04" && ! -e "${DATA_DIR}/markers/week-${week}" ]]; then
     if nice -n 15 ionice -c 3 restic forget \
+      --keep-within 6m \
       --keep-daily 14 \
       --keep-weekly 8 \
       --keep-monthly 6 \

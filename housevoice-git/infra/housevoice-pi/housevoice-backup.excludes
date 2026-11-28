@@ -1,0 +1,18 @@
+/home/pi/.cache
+/home/pi/.local/share/Trash
+/home/pi/.xsession-errors
+/home/pi/.xsession-errors.old
+/home/pi/.config/chromium/*/Cache
+/home/pi/.config/chromium/*/Code Cache
+/home/pi/.config/chromium/*/GPUCache
+/home/pi/.config/chromium/ShaderCache
+/home/pi/.config/chromium/GrShaderCache
+/home/pi/.config/chromium/Crash Reports
+/etc/shadow
+/etc/shadow-
+/etc/gshadow
+/etc/gshadow-
+/etc/ssh/ssh_host_*_key
+/etc/ssl/private
+/etc/sudoers.d
+/etc/NetworkManager/system-connections

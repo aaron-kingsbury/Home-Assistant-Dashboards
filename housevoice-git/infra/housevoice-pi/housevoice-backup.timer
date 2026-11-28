@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily HouseVoice Raspberry Pi backup at 03:00
+
+[Timer]
+OnCalendar=*-*-* 03:00:00
+Persistent=true
+AccuracySec=1min
+Unit=housevoice-backup.service
+
+[Install]
+WantedBy=timers.target

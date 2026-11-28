@@ -26,6 +26,7 @@ Full repository data verification runs on the first day of each month at 05:00.
 
 Retention:
 
+- All snapshots from the most recent 6 months as append-only safety history
 - 14 daily snapshots
 - 8 weekly snapshots
 - 6 monthly snapshots

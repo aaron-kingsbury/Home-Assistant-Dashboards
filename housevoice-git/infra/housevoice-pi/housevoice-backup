@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly BACKUP_ROOT="${HOME}/.config/housevoice-backup"
+readonly STATE_ROOT="${HOME}/.local/state/housevoice-backup"
+readonly MANIFEST_ROOT="${STATE_ROOT}/manifests"
+readonly STATUS_FILE="${STATE_ROOT}/status.json"
+readonly RESTIC="${HOME}/.local/bin/restic"
+readonly EXCLUDES="${BACKUP_ROOT}/excludes"
+readonly RECEIVER_STATUS="https://192.168.50.10:8444/status.json"
+
+export RESTIC_REPOSITORY="rest:https://192.168.50.10:8443/repo/"
+export RESTIC_PASSWORD_FILE="${BACKUP_ROOT}/repository-passphrase"
+export RESTIC_CACERT="${BACKUP_ROOT}/server-ca.crt"
+export RESTIC_TLS_CLIENT_CERT="${BACKUP_ROOT}/client.pem"
+export RESTIC_CACHE_DIR="${HOME}/.cache/restic"
+
+install -d -m 0700 "${STATE_ROOT}" "${MANIFEST_ROOT}" "${RESTIC_CACHE_DIR}"
+
+exec 9>"${STATE_ROOT}/backup.lock"
+if ! flock -n 9; then
+  echo "A HouseVoice backup is already running."
+  exit 0
+fi
+
+started_at="$(date -Iseconds)"
+
+write_status() {
+  local result="$1"
+  local message="$2"
+  local snapshot_id="${3:-}"
+  local completed_at
+  completed_at="$(date -Iseconds)"
+
+  python3 - \
+    "${result}" \
+    "${message}" \
+    "${started_at}" \
+    "${completed_at}" \
+    "${snapshot_id}" \
+    > "${STATUS_FILE}.tmp" <<'PYTHON'
+import json
+import sys
+
+result, message, started_at, completed_at, snapshot_id = sys.argv[1:]
+json.dump(
+    {
+        "result": result,
+        "message": message,
+        "started_at": started_at,
+        "completed_at": completed_at,
+        "snapshot_id": snapshot_id,
+    },
+    sys.stdout,
+    indent=2,
+)
+sys.stdout.write("\n")
+PYTHON
+  mv "${STATUS_FILE}.tmp" "${STATUS_FILE}"
+}
+
+failure() {
+  local rc=$?
+  write_status "failed" "Backup command failed with exit code ${rc}."
+  exit "${rc}"
+}
+trap failure ERR
+
+receiver_json="$(
+  curl \
+    --fail \
+    --silent \
+    --show-error \
+    --connect-timeout 10 \
+    --max-time 30 \
+    --cacert "${BACKUP_ROOT}/server-ca.crt" \
+    "${RECEIVER_STATUS}"
+)"
+
+backup_allowed="$(
+  python3 -c \
+    'import json, sys; print(str(json.load(sys.stdin)["backup_allowed"]).lower())' \
+    <<<"${receiver_json}"
+)"
+if [[ "${backup_allowed}" != "true" ]]; then
+  write_status "blocked" "Receiver storage safeguard blocked this backup."
+  echo "Receiver storage safeguard blocked this backup."
+  exit 1
+fi
+
+dpkg-query -W -f='${binary:Package}\t${Version}\n' \
+  > "${MANIFEST_ROOT}/packages.tsv"
+systemctl list-unit-files --no-pager \
+  > "${MANIFEST_ROOT}/system-units.txt"
+systemctl --user list-unit-files --no-pager \
+  > "${MANIFEST_ROOT}/user-units.txt"
+systemctl --user list-units --all --no-pager \
+  > "${MANIFEST_ROOT}/user-unit-state.txt"
+findmnt --json > "${MANIFEST_ROOT}/mounts.json"
+lsblk --json --output-all > "${MANIFEST_ROOT}/block-devices.json"
+ip -json address show > "${MANIFEST_ROOT}/network-addresses.json"
+cp /etc/os-release "${MANIFEST_ROOT}/os-release"
+crontab -l > "${MANIFEST_ROOT}/user-crontab.txt" 2>/dev/null || :
+
+unreadable_excludes="${STATE_ROOT}/unreadable-excludes"
+find /etc /boot/firmware \
+  -xdev \
+  ! -readable \
+  -prune \
+  -print \
+  > "${unreadable_excludes}"
+
+output_file="${STATE_ROOT}/last-backup-output.jsonl"
+nice -n 15 ionice -c 3 "${RESTIC}" backup \
+  --json \
+  --host housevoice \
+  --tag housevoice-pi \
+  --one-file-system \
+  --exclude-caches \
+  --exclude-file "${EXCLUDES}" \
+  --exclude-file "${unreadable_excludes}" \
+  "${HOME}" \
+  /etc \
+  /boot/firmware \
+  > "${output_file}" 2>&1
+
+snapshot_id="$(
+  "${RESTIC}" snapshots \
+    --host housevoice \
+    --tag housevoice-pi \
+    --latest 1 \
+    --json |
+    python3 -c 'import json, sys; print(json.load(sys.stdin)[0]["id"][:8])'
+)"
+
+write_status "success" "Encrypted backup completed." "${snapshot_id}"
+trap - ERR
+echo "HouseVoice backup completed: ${snapshot_id}"

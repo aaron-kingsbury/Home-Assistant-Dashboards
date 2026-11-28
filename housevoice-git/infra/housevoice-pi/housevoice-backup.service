@@ -1,0 +1,27 @@
+[Unit]
+Description=Encrypted HouseVoice Raspberry Pi backup
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/pi/.local/bin/housevoice-backup
+Nice=15
+IOSchedulingClass=idle
+TimeoutStartSec=6h
+UMask=0077
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/pi/.cache/restic
+ReadWritePaths=/home/pi/.local/state/housevoice-backup
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=default.target
