@@ -1,0 +1,229 @@
+#!/usr/bin/with-contenv bash
+set -euo pipefail
+
+readonly DATA_DIR="/data"
+readonly REPOSITORY_ROOT="/share/housevoice-pi-backups"
+readonly REPOSITORY="${REPOSITORY_ROOT}/repository"
+readonly STATUS_FILE="${DATA_DIR}/status.json"
+readonly PASSPHRASE_FILE="${DATA_DIR}/repository-passphrase"
+readonly SERVER_CERT="${DATA_DIR}/server.crt"
+readonly SERVER_KEY="${DATA_DIR}/server.key"
+readonly NGINX_CONFIG="${DATA_DIR}/nginx.conf"
+
+max_repository_gib="$(jq -r '.max_repository_gib // 30' /data/options.json)"
+minimum_free_gib="$(jq -r '.minimum_free_gib // 100' /data/options.json)"
+readonly max_repository_gib
+readonly minimum_free_gib
+readonly max_repository_bytes="$((max_repository_gib * 1024 * 1024 * 1024))"
+readonly minimum_free_bytes="$((minimum_free_gib * 1024 * 1024 * 1024))"
+
+install -d -m 0700 "${REPOSITORY_ROOT}" "${REPOSITORY}" "${DATA_DIR}/markers"
+
+if [[ ! -s "${PASSPHRASE_FILE}" ]]; then
+  umask 077
+  openssl rand -base64 48 > "${PASSPHRASE_FILE}"
+fi
+chmod 0600 "${PASSPHRASE_FILE}"
+
+if [[ ! -s "${SERVER_CERT}" || ! -s "${SERVER_KEY}" ]]; then
+  umask 077
+  openssl req \
+    -x509 \
+    -newkey rsa:3072 \
+    -nodes \
+    -days 3650 \
+    -keyout "${SERVER_KEY}" \
+    -out "${SERVER_CERT}" \
+    -subj "/CN=housevoice-restic-receiver" \
+    -addext "subjectAltName=IP:192.168.50.10,DNS:homeassistant.local" \
+    -addext "keyUsage=critical,digitalSignature,keyEncipherment" \
+    -addext "extendedKeyUsage=serverAuth"
+fi
+chmod 0600 "${SERVER_KEY}"
+chmod 0644 "${SERVER_CERT}"
+
+cat > "${NGINX_CONFIG}" <<EOF
+worker_processes 1;
+pid /tmp/nginx.pid;
+error_log /dev/stderr warn;
+
+events {
+  worker_connections 128;
+}
+
+http {
+  access_log /dev/stdout combined;
+  client_max_body_size 0;
+  proxy_request_buffering off;
+  proxy_buffering off;
+
+  server {
+    listen 8443 ssl;
+    ssl_certificate ${SERVER_CERT};
+    ssl_certificate_key ${SERVER_KEY};
+    ssl_client_certificate /etc/housevoice/client-ca.crt;
+    ssl_verify_client on;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    allow 192.168.50.0/24;
+    allow 172.16.0.0/12;
+    deny all;
+
+    location = /bootstrap/repository-passphrase {
+      alias ${PASSPHRASE_FILE};
+      default_type text/plain;
+    }
+
+    location /repo/ {
+      proxy_pass http://127.0.0.1:8001/;
+      proxy_http_version 1.1;
+      proxy_set_header Host \$host;
+    }
+  }
+
+  server {
+    listen 8444 ssl;
+    ssl_certificate ${SERVER_CERT};
+    ssl_certificate_key ${SERVER_KEY};
+    ssl_protocols TLSv1.2 TLSv1.3;
+    allow 192.168.50.0/24;
+    allow 172.16.0.0/12;
+    deny all;
+
+    location = /health {
+      default_type text/plain;
+      return 200 "ok\n";
+    }
+
+    location = /server-ca.crt {
+      alias ${SERVER_CERT};
+      default_type application/x-pem-file;
+    }
+
+    location = /status.json {
+      alias ${STATUS_FILE};
+      default_type application/json;
+      add_header Cache-Control "no-store";
+    }
+  }
+}
+EOF
+
+export RESTIC_REPOSITORY="${REPOSITORY}"
+export RESTIC_PASSWORD_FILE="${PASSPHRASE_FILE}"
+
+update_status() {
+  local now repository_bytes available_bytes snapshot_count last_snapshot
+  local integrity_status integrity_time backup_allowed
+
+  now="$(date --iso-8601=seconds)"
+  repository_bytes="$(du -sb "${REPOSITORY}" 2>/dev/null | awk '{print $1}')"
+  available_bytes="$(df -B1 --output=avail /share | tail -n 1 | tr -d ' ')"
+  snapshot_count=0
+  last_snapshot=""
+
+  if [[ -f "${REPOSITORY}/config" ]]; then
+    snapshots="$(restic snapshots --json 2>/dev/null || printf '[]')"
+    snapshot_count="$(jq 'length' <<<"${snapshots}")"
+    last_snapshot="$(jq -r 'sort_by(.time) | last | .time // ""' <<<"${snapshots}")"
+  fi
+
+  integrity_status="$(cat "${DATA_DIR}/last-integrity-status" 2>/dev/null || printf 'never')"
+  integrity_time="$(cat "${DATA_DIR}/last-integrity-time" 2>/dev/null || true)"
+  backup_allowed=true
+  if (( repository_bytes >= max_repository_bytes || available_bytes < minimum_free_bytes )); then
+    backup_allowed=false
+  fi
+
+  jq -n \
+    --arg updated_at "${now}" \
+    --arg last_snapshot "${last_snapshot}" \
+    --arg integrity_status "${integrity_status}" \
+    --arg integrity_time "${integrity_time}" \
+    --argjson snapshot_count "${snapshot_count}" \
+    --argjson repository_bytes "${repository_bytes}" \
+    --argjson max_repository_bytes "${max_repository_bytes}" \
+    --argjson available_bytes "${available_bytes}" \
+    --argjson minimum_free_bytes "${minimum_free_bytes}" \
+    --argjson backup_allowed "${backup_allowed}" \
+    '{
+      updated_at: $updated_at,
+      last_snapshot: $last_snapshot,
+      snapshot_count: $snapshot_count,
+      repository_bytes: $repository_bytes,
+      max_repository_bytes: $max_repository_bytes,
+      available_bytes: $available_bytes,
+      minimum_free_bytes: $minimum_free_bytes,
+      backup_allowed: $backup_allowed,
+      integrity_status: $integrity_status,
+      integrity_time: $integrity_time
+    }' > "${STATUS_FILE}.tmp"
+  mv "${STATUS_FILE}.tmp" "${STATUS_FILE}"
+}
+
+run_maintenance() {
+  [[ -f "${REPOSITORY}/config" ]] || return 0
+
+  local week month
+  week="$(date +%G-%V)"
+  month="$(date +%Y-%m)"
+
+  if [[ "$(date +%u-%H)" == "7-04" && ! -e "${DATA_DIR}/markers/week-${week}" ]]; then
+    if nice -n 15 ionice -c 3 restic forget \
+      --keep-daily 14 \
+      --keep-weekly 8 \
+      --keep-monthly 6 \
+      --prune &&
+      nice -n 15 ionice -c 3 restic check; then
+      printf 'ok' > "${DATA_DIR}/last-integrity-status"
+    else
+      printf 'failed' > "${DATA_DIR}/last-integrity-status"
+    fi
+    date --iso-8601=seconds > "${DATA_DIR}/last-integrity-time"
+    touch "${DATA_DIR}/markers/week-${week}"
+  fi
+
+  if [[ "$(date +%d-%H)" == "01-05" && ! -e "${DATA_DIR}/markers/month-${month}" ]]; then
+    if nice -n 15 ionice -c 3 restic check --read-data; then
+      printf 'ok-full' > "${DATA_DIR}/last-integrity-status"
+    else
+      printf 'failed-full' > "${DATA_DIR}/last-integrity-status"
+    fi
+    date --iso-8601=seconds > "${DATA_DIR}/last-integrity-time"
+    touch "${DATA_DIR}/markers/month-${month}"
+  fi
+}
+
+maintenance_loop() {
+  while true; do
+    run_maintenance || true
+    update_status || true
+    sleep 300
+  done
+}
+
+update_status
+fingerprint="$(openssl x509 -in "${SERVER_CERT}" -noout -fingerprint -sha256 | cut -d= -f2)"
+echo "HouseVoice Restic receiver certificate SHA-256: ${fingerprint}"
+
+/usr/local/bin/rest-server \
+  --append-only \
+  --no-auth \
+  --listen 127.0.0.1:8001 \
+  --path "${REPOSITORY}" \
+  --max-size "${max_repository_bytes}" &
+rest_server_pid=$!
+
+maintenance_loop &
+maintenance_pid=$!
+
+nginx -c "${NGINX_CONFIG}" -g "daemon off;" &
+nginx_pid=$!
+
+cleanup() {
+  kill "${rest_server_pid}" "${maintenance_pid}" "${nginx_pid}" 2>/dev/null || true
+  wait "${rest_server_pid}" "${maintenance_pid}" "${nginx_pid}" 2>/dev/null || true
+}
+trap cleanup EXIT INT TERM
+
+wait -n "${rest_server_pid}" "${maintenance_pid}" "${nginx_pid}"
+exit 1

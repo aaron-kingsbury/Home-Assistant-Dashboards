@@ -1,0 +1,25 @@
+name: "HouseVoice Restic Receiver"
+version: "1.0.0"
+slug: "housevoice_rest_server"
+description: "Restricted append-only Restic receiver for Raspberry Pi disaster recovery"
+url: "https://github.com/aaron-kingsbury/Home-Assistant-Dashboards"
+arch:
+  - amd64
+startup: services
+boot: auto
+init: false
+map:
+  - type: share
+    read_only: false
+ports:
+  8443/tcp: 8443
+  8444/tcp: 8444
+ports_description:
+  8443/tcp: "Mutual-TLS Restic receiver"
+  8444/tcp: "Read-only health and status"
+options:
+  max_repository_gib: 30
+  minimum_free_gib: 100
+schema:
+  max_repository_gib: "int(10,200)"
+  minimum_free_gib: "int(50,400)"
